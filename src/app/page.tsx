@@ -1,4 +1,5 @@
 import Carousel from "@/components/Carousel"
+import Galery from "@/components/Galery"
 import Navbar from "@/components/NavBar"
 
 export default async function HomePage() {
@@ -6,6 +7,7 @@ export default async function HomePage() {
         <>
             <Navbar/>
             <Carousel/>
+            <Galery/>
         </>
     )
 }

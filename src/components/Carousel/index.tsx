@@ -90,7 +90,6 @@ const Carousel: React.FC<CarouselProps> = ({ slides }) => {
   );
 };
 
-// COMPONENTE: CarouselExample (demonstração de uso)
 const CarouselExample: React.FC = () => {
   const slides: Slide[] = [
     { src: img1, alt: "Imagem 1"},
