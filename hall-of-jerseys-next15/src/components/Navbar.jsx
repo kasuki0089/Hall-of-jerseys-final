@@ -10,7 +10,12 @@ export default function Navbar() {
       <Link href='/produtos'>Produtos</Link>
       {!session && <Link href='/login'>Login</Link>}
       {session && <><Link href='/perfil'>Perfil</Link><button onClick={()=>signOut()}>Sair</button></>}
-      {session?.user?.role === 'admin' && <Link href='/admin'>Admin</Link>}
+      {session?.user?.role === 'admin' && (
+        <>
+          <Link href='/admin'>Admin</Link>
+          <Link href='/admin/produtos'>Gerenciar Produtos</Link>
+        </>
+      )}
     </nav>
   );
 }
