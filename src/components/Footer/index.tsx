@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import logomarca from "@/public/images/logomarca-without-background.jpeg";
+import logomarca from "@/public/images/logomarca-without-background.png";
 import React from "react";
 
 export default function Footer() {

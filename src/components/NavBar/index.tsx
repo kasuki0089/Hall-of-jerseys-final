@@ -1,25 +1,28 @@
 'use client';
 import { Search, ShoppingCart, User } from "lucide-react";
+import Link from "next/link"
 import Image from "next/image";
-import logomarca from "@/public/images/logomarca.jpeg";
+import logomarca from "@/public/images/logomarca.png";
 
 export default function Navbar() {
   return (
     <nav className="w-full bg-primary text-white py-3 shadow-md">
       <div className="max-w-8xl mx-auto px-4 flex items-center justify-between">
         <div className="flex items-center">
-          <div className="w-40 h-10 flex items-center">
-            <Image
-              src={logomarca}
-              alt="Logomarca"
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <Link href="/">
+            <div className="w-40 h-10 flex items-center">
+                <Image
+                  src={logomarca}
+                  alt="Logomarca"
+                  className="w-full h-full object-contain"
+                />
+            </div>
+          </Link>
         </div>
 
         <ul className="hidden md:flex items-center gap-7 font-light text-sm">
           <li className="hover:text-secondary cursor-pointer transition duration-500">PRODUTOS</li>
-          <li className="hover:text-secondary cursor-pointer transition duration-500">SOBRE</li>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/about">SOBRE</Link>
           <li className="hover:text-secondary cursor-pointer transition duration-500">CONTATO</li>
           <li className="hover:text-secondary cursor-pointer transition duration-500">SUPORTE</li>
         </ul>
