@@ -41,11 +41,11 @@ export default function Footer() {
               <input
                 id="footer-email"
                 type="email"
-                placeholder="Your email address..."
+                placeholder="Seu e-mail"
                 className="px-3 py-2 rounded-l-md border border-gray-300 text-sm w-64 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               <button className="bg-primary text-white px-4 py-2 rounded-r-md text-sm hover:bg-primary-dark">
-                Subscribe
+                Inscrever-se
               </button>
             </div>
           </div>
