@@ -18,7 +18,6 @@ export class JsonProductRepository implements ProductRepository {
     const jsonContent = await readFile(JSON_PRODUCTS_FILE_PATH, "utf-8");
     const parsedJson = JSON.parse(jsonContent);
 
-    // ✅ Corrigido: suporta JSON com ou sem a chave "products"
     if (Array.isArray(parsedJson)) {
       return parsedJson as ProductModel[];
     }
@@ -47,7 +46,6 @@ export class JsonProductRepository implements ProductRepository {
     return product;
   }
 
-  // ✅ Retorna os 5 primeiros produtos
   async findFirstSeven(): Promise<ProductModel[]> {
     await this.simulateWait();
 
