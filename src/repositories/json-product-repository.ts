@@ -52,4 +52,11 @@ export class JsonProductRepository implements ProductRepository {
     const products = await this.findAll();
     return products.slice(0, 7);
   }
+
+  async findByLigue(ligue: string): Promise<ProductModel[]> {
+    await this.simulateWait();
+
+    const products = await this.findAll();
+    return products.filter((product) => product.ligue.toLowerCase() === ligue.toLowerCase());
+  }
 }
