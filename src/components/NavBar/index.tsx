@@ -21,7 +21,7 @@ export default function Navbar() {
         </div>
 
         <ul className="hidden md:flex items-center gap-7 font-light text-sm">
-          <li className="hover:text-secondary cursor-pointer transition duration-500">PRODUTOS</li>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/produtos">PRODUTOS</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/about">SOBRE</Link>
           <li className="hover:text-secondary cursor-pointer transition duration-500">CONTATO</li>
           <li className="hover:text-secondary cursor-pointer transition duration-500">SUPORTE</li>

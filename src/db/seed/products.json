@@ -3,7 +3,7 @@
     "id": "1",
     "name": "Chicago Bulls - Michael Jordan #23",
     "price": "R$ 499,90",
-    "coverImageUrl": "src/public/images/prodImages/jordan_bulls_23_1996.jpg",
+    "coverImageUrl": "/images/prodImages/jordan_bulls_23_1996.jpg",
     "size": [
       "PP",
       "P",
@@ -24,7 +24,7 @@
     "id": "2",
     "name": "Los Angeles Lakers - LeBron James #6",
     "price": "R$ 549,90",
-    "coverImageUrl": "src/public/images/prodImages/lebron_lakers_6_2024.jpg",
+    "coverImageUrl": "/images/prodImages/lebron_lakers_6_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -45,7 +45,7 @@
     "id": "3",
     "name": "Golden State Warriors - Stephen Curry #30",
     "price": "R$ 529,90",
-    "coverImageUrl": "src/public/images/prodImages/curry_30_2024.jpg",
+    "coverImageUrl": "/images/prodImages/curry_30_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -66,7 +66,7 @@
     "id": "4",
     "name": "New York Rangers - Wayne Gretzky #99",
     "price": "R$ 599,90",
-    "coverImageUrl": "src/public/images/prodImages/gretzky_99_1996.jpg",
+    "coverImageUrl": "/images/prodImages/gretzky_99_1996.jpg",
     "size": [
       "PP",
       "P",
@@ -87,7 +87,7 @@
     "id": "5",
     "name": "Chicago Blackhawks - Patrick Kane #88",
     "price": "R$ 579,90",
-    "coverImageUrl": "src/public/images/prodImages/kane_88_2023.jpg",
+    "coverImageUrl": "/images/prodImages/kane_88_2023.jpg",
     "size": [
       "PP",
       "P",
@@ -108,7 +108,7 @@
     "id": "6",
     "name": "Pittsburgh Penguins - Sidney Crosby #87",
     "price": "R$ 599,90",
-    "coverImageUrl": "src/public/images/prodImages/corsby_87_2024.jpg",
+    "coverImageUrl": "/images/prodImages/corsby_87_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -129,7 +129,7 @@
     "id": "7",
     "name": "Kansas City Chiefs - Patrick Mahomes #15",
     "price": "R$ 649,90",
-    "coverImageUrl": "src/public/images/prodImages/mahomes_15_2024.jpg",
+    "coverImageUrl": "/images/prodImages/mahomes_15_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -150,7 +150,7 @@
     "id": "8",
     "name": "Dallas Cowboys - Dak Prescott #4",
     "price": "R$ 599,90",
-    "coverImageUrl": "src/public/images/prodImages/prescott_4_2023.jpg",
+    "coverImageUrl": "/images/prodImages/prescott_4_2023.jpg",
     "size": [
       "PP",
       "P",
@@ -171,7 +171,7 @@
     "id": "9",
     "name": "New England Patriots - Tom Brady #12",
     "price": "R$ 679,90",
-    "coverImageUrl": "src/public/images/prodImages/brady_12_2019.jpg",
+    "coverImageUrl": "/images/prodImages/brady_12_2019.jpg",
     "size": [
       "PP",
       "P",
@@ -192,7 +192,7 @@
     "id": "10",
     "name": "LA Galaxy - Zlatan Ibrahimović #9",
     "price": "R$ 449,90",
-    "coverImageUrl": "src/public/images/prodImages/zlatan_9_2019.jpg",
+    "coverImageUrl": "/images/prodImages/zlatan_9_2019.jpg",
     "size": [
       "PP",
       "P",
@@ -213,7 +213,7 @@
     "id": "11",
     "name": "Inter Miami - Lionel Messi #10",
     "price": "R$ 699,90",
-    "coverImageUrl": "src/public/images/prodImages/messi_intermiami_10_2024.jpg",
+    "coverImageUrl": "/images/prodImages/messi_intermiami_10_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -234,7 +234,7 @@
     "id": "12",
     "name": "Atlanta United - Josef Martínez #7",
     "price": "R$ 479,90",
-    "coverImageUrl": "src/public/images/prodImages/j_martinez_7_2020.jpg",
+    "coverImageUrl": "/images/prodImages/j_martinez_7_2020.jpg",
     "size": [
       "PP",
       "P",
@@ -255,7 +255,7 @@
     "id": "13",
     "name": "Seattle Sounders FC - Jordan Morris #13",
     "price": "R$ 489,90",
-    "coverImageUrl": "src/public/images/prodImages/morris_seattle_13_2024.jpg",
+    "coverImageUrl": "/images/prodImages/morris_seattle_13_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -276,7 +276,7 @@
     "id": "14",
     "name": "Toronto FC - Lorenzo Insigne #24",
     "price": "R$ 459,90",
-    "coverImageUrl": "src/public/images/prodImages/insigne_toronto_24_2023.jpg",
+    "coverImageUrl": "/images/prodImages/insigne_toronto_24_2023.jpg",
     "size": [
       "PP",
       "P",
@@ -297,7 +297,7 @@
     "id": "15",
     "name": "Philadelphia Eagles - Jalen Hurts #1",
     "price": "R$ 699,90",
-    "coverImageUrl": "src/public/images/prodImages/hurts_eagles_1_2024.jpg",
+    "coverImageUrl": "/images/prodImages/hurts_eagles_1_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -318,7 +318,7 @@
     "id": "16",
     "name": "San Francisco 49ers - Christian McCaffrey #23",
     "price": "R$ 649,90",
-    "coverImageUrl": "src/public/images/prodImages/mccaffrey_49ers_23_2024.jpg",
+    "coverImageUrl": "/images/prodImages/mccaffrey_49ers_23_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -339,7 +339,7 @@
     "id": "17",
     "name": "Buffalo Bills - Josh Allen #17",
     "price": "R$ 719,90",
-    "coverImageUrl": "src/public/images/prodImages/allen_bills_17_2024.jpg",
+    "coverImageUrl": "/images/prodImages/allen_bills_17_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -360,7 +360,7 @@
     "id": "18",
     "name": "Toronto Maple Leafs - Auston Matthews #34",
     "price": "R$ 529,90",
-    "coverImageUrl": "src/public/images/prodImages/matthews_leafs_34_2024.jpg",
+    "coverImageUrl": "/images/prodImages/matthews_leafs_34_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -381,7 +381,7 @@
     "id": "19",
     "name": "Colorado Avalanche - Nathan MacKinnon #29",
     "price": "R$ 549,90",
-    "coverImageUrl": "src/public/images/prodImages/mackinnon_avalanche_29_2024.jpg",
+    "coverImageUrl": "/images/prodImages/mackinnon_avalanche_29_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -402,7 +402,7 @@
     "id": "20",
     "name": "Dallas Stars - Tyler Seguin #91",
     "price": "R$ 519,90",
-    "coverImageUrl": "src/public/images/prodImages/seguin_stars_91_2024.jpg",
+    "coverImageUrl": "/images/prodImages/seguin_stars_91_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -423,7 +423,7 @@
     "id": "21",
     "name": "LA Galaxy - Chicharito #14",
     "price": "R$ 469,90",
-    "coverImageUrl": "src/public/images/prodImages/chicharito_lagalaxy_14_2023.jpg",
+    "coverImageUrl": "/images/prodImages/chicharito_lagalaxy_14_2023.jpg",
     "size": [
       "PP",
       "P",
@@ -444,7 +444,7 @@
     "id": "22",
     "name": "Orlando City SC - Ercan Kara #9",
     "price": "R$ 459,90",
-    "coverImageUrl": "src/public/images/prodImages/kara_orlando_9_2023.jpg",
+    "coverImageUrl": "/images/prodImages/kara_orlando_9_2023.jpg",
     "size": [
       "PP",
       "P",
@@ -465,7 +465,7 @@
     "id": "23",
     "name": "New York Jets - Aaron Rodgers #8",
     "price": "R$ 629,90",
-    "coverImageUrl": "src/public/images/prodImages/rodgers_jets_8_2024.jpg",
+    "coverImageUrl": "/images/prodImages/rodgers_jets_8_2024.jpg",
     "size": [
       "PP",
       "P",
@@ -486,7 +486,7 @@
     "id": "24",
     "name": "Las Vegas Raiders - Derek Carr #4",
     "price": "R$ 599,90",
-    "coverImageUrl": "src/public/images/prodImages/carr_raiders_4_2024.jpg",
+    "coverImageUrl": "/images/prodImages/carr_raiders_4_2024.jpg",
     "size": [
       "PP",
       "P",
