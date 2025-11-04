@@ -4,6 +4,7 @@ import { ProductModel } from "@/models/product/product-model";
 import Link from "next/link";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
+import { ShoppingCart } from "lucide-react";
 
 type ProductPageProps = {
   params: {
@@ -60,7 +61,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     product.size.map((size) => (
                       <button
                         key={size}
-                        className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors"
+                        className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
                       >
                         {size}
                       </button>
@@ -78,8 +79,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="text-sm text-gray-600">ou 3x de R$ 100,00</p>
               </div>
 
-              <button className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                🛒 COMPRAR
+              <button className="w-full flex justify-center items-center bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer">
+                <ShoppingCart color="#ffffff" size={20} className="mr-3"/>COMPRAR
               </button>
             </div>
           </div>

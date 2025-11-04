@@ -10,7 +10,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link href={`/produtos/${product.id}`}>
       <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-        <div className="aspect-square bg-gray-200 rounded-t-lg mb-4 relative overflow-hidden">
+        <div className="aspect-square bg-gray-200 rounded-t-lg relative overflow-hidden">
           <Image
             src={product.coverImageUrl}
             alt={product.name}
@@ -20,9 +20,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           />
         </div>
         <div className="p-4">
-          <h3 className="font-semibold text-gray-800 mb-2 text-sm">#{product.code}</h3>
-          <p className="text-xs text-gray-600 mb-1">{product.name}</p>
-          <p className="text-xs text-gray-600 mb-1">Esportivo / {product.sport}</p>
+          <p className="text-[1.005rem] font-bold text-gray-600 mb-1">{product.name}</p>
+          <p className="text-gray-600 mb-1">{product.sport}</p>
           <p className="text-xs text-gray-600 mb-2">Original</p>
           <p className="font-bold text-gray-800">{product.price}</p>
         </div>
