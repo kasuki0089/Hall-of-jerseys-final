@@ -10,7 +10,7 @@ export default function Navbar() {
       <div className="max-w-8xl mx-auto px-4 flex items-center justify-between">
         <div className="flex items-center">
           <Link href="/">
-            <div className="w-40 h-10 flex items-center">
+            <div className="w-32 md:w-40 h-8 md:h-10 flex items-center">
                 <Image
                   src={logomarca}
                   alt="Logomarca"
@@ -24,15 +24,17 @@ export default function Navbar() {
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/produtos">PRODUTOS</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/about">SOBRE</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/contact">CONTATO</Link>
-          <li className="hover:text-secondary cursor-pointer transition duration-500">SUPORTE</li>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/suporte">SUPORTE</Link>
         </ul>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
           <Search className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
           <ShoppingCart className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
-          <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-500">
-            <User className="w-4 h-4 text-secondary" />
-          </div>
+          <Link href="/login">
+            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-500">
+              <User className="w-4 h-4 text-secondary" />
+            </div>
+          </Link>
         </div>
       </div>
     </nav>
