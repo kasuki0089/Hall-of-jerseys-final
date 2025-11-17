@@ -71,10 +71,10 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             <button
               key={league.id}
               onClick={() => handleFilterChange(league.id)}
-              className={`px-4 py-2 border rounded hover:bg-gray-100 transition-colors ${
+              className={`px-4 py-2 border rounded hover:cursor-pointer transition-colors duration-200 ${
                 activeFilter === league.id 
-                  ? "bg-blue-600 text-white border-blue-600" 
-                  : "border-gray-300"
+                  ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700" 
+                  : "border-gray-300 hover:bg-gray-100"
               }`}
             >
               {league.name}

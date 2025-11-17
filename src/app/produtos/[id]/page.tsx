@@ -61,13 +61,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     product.size.map((size) => (
                       <button
                         key={size}
-                        className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                        className="w-12 h-12 bg-gray-200 border border-gray-200 hover:bg-gray-300 hover:border-gray-300 transition-colors cursor-pointer duration-300 shadow-md"
                       >
                         {size}
                       </button>
                     ))
                   ) : (
-                    <button className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors">
+                    <button className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors duration-300">
                       {product.size}
                     </button>
                   )}
