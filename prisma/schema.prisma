@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String   @unique
+  senha     String
+  role      String   @default("cliente")
+  pedidos   Pedido[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Produto {
+  id          Int          @id @default(autoincrement())
+  nome        String
+  descricao   String       @db.Text
+  preco       Float
+  estoque     Int
+  liga        String       // NBA, NFL, MLB, etc
+  time        String       // Lakers, Warriors, etc
+  tamanho     String       // P, M, G, GG, XGG
+  categoria   String       @default("Jersey") // Jersey, Camisa Treino, Edição Especial
+  imagemUrl   String?      @db.Text
+  sku         String?      @unique
+  ativo       Boolean      @default(true)
+  itens       ItemPedido[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([liga])
+  @@index([time])
+  @@index([ativo])
+}
+
+model Pedido {
+  id        Int          @id @default(autoincrement())
+  usuarioId Int
+  usuario   Usuario      @relation(fields: [usuarioId], references: [id])
+  status    String       @default("pendente") // pendente, pago, enviado, entregue, cancelado
+  total     Float        @default(0)
+  itens     ItemPedido[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model ItemPedido {
+  id         Int      @id @default(autoincrement())
+  pedidoId   Int
+  produtoId  Int
+  quantidade Int
+  precoUnit  Float    // Preço no momento da compra
+  subtotal   Float    // quantidade * precoUnit
+  tamanho    String   // Tamanho escolhido
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  produto    Produto  @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  createdAt  DateTime @default(now())
+
+  @@index([pedidoId])
+  @@index([produtoId])
+}
