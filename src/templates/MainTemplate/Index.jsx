@@ -1,3 +1,4 @@
+import Footer from "../../components/Footer";
 import Navbar from "../../components/Navbar";
 
 export default function MainTemplate({ children }) {
@@ -7,6 +8,7 @@ export default function MainTemplate({ children }) {
       <main>
         {children}
       </main>
+      <Footer />
     </>
   );
 }

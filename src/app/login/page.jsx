@@ -1,14 +1,14 @@
-"use client";
-
-import { useState } from "react";
-import { signIn, getSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+'use client';
+import { User, Lock } from "lucide-react";
 import Link from "next/link";
-import MainTemplate from "../../templates/MainTemplate/Index.jsx";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -20,103 +20,113 @@ export default function LoginPage() {
 
     try {
       const result = await signIn("credentials", {
-        email,
-        senha,
         redirect: false,
+        email,
+        senha: password,
       });
 
       if (result?.error) {
-        setError("Email ou senha incorretos");
+        setError("Email ou senha inválidos");
       } else {
-        const session = await getSession();
-        if (session?.user?.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/");
-        }
+        router.push("/");
       }
-    } catch (error) {
-      setError("Erro ao fazer login");
+    } catch (err) {
+      setError("Erro interno do servidor");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <MainTemplate>
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-              Faça login em sua conta
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Ou{" "}
-              <Link href="/cadastro" className="font-medium text-blue-600 hover:text-blue-500">
-                crie uma conta nova
-              </Link>
-            </p>
-          </div>
-          
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
+    <div className="min-h-screen w-full flex items-center justify-center p-4 relative bg-gradient-to-br from-primary to-primary-dark">
+      
+      <div className="w-full max-w-6xl min-h-[500px] md:h-[600px] flex flex-col lg:flex-row rounded-2xl overflow-hidden shadow-2xl">
+        
+        {/* Seção Esquerda - Texto de Boas-vindas */}
+        <div className="hidden lg:flex lg:w-[65%] bg-gradient-to-br from-primary-light to-primary text-white flex-col justify-center px-14 relative">
+          <h1 className="text-5xl xl:text-6xl font-bold leading-tight mb-6 relative z-10">
+            Bem vindo de volta!
+          </h1>
+          <p className="text-xl xl:text-2xl leading-relaxed w-[85%] relative z-10">
+            Você pode fazer login para acessar com a sua conta existente.
+          </p>
+        </div>
+
+        {/* Seção Direita - Formulário de Login */}
+        <div className="w-full lg:w-[35%] bg-white flex flex-col justify-center px-8 md:px-12 py-12">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-10 text-gray-800">
+            Entrar
+          </h2>
+
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Input E-mail */}
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full h-14 pl-12 pr-4 border-2 border-gray-300 rounded-2xl text-gray-700 placeholder-gray-400 text-lg outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            {/* Input Senha */}
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full h-14 pl-12 pr-4 border-2 border-gray-300 rounded-2xl text-gray-700 placeholder-gray-400 text-lg outline-none focus:border-primary transition-colors"
+              />
+            </div>
+
+            {/* Lembrar-me e Esqueceu a senha */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 text-sm">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Digite seu email"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 accent-secondary cursor-pointer"
                 />
-              </div>
+                <span className="text-gray-700">Lembrar-me</span>
+              </label>
               
-              <div>
-                <label htmlFor="senha" className="block text-sm font-medium text-gray-700">
-                  Senha
-                </label>
-                <input
-                  id="senha"
-                  name="senha"
-                  type="password"
-                  required
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                  placeholder="Digite sua senha"
-                />
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Entrando..." : "Entrar"}
-              </button>
-            </div>
-
-            <div className="text-center">
-              <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-500">
+              <Link href="/recuperar-senha" className="text-gray-700 hover:text-primary transition-colors">
                 Esqueceu sua senha?
+              </Link>
+            </div>
+
+            {/* Botão Entrar */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 md:h-14 bg-secondary hover:bg-secondary-dark text-white rounded-2xl text-xl md:text-2xl font-semibold tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] mt-6 md:mt-8 disabled:opacity-50"
+            >
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+
+            {/* Link para Cadastro */}
+            <div className="text-center text-sm text-gray-700 mt-4">
+              Novo aqui?&nbsp;
+              <Link href="/cadastro" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                Crie uma conta
               </Link>
             </div>
           </form>
         </div>
       </div>
-    </MainTemplate>
+    </div>
   );
 }

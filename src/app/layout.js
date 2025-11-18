@@ -1,15 +1,21 @@
-import NextAuthProvider from "../providers/NextAuthProvider";
+import { Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import NextAuthProvider from '../providers/NextAuthProvider';
+
+const spaceGrotesk = Space_Grotesk({ 
+  subsets: ["latin"], 
+  weight: ["400", "700"] 
+});
 
 export const metadata = {
-  title: "Hall of Jerseys",
-  description: "Loja de jerseys esportivos americanos",
+  title: "Hall OF Jerseys",
+  description: "Hall of Jerseys - Sua loja de jerseys esportivos americanos",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={spaceGrotesk.className}>
         <NextAuthProvider>
           {children}
         </NextAuthProvider>

@@ -31,201 +31,200 @@ export default function Produtos() {
       queryParams.append('pagina', paginacao.pagina);
       queryParams.append('limite', '12');
 
-      const res = await fetch(`/api/produtos?${queryParams}`);
-      const data = await res.json();
+      const response = await fetch(`/api/produtos?${queryParams}`);
+      const data = await response.json();
       
       setProdutos(data.produtos || []);
-      setPaginacao(prev => ({ 
-        ...prev, 
-        totalPaginas: data.paginacao?.totalPaginas || 1 
+      setPaginacao(prev => ({
+        ...prev,
+        totalPaginas: data.paginacao?.totalPaginas || 1
       }));
     } catch (error) {
       console.error('Erro ao carregar produtos:', error);
+      setProdutos([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleFiltrar = () => {
+  const handleFiltroChange = (campo, valor) => {
+    setFiltros(prev => ({ ...prev, [campo]: valor }));
     setPaginacao(prev => ({ ...prev, pagina: 1 }));
-    carregarProdutos();
   };
 
   const limparFiltros = () => {
-    setFiltros({ liga: '', time: '', busca: '', precoMin: '', precoMax: '' });
+    setFiltros({
+      liga: '',
+      time: '',
+      busca: '',
+      precoMin: '',
+      precoMax: ''
+    });
     setPaginacao(prev => ({ ...prev, pagina: 1 }));
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Hall of Jerseys</h1>
-          <p className="text-xl">As melhores camisas de NBA, NFL e MLB</p>
-        </div>
-      </div>
+  const trocarPagina = (novaPagina) => {
+    setPaginacao(prev => ({ ...prev, pagina: novaPagina }));
+  };
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Filtros */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold mb-4">Filtros</h2>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Produtos</h1>
+
+      {/* Filtros */}
+      <div className="bg-gray-100 p-6 rounded-lg mb-6">
+        <h2 className="text-xl font-semibold mb-4">Filtros</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">Buscar</label>
             <input
               type="text"
-              placeholder="Buscar produto..."
+              placeholder="Nome do produto..."
               value={filtros.busca}
-              onChange={(e) => setFiltros({ ...filtros, busca: e.target.value })}
-              className="border rounded px-3 py-2"
+              onChange={(e) => handleFiltroChange('busca', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium mb-2">Liga</label>
             <select
               value={filtros.liga}
-              onChange={(e) => setFiltros({ ...filtros, liga: e.target.value })}
-              className="border rounded px-3 py-2"
+              onChange={(e) => handleFiltroChange('liga', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Todas as Ligas</option>
+              <option value="">Todas as ligas</option>
               <option value="NBA">NBA</option>
               <option value="NFL">NFL</option>
               <option value="MLB">MLB</option>
+              <option value="NHL">NHL</option>
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Time</label>
+            <input
+              type="text"
+              placeholder="Nome do time..."
+              value={filtros.time}
+              onChange={(e) => handleFiltroChange('time', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Preço Mín.</label>
             <input
               type="number"
-              placeholder="Preço mín"
+              placeholder="R$ 0,00"
               value={filtros.precoMin}
-              onChange={(e) => setFiltros({ ...filtros, precoMin: e.target.value })}
-              className="border rounded px-3 py-2"
+              onChange={(e) => handleFiltroChange('precoMin', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">Preço Máx.</label>
             <input
               type="number"
-              placeholder="Preço máx"
+              placeholder="R$ 999,99"
               value={filtros.precoMax}
-              onChange={(e) => setFiltros({ ...filtros, precoMax: e.target.value })}
-              className="border rounded px-3 py-2"
+              onChange={(e) => handleFiltroChange('precoMax', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <div className="flex gap-2">
-              <button
-                onClick={handleFiltrar}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 flex-1"
-              >
-                Filtrar
-              </button>
-              <button
-                onClick={limparFiltros}
-                className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-              >
-                Limpar
-              </button>
-            </div>
           </div>
         </div>
+        
+        <div className="mt-4">
+          <button
+            onClick={limparFiltros}
+            className="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700"
+          >
+            Limpar Filtros
+          </button>
+        </div>
+      </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Carregando produtos...</p>
-          </div>
-        )}
+      {/* Loading */}
+      {loading && (
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-gray-600">Carregando produtos...</p>
+        </div>
+      )}
 
-        {/* Grid de Produtos */}
-        {!loading && produtos.length > 0 && (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-              {produtos.map((produto) => (
-                <Link 
-                  href={`/produtos/${produto.id}`} 
-                  key={produto.id}
-                  className="bg-white rounded-lg shadow hover:shadow-xl transition-shadow overflow-hidden group"
-                >
-                  <div className="relative h-64 bg-gray-200 overflow-hidden">
-                    {produto.imagemUrl ? (
+      {/* Lista de Produtos */}
+      {!loading && (
+        <div>
+          {produtos.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 text-lg">Nenhum produto encontrado.</p>
+            </div>
+          ) : (
+            <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                {produtos.map((produto) => (
+                  <div key={produto.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    {produto.imagemUrl && (
                       <img
                         src={produto.imagemUrl}
                         alt={produto.nome}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-48 object-cover"
                       />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-gray-400">
-                        <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
                     )}
-                    <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">
-                      {produto.liga}
-                    </div>
-                    {produto.estoque <= 5 && (
-                      <div className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">
-                        Últimas unidades!
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2">{produto.nome}</h3>
+                      <p className="text-sm text-gray-600 mb-2">{produto.liga} - {produto.time}</p>
+                      <p className="text-sm text-gray-500 mb-3 line-clamp-2">{produto.descricao}</p>
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-xl font-bold text-green-600">
+                          R$ {produto.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          Estoque: {produto.estoque}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-lg mb-1 text-gray-900 line-clamp-2 group-hover:text-blue-600">
-                      {produto.nome}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-2">{produto.time}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-blue-600">
-                        R$ {produto.preco.toFixed(2)}
-                      </span>
-                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                        Tam. {produto.tamanho}
-                      </span>
-                    </div>
-                    <div className="mt-3 text-sm text-gray-600">
-                      <span className={produto.estoque > 0 ? 'text-green-600' : 'text-red-600'}>
-                        {produto.estoque > 0 ? `${produto.estoque} em estoque` : 'Esgotado'}
-                      </span>
+                      <div className="flex gap-2">
+                        <Link
+                          href={`/produtos/${produto.id}`}
+                          className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+                        >
+                          Ver Detalhes
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Paginação */}
-            {paginacao.totalPaginas > 1 && (
-              <div className="flex justify-center gap-2">
-                <button
-                  onClick={() => setPaginacao(prev => ({ ...prev, pagina: Math.max(1, prev.pagina - 1) }))}
-                  disabled={paginacao.pagina === 1}
-                  className="px-4 py-2 bg-white border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                >
-                  Anterior
-                </button>
-                <span className="px-4 py-2 bg-blue-600 text-white rounded">
-                  {paginacao.pagina} / {paginacao.totalPaginas}
-                </span>
-                <button
-                  onClick={() => setPaginacao(prev => ({ ...prev, pagina: Math.min(paginacao.totalPaginas, prev.pagina + 1) }))}
-                  disabled={paginacao.pagina === paginacao.totalPaginas}
-                  className="px-4 py-2 bg-white border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
-                >
-                  Próxima
-                </button>
+                ))}
               </div>
-            )}
-          </>
-        )}
 
-        {/* Sem Resultados */}
-        {!loading && produtos.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Nenhum produto encontrado</h3>
-            <p className="text-gray-600 mb-4">Tente ajustar os filtros ou limpe-os para ver todos os produtos</p>
-            <button
-              onClick={limparFiltros}
-              className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            >
-              Limpar Filtros
-            </button>
-          </div>
-        )}
-      </div>
+              {/* Paginação */}
+              {paginacao.totalPaginas > 1 && (
+                <div className="flex justify-center items-center space-x-2">
+                  <button
+                    onClick={() => trocarPagina(paginacao.pagina - 1)}
+                    disabled={paginacao.pagina === 1}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Anterior
+                  </button>
+                  
+                  <span className="mx-4 text-gray-600">
+                    Página {paginacao.pagina} de {paginacao.totalPaginas}
+                  </span>
+                  
+                  <button
+                    onClick={() => trocarPagina(paginacao.pagina + 1)}
+                    disabled={paginacao.pagina === paginacao.totalPaginas}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Próxima
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

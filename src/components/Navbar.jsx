@@ -1,152 +1,75 @@
-"use client";
-
-import { useState } from "react";
+'use client';
+import { Search, ShoppingCart, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Search, ShoppingCart, User, LogOut, Settings, ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
-    <nav className="bg-blue-600 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold">
-              HALL OF JERSEYS
-            </Link>
-          </div>
-
-          {/* Menu principal */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              <Link
-                href="/produtos"
-                className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Produtos
-              </Link>
-              <Link
-                href="/sobre"
-                className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Sobre
-              </Link>
-              <Link
-                href="/contato"
-                className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
-              >
-                Contato
-              </Link>
+    <nav className="w-full bg-primary text-white py-3 shadow-md">
+      <div className="max-w-8xl mx-auto px-4 flex items-center justify-between">
+        <div className="flex items-center">
+          <Link href="/">
+            <div className="w-32 md:w-40 h-8 md:h-10 flex items-center">
+              <div className="text-2xl font-bold">HALL OF JERSEYS</div>
             </div>
-          </div>
+          </Link>
+        </div>
 
-          {/* Ações do usuário */}
-          <div className="flex items-center space-x-4">
-            {/* Busca */}
-            <button className="p-2 hover:bg-blue-700 rounded-md transition-colors">
-              <Search className="h-5 w-5" />
-            </button>
+        <ul className="hidden md:flex items-center gap-7 font-light text-sm">
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/produtos">PRODUTOS</Link>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/about">SOBRE</Link>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/contact">CONTATO</Link>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/suporte">SUPORTE</Link>
+          {session?.user?.role === 'ADMIN' && (
+            <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/admin">ADMIN</Link>
+          )}
+        </ul>
 
-            {/* Carrinho */}
-            <button className="p-2 hover:bg-blue-700 rounded-md transition-colors">
-              <ShoppingCart className="h-5 w-5" />
-            </button>
-
-            {/* Menu do usuário */}
-            {session ? (
-              <div className="relative">
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 p-2 hover:bg-blue-700 rounded-md transition-colors"
-                >
-                  <User className="h-5 w-5" />
-                  <span className="hidden md:block text-sm">
-                    {session.user.name}
-                  </span>
-                  <ChevronDown className="h-4 w-4" />
-                </button>
-
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
-                    <div className="py-1">
-                      <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                        {session.user.email}
-                      </div>
-                      
-                      <Link
-                        href="/perfil"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <User className="inline h-4 w-4 mr-2" />
-                        Meu Perfil
-                      </Link>
-
-                      <Link
-                        href="/meus-pedidos"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <ShoppingCart className="inline h-4 w-4 mr-2" />
-                        Meus Pedidos
-                      </Link>
-
-                      {session.user.role === "admin" && (
-                        <Link
-                          href="/admin"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => setIsUserMenuOpen(false)}
-                        >
-                          <Settings className="inline h-4 w-4 mr-2" />
-                          Administração
-                        </Link>
-                      )}
-
-                      <button
-                        onClick={() => {
-                          setIsUserMenuOpen(false);
-                          signOut({ callbackUrl: "/" });
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      >
-                        <LogOut className="inline h-4 w-4 mr-2" />
-                        Sair
-                      </button>
-                    </div>
+        <div className="flex items-center gap-2 md:gap-4">
+          <Search className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
+          <ShoppingCart className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
+          
+          {session ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-500"
+              >
+                <User className="w-4 h-4 text-secondary" />
+              </button>
+              
+              {showUserMenu && (
+                <div className="absolute right-0 top-10 bg-white text-gray-800 rounded-lg shadow-lg py-2 w-48 z-50">
+                  <div className="px-4 py-2 border-b text-sm">
+                    <p className="font-semibold">{session.user.nome}</p>
+                    <p className="text-gray-600">{session.user.email}</p>
                   </div>
-                )}
+                  <Link href="/perfil" className="block px-4 py-2 text-sm hover:bg-gray-100">
+                    Meu Perfil
+                  </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sair
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link href="/login">
+              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-500">
+                <User className="w-4 h-4 text-secondary" />
               </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Link
-                  href="/login"
-                  className="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Entrar
-                </Link>
-                <Link
-                  href="/cadastro"
-                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  Cadastrar
-                </Link>
-              </div>
-            )}
-          </div>
+            </Link>
+          )}
         </div>
       </div>
-
-      {/* Menu mobile overlay */}
-      {isUserMenuOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsUserMenuOpen(false)}
-        />
-      )}
     </nav>
   );
 }
