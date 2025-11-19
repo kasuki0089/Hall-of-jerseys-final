@@ -18,26 +18,59 @@ model Usuario {
   updatedAt DateTime @updatedAt
 }
 
+model Liga {
+  id     Int       @id @default(autoincrement())
+  nome   String    @unique
+  sigla  String    @unique
+  pais   String
+  ativo  Boolean   @default(true)
+  times  Time[]
+  produtos Produto[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ativo])
+}
+
+model Time {
+  id       Int       @id @default(autoincrement())
+  nome     String
+  cidade   String?
+  ligaId   Int
+  liga     Liga      @relation(fields: [ligaId], references: [id])
+  ativo    Boolean   @default(true)
+  produtos Produto[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([nome, ligaId])
+  @@index([ligaId])
+  @@index([ativo])
+}
+
 model Produto {
   id          Int          @id @default(autoincrement())
-  nome        String
-  descricao   String       @db.Text
-  preco       Float
-  estoque     Int
-  liga        String       // NBA, NFL, MLB, etc
-  time        String       // Lakers, Warriors, etc
-  tamanho     String       // P, M, G, GG, XGG
-  categoria   String       @default("Jersey") // Jersey, Camisa Treino, Edição Especial
-  imagemUrl   String?      @db.Text
-  sku         String?      @unique
-  ativo       Boolean      @default(true)
+  nome        String       // Nome do produto (ex: "Jersey Lakers #24 Kobe Bryant")
+  tamanho     String?      // P, M, G, GG, XGG
+  preco       Int          // Preço em centavos
+  codigo      Int          @unique
+  descricao   String?      
+  sale        Boolean      @default(false)
+  serie       String?      // Edição especial, retro, etc
+  categoria   String       @default("JERSEY") // JERSEY, REGATA, CAMISA, CAMISA_MANGA_LONGA
+  ligaId      Int
+  timeId      Int
+  liga        Liga         @relation(fields: [ligaId], references: [id])
+  time        Time         @relation(fields: [timeId], references: [id])
   itens       ItemPedido[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
-  @@index([liga])
-  @@index([time])
-  @@index([ativo])
+  @@index([categoria])
+  @@index([codigo])
+  @@index([ligaId])
+  @@index([timeId])
+  @@index([sale])
 }
 
 model Pedido {

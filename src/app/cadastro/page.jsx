@@ -3,6 +3,7 @@ import { User, Lock, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import MainTemplate from '../../templates/MainTemplate';
 
 export default function CadastroPage() {
   const [formData, setFormData] = useState({
@@ -63,7 +64,8 @@ export default function CadastroPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 relative bg-gradient-to-br from-secondary to-secondary-dark">
+    <MainTemplate>
+      <div className="min-h-screen w-full flex items-center justify-center p-4 relative bg-gradient-to-br from-secondary to-secondary-dark">
       
       <div className="w-full max-w-6xl min-h-[600px] md:h-[700px] flex flex-col lg:flex-row rounded-2xl overflow-hidden shadow-2xl">
         
@@ -178,6 +180,6 @@ export default function CadastroPage() {
           </form>
         </div>
       </div>
-    </div>
+    </MainTemplate>
   );
 }

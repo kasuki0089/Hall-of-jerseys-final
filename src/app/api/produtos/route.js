@@ -8,14 +8,13 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     
     // Parâmetros de filtro
-    const liga = searchParams.get('liga');
-    const time = searchParams.get('time');
     const categoria = searchParams.get('categoria');
+    const ligaId = searchParams.get('ligaId');
+    const timeId = searchParams.get('timeId');
     const tamanho = searchParams.get('tamanho');
     const busca = searchParams.get('busca');
-    const precoMin = searchParams.get('precoMin');
-    const precoMax = searchParams.get('precoMax');
-    const apenasAtivos = searchParams.get('ativo') !== 'false'; // padrão: true
+    const sale = searchParams.get('sale');
+    const serie = searchParams.get('serie');
     
     // Parâmetros de paginação
     const pagina = parseInt(searchParams.get('pagina')) || 1;
@@ -25,39 +24,38 @@ export async function GET(req) {
     // Construir condições de filtro
     const where = {};
     
-    if (apenasAtivos) {
-      where.ativo = true;
+    if (categoria && categoria !== 'todas') {
+      where.categoria = categoria.toUpperCase();
     }
     
-    if (liga) {
-      where.liga = { contains: liga, mode: 'insensitive' };
+    if (ligaId && ligaId !== 'todas') {
+      where.ligaId = parseInt(ligaId);
     }
     
-    if (time) {
-      where.time = { contains: time, mode: 'insensitive' };
-    }
-    
-    if (categoria) {
-      where.categoria = categoria;
+    if (timeId && timeId !== 'todos') {
+      where.timeId = parseInt(timeId);
     }
     
     if (tamanho) {
       where.tamanho = tamanho;
     }
     
+    if (sale === 'true') {
+      where.sale = true;
+    }
+    
+    if (serie) {
+      where.serie = { contains: serie, mode: 'insensitive' };
+    }
+    
     if (busca) {
       where.OR = [
         { nome: { contains: busca, mode: 'insensitive' } },
         { descricao: { contains: busca, mode: 'insensitive' } },
-        { liga: { contains: busca, mode: 'insensitive' } },
-        { time: { contains: busca, mode: 'insensitive' } }
+        { serie: { contains: busca, mode: 'insensitive' } },
+        { liga: { nome: { contains: busca, mode: 'insensitive' } } },
+        { time: { nome: { contains: busca, mode: 'insensitive' } } }
       ];
-    }
-    
-    if (precoMin || precoMax) {
-      where.preco = {};
-      if (precoMin) where.preco.gte = parseFloat(precoMin);
-      if (precoMax) where.preco.lte = parseFloat(precoMax);
     }
 
     // Executar consultas
@@ -66,6 +64,10 @@ export async function GET(req) {
         where,
         skip: offset,
         take: limite,
+        include: {
+          liga: true,
+          time: true
+        },
         orderBy: { createdAt: 'desc' }
       }),
       prisma.produto.count({ where })
@@ -103,47 +105,69 @@ export async function POST(req) {
       nome,
       descricao,
       preco,
-      estoque,
-      liga,
-      time,
+      codigo,
       tamanho,
+      sale,
+      serie,
       categoria,
-      imagemUrl,
-      sku
+      ligaId,
+      timeId
     } = body;
 
     // Validações básicas
-    if (!nome || !descricao || !preco || !estoque || !liga || !time || !tamanho) {
+    if (!nome || !preco || !codigo || !ligaId || !timeId) {
       return Response.json(
-        { error: 'Campos obrigatórios: nome, descricao, preco, estoque, liga, time, tamanho' },
+        { error: 'Campos obrigatórios: nome, preco, codigo, ligaId, timeId' },
         { status: 400 }
       );
     }
 
-    // Verificar se SKU já existe (se fornecido)
-    if (sku) {
-      const produtoExistente = await prisma.produto.findUnique({
-        where: { sku }
-      });
-      
-      if (produtoExistente) {
-        return Response.json({ error: 'SKU já existe' }, { status: 400 });
+    // Verificar se código já existe
+    const produtoExistente = await prisma.produto.findUnique({
+      where: { codigo: parseInt(codigo) }
+    });
+    
+    if (produtoExistente) {
+      return Response.json({ error: 'Código já existe' }, { status: 400 });
+    }
+
+    // Verificar se liga existe
+    const liga = await prisma.liga.findUnique({
+      where: { id: parseInt(ligaId) }
+    });
+    
+    if (!liga) {
+      return Response.json({ error: 'Liga não encontrada' }, { status: 400 });
+    }
+
+    // Verificar se time existe e pertence à liga
+    const time = await prisma.time.findFirst({
+      where: { 
+        id: parseInt(timeId),
+        ligaId: parseInt(ligaId)
       }
+    });
+    
+    if (!time) {
+      return Response.json({ error: 'Time não encontrado ou não pertence à liga especificada' }, { status: 400 });
     }
 
     const produto = await prisma.produto.create({
       data: {
         nome,
         descricao,
-        preco: parseFloat(preco),
-        estoque: parseInt(estoque),
-        liga,
-        time,
+        preco: parseInt(preco),
+        codigo: parseInt(codigo),
         tamanho,
-        categoria: categoria || 'Jersey',
-        imagemUrl,
-        sku,
-        ativo: true
+        sale: sale || false,
+        serie,
+        categoria: categoria || 'JERSEY',
+        ligaId: parseInt(ligaId),
+        timeId: parseInt(timeId)
+      },
+      include: {
+        liga: true,
+        time: true
       }
     });
 
@@ -152,9 +176,9 @@ export async function POST(req) {
   } catch (error) {
     console.error('Erro ao criar produto:', error);
     
-    // Erro de constraint (SKU duplicado, etc)
+    // Erro de constraint (código duplicado, etc)
     if (error.code === 'P2002') {
-      return Response.json({ error: 'SKU já existe' }, { status: 400 });
+      return Response.json({ error: 'Código já existe' }, { status: 400 });
     }
     
     return Response.json({ error: 'Erro interno do servidor' }, { status: 500 });

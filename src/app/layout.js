@@ -10,6 +10,11 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata = {
   title: "Hall OF Jerseys",
   description: "Hall of Jerseys - Sua loja de jerseys esportivos americanos",
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon-16x16.png',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({ children }) {

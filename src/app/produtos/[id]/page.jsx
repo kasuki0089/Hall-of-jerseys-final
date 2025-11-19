@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import MainTemplate from '../../../../templates/MainTemplate';
 
 export default function ProdutoDetalhes() {
   const params = useParams();
@@ -45,30 +46,35 @@ export default function ProdutoDetalhes() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Carregando produto...</p>
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600">Carregando produto...</p>
+          </div>
         </div>
-      </div>
+      </MainTemplate>
     );
   }
 
   if (!produto) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Produto não encontrado</h2>
-          <Link href="/produtos" className="text-blue-600 hover:underline">
-            Voltar para produtos
-          </Link>
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Produto não encontrado</h2>
+            <Link href="/produtos" className="text-blue-600 hover:underline">
+              Voltar para produtos
+            </Link>
+          </div>
         </div>
-      </div>
+      </MainTemplate>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <MainTemplate>
+      <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Breadcrumb */}
         <nav className="mb-6 text-sm">
@@ -240,6 +246,6 @@ export default function ProdutoDetalhes() {
           </Link>
         </div>
       </div>
-    </div>
+    </MainTemplate>
   );
 }

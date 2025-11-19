@@ -3,6 +3,7 @@ import { User, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import MainTemplate from '../../templates/MainTemplate';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -25,7 +26,6 @@ export default function LoginPage() {
       } else {
         setError("Email ou senha inválidos");
       }
-      }
     } catch (err) {
       setError("Erro interno do servidor");
     } finally {
@@ -34,7 +34,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 relative bg-gradient-to-br from-primary to-primary-dark">
+    <MainTemplate>
+      <div className="min-h-screen w-full flex items-center justify-center p-4 relative bg-gradient-to-br from-primary to-primary-dark">
       
       <div className="w-full max-w-6xl min-h-[500px] md:h-[600px] flex flex-col lg:flex-row rounded-2xl overflow-hidden shadow-2xl">
         
@@ -123,6 +124,6 @@ export default function LoginPage() {
           </form>
         </div>
       </div>
-    </div>
+    </MainTemplate>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import MainTemplate from '../../../templates/MainTemplate';
 
 export default function Produtos() {
   const [produtos, setProdutos] = useState([]);
@@ -224,7 +225,7 @@ export default function Produtos() {
             </div>
           )}
         </div>
-      )}
-    </div>
+      </div>
+    </MainTemplate>
   );
 }
