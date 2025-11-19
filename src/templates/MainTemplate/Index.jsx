@@ -1,10 +1,10 @@
 import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
+import NavBar from "../../components/NavBar";
 
 export default function MainTemplate({ children }) {
   return (
     <>
-      <Navbar />
+      <NavBar />
       <main>
         {children}
       </main>

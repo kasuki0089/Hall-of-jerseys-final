@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import MainTemplate from "../../templates/MainTemplate/Index.jsx";
 import { User, Mail, Calendar, Shield, Save } from "lucide-react";
 

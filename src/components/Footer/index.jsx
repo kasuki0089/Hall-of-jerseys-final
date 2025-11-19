@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import logomarca from "@/public/images/logomarca-without-background.png";
 import React from "react";
 
 export default function Footer() {
@@ -11,13 +10,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row md:justify-between items-center md:items-start gap-8">
           <div className="flex flex-col items-center md:items-start gap-4">
             <div className="relative w-32 h-10">
-              <Image
-                src={logomarca}
-                alt="Logomarca"
-                fill
-                className="object-contain"
-                priority
-              />
+              <div className="text-2xl font-bold text-gray-800">HALL OF JERSEYS</div>
             </div>
 
             <nav>

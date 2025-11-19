@@ -1,11 +1,8 @@
 'use client';
-import { Search, ShoppingCart, User, LogOut } from "lucide-react";
+import { Search, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Navbar() {
-  const [showUserMenu, setShowUserMenu] = useState(false);
-
   return (
     <nav className="w-full bg-primary text-white py-3 shadow-md">
       <div className="max-w-8xl mx-auto px-4 flex items-center justify-between">
@@ -27,7 +24,6 @@ export default function Navbar() {
         <div className="flex items-center gap-2 md:gap-4">
           <Search className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
           <ShoppingCart className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
-          
           <Link href="/login">
             <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center cursor-pointer hover:scale-105 transition-transform duration-500">
               <User className="w-4 h-4 text-secondary" />

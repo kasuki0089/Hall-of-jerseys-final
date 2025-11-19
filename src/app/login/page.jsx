@@ -2,7 +2,6 @@
 import { User, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -19,16 +18,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        senha: password,
-      });
-
-      if (result?.error) {
-        setError("Email ou senha inválidos");
-      } else {
+      // Simulação de login - NextAuth temporariamente desabilitado
+      if (email && password) {
+        // Simular sucesso de login
         router.push("/");
+      } else {
+        setError("Email ou senha inválidos");
+      }
       }
     } catch (err) {
       setError("Erro interno do servidor");

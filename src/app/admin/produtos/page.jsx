@@ -1,10 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
 export default function AdminProdutos() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [produtos, setProdutos] = useState([]);
   const [filtros, setFiltros] = useState({ liga: '', time: '', busca: '' });

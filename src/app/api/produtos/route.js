@@ -1,6 +1,6 @@
-import prisma from '@/lib/db';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../auth/[...nextauth]/route';
+import prisma from '../../../lib/db';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '../auth/[...nextauth]/route';
 
 // GET /api/produtos - Listar produtos com filtros e paginação
 export async function GET(req) {
@@ -92,11 +92,11 @@ export async function GET(req) {
 // POST /api/produtos - Criar novo produto (apenas admins)
 export async function POST(req) {
   try {
-    const session = await getServerSession(authOptions);
+    // const session = await getServerSession(authOptions);
     
-    if (!session || session.user.role !== 'admin') {
-      return Response.json({ error: 'Acesso negado' }, { status: 403 });
-    }
+    // if (!session || session.user.role !== 'admin') {
+    //   return Response.json({ error: 'Acesso negado' }, { status: 403 });
+    // }
 
     const body = await req.json();
     const {

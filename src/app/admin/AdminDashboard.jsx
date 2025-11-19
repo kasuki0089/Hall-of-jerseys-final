@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { signOut } from "next-auth/react";
 import MainTemplate from "../../templates/MainTemplate/Index.jsx";
 import { 
   Users, 
