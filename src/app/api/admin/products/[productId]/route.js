@@ -12,8 +12,9 @@ export async function GET(req, { params }) {
       });
     }
 
+    const { productId } = await params;
     const product = await prisma.produto.findUnique({
-      where: { id: parseInt(params.productId) }
+      where: { id: parseInt(productId) }
     });
 
     if (!product) {
@@ -41,9 +42,10 @@ export async function PUT(req, { params }) {
       });
     }
 
+    const { productId } = await params;
     const body = await req.json();
     const { nome, descricao, preco, estoque, liga, tamanho } = body;
-    const productId = parseInt(params.productId);
+    const productIdInt = parseInt(productId);
 
     // Verificar se produto existe
     const existingProduct = await prisma.produto.findUnique({
@@ -66,7 +68,7 @@ export async function PUT(req, { params }) {
     if (tamanho !== undefined) updateData.tamanho = tamanho;
 
     const updatedProduct = await prisma.produto.update({
-      where: { id: productId },
+      where: { id: productIdInt },
       data: updateData
     });
 
@@ -89,7 +91,8 @@ export async function DELETE(req, { params }) {
       });
     }
 
-    const productId = parseInt(params.productId);
+    const { productId } = await params;
+    const productIdInt = parseInt(productId);
 
     // Verificar se produto existe
     const existingProduct = await prisma.produto.findUnique({
@@ -103,7 +106,7 @@ export async function DELETE(req, { params }) {
     }
 
     await prisma.produto.delete({
-      where: { id: productId }
+      where: { id: productIdInt }
     });
 
     return new Response(JSON.stringify({ message: "Produto excluído com sucesso" }), { 

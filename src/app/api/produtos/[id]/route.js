@@ -1,11 +1,11 @@
-import prisma from '@/lib/db';
+import prisma from '../../../../lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../auth/[...nextauth]/route';
 
 // GET /api/produtos/[id] - Buscar produto específico
 export async function GET(req, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const produto = await prisma.produto.findUnique({
       where: { id: parseInt(id) }
     });
@@ -42,7 +42,7 @@ export async function PUT(req, { params }) {
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
 
     // Validação básica
@@ -98,7 +98,7 @@ export async function DELETE(req, { params }) {
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Verificar se o produto existe e se tem pedidos associados
     const produto = await prisma.produto.findUnique({

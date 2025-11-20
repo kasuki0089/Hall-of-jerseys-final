@@ -12,7 +12,7 @@ export async function PATCH(request, { params }) {
       });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
     const body = await request.json();
     const { role } = body;
 
@@ -52,7 +52,7 @@ export async function DELETE(request, { params }) {
       });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     // Não permitir que o admin delete a si mesmo
     if (parseInt(userId) === session.user.id) {
