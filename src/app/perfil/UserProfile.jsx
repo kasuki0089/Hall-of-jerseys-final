@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import MainTemplate from "../../templates/MainTemplate/Index.jsx";
+import MainTemplate from "../../templates/MainTemplate/index.jsx";
 import { User, Mail, Calendar, Shield, Save } from "lucide-react";
 
 export default function UserProfile({ session }) {

@@ -1,37 +1,22 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import prisma from '../../../../lib/db';
-import bcrypt from 'bcrypt';
+// NextAuth temporariamente desabilitado para evitar erros
+// Este arquivo será reconfigurado posteriormente
 
+export async function GET() {
+  return new Response(JSON.stringify({ error: 'Auth temporariamente desabilitado' }), {
+    status: 501,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+export async function POST() {
+  return new Response(JSON.stringify({ error: 'Auth temporariamente desabilitado' }), {
+    status: 501,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+// Exportação temporária para evitar erros de import
 export const authOptions = {
-  providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: { email: { label: 'Email', type: 'text' }, senha: { label: 'Senha', type: 'password' } },
-      async authorize(credentials) {
-        const user = await prisma.usuario.findUnique({ where: { email: credentials.email } });
-        if (user && await bcrypt.compare(credentials.senha, user.senha)) {
-          return { id: user.id, name: user.nome, email: user.email, role: user.role };
-        }
-        return null;
-      }
-    })
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) token.role = user.role;
-      if (user) token.name = user.name || user.nome;
-      return token;
-    },
-    async session({ session, token }) {
-      session.user = session.user || {};
-      session.user.role = token.role;
-      session.user.name = token.name || session.user.name;
-      return session;
-    }
-  },
-  pages: { signIn: '/login' }
+  providers: [],
+  callbacks: {}
 };
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };

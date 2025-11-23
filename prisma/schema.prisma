@@ -51,17 +51,26 @@ model Time {
 model Produto {
   id          Int          @id @default(autoincrement())
   nome        String       // Nome do produto (ex: "Jersey Lakers #24 Kobe Bryant")
+  codigo      String       @unique  // Código único do produto
   tamanho     String?      // P, M, G, GG, XGG
-  preco       Int          // Preço em centavos
-  codigo      Int          @unique
+  preco       Float        // Preço do produto
   descricao   String?      
-  sale        Boolean      @default(false)
-  serie       String?      // Edição especial, retro, etc
   categoria   String       @default("JERSEY") // JERSEY, REGATA, CAMISA, CAMISA_MANGA_LONGA
+  cor         String?      // Cor do produto
+  sport       String?      // Esporte (Basquete, Futebol, etc)
+  year        Int?         // Ano da temporada
+  serie       String?      // Edição especial, retro, etc
+  estoque     Int          @default(0)
+  ativo       Boolean      @default(true)
+  sale        Boolean      @default(false)
+  imagemUrl   String?      // URL da imagem do produto
+  liga        String?      // Nome da liga (para compatibilidade)
+  ligue       String?      // Sigla da liga (para compatibilidade)  
+  time        String?      // Nome do time (para compatibilidade)
   ligaId      Int
   timeId      Int
-  liga        Liga         @relation(fields: [ligaId], references: [id])
-  time        Time         @relation(fields: [timeId], references: [id])
+  ligaObj     Liga         @relation(fields: [ligaId], references: [id])
+  timeObj     Time         @relation(fields: [timeId], references: [id])
   itens       ItemPedido[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -71,6 +80,7 @@ model Produto {
   @@index([ligaId])
   @@index([timeId])
   @@index([sale])
+  @@index([ativo])
 }
 
 model Pedido {

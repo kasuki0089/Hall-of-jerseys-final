@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import MainTemplate from "../../templates/MainTemplate/Index.jsx";
+import MainTemplate from "../../templates/MainTemplate/index.jsx";
 import { 
   Users, 
   Package, 

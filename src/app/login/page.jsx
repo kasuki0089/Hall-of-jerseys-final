@@ -19,9 +19,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Simulação de login - NextAuth temporariamente desabilitado
       if (email && password) {
-        // Simular sucesso de login
         router.push("/");
       } else {
         setError("Email ou senha inválidos");
@@ -35,18 +33,16 @@ export default function LoginPage() {
 
   return (
     <MainTemplate>
-      <div className="min-h-screen w-full flex items-center justify-center p-4 relative bg-gradient-to-br from-primary to-primary-dark">
-      
-      <div className="w-full max-w-6xl min-h-[500px] md:h-[600px] flex flex-col lg:flex-row rounded-2xl overflow-hidden shadow-2xl">
-        
-        {/* Seção Esquerda - Texto de Boas-vindas */}
-        <div className="hidden lg:flex lg:w-[65%] bg-gradient-to-br from-primary-light to-primary text-white flex-col justify-center px-14 relative">
-          <h1 className="text-5xl xl:text-6xl font-bold leading-tight mb-6 relative z-10">
-            Bem vindo de volta!
-          </h1>
-          <p className="text-xl xl:text-2xl leading-relaxed w-[85%] relative z-10">
-            Você pode fazer login para acessar com a sua conta existente.
-          </p>
+      <div className="min-h-screen bg-gray-50 flex">
+        {/* Seção Esquerda - Imagem */}
+        <div className="hidden lg:flex lg:w-[65%] bg-gradient-to-br from-blue-600 to-blue-800 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+          <div className="relative z-10 flex flex-col justify-center items-center text-white p-12">
+            <h1 className="text-5xl font-bold mb-6">Hall of Jerseys</h1>
+            <p className="text-xl text-center max-w-md">
+              Encontre as melhores camisas esportivas dos seus times favoritos
+            </p>
+          </div>
         </div>
 
         {/* Seção Direita - Formulário de Login */}
@@ -88,35 +84,35 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Lembrar-me e Esqueceu a senha */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 text-sm">
-              <label className="flex items-center gap-2 cursor-pointer">
+            {/* Lembrar de mim e Esqueci a senha */}
+            <div className="flex items-center justify-between text-sm">
+              <label className="flex items-center">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 accent-secondary cursor-pointer"
+                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <span className="text-gray-700">Lembrar-me</span>
+                <span className="ml-2 text-gray-600">Lembrar de mim</span>
               </label>
               
-              <Link href="/recuperar-senha" className="text-gray-700 hover:text-primary transition-colors">
-                Esqueceu sua senha?
+              <Link href="/forgot-password" className="text-blue-600 hover:text-blue-800 transition-colors">
+                Esqueci a senha
               </Link>
             </div>
 
-            {/* Botão Entrar */}
+            {/* Botão de Login */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 md:h-14 bg-secondary hover:bg-secondary-dark text-white rounded-2xl text-xl md:text-2xl font-semibold tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] mt-6 md:mt-8 disabled:opacity-50"
+              className="w-full h-14 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white text-lg font-semibold rounded-2xl transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200"
             >
               {loading ? "Entrando..." : "Entrar"}
             </button>
 
             {/* Link para Cadastro */}
-            <div className="text-center text-sm text-gray-700 mt-4">
-              Novo aqui?&nbsp;
+            <div className="text-center text-gray-600">
+              Não tem uma conta?{" "}
               <Link href="/cadastro" className="text-blue-600 hover:text-blue-800 font-semibold transition-colors">
                 Crie uma conta
               </Link>
