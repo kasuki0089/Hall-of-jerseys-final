@@ -1,10 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Liga {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  sigla     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  // Relacionamentos
+  times     Time[]
+  produtos  Produto[]
+
+  @@map("ligas")
+}
+
+model Time {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  sigla     String?
+  cidade    String?
+  ligaId    Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  // Relacionamentos
+  liga      Liga      @relation(fields: [ligaId], references: [id])
+  produtos  Produto[]
+
+  @@map("times")
+}
+
+model Produto {
+  id          Int      @id @default(autoincrement())
+  nome        String
+  codigo      String   @unique
+  descricao   String?  @db.Text
+  preco       Float
+  tamanho     String?
+  cor         String?
+  sport       String?
+  year        Int?
+  serie       String?
+  estoque     Int      @default(0)
+  ativo       Boolean  @default(true)
+  sale        Boolean  @default(false)
+  imagemUrl   String?  @db.Text
+  ligaId      Int
+  timeId      Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacionamentos
+  liga        Liga     @relation(fields: [ligaId], references: [id])
+  time        Time?    @relation(fields: [timeId], references: [id])
+  itensPedido ItemPedido[]
+
+  @@map("produtos")
+}
+
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nome      String
+  email     String    @unique
+  senha     String
+  telefone  String?
+  endereco  String?   @db.Text
+  role      String    @default("user") // user, admin
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  // Relacionamentos
+  pedidos   Pedido[]
+
+  @@map("usuarios")
+}
+
+model Pedido {
+  id        Int         @id @default(autoincrement())
+  usuarioId Int
+  total     Float
+  status    String      @default("pendente") // pendente, processando, enviado, entregue, cancelado
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  
+  // Relacionamentos
+  usuario   Usuario     @relation(fields: [usuarioId], references: [id])
+  itens     ItemPedido[]
+
+  @@map("pedidos")
+}
+
+model ItemPedido {
+  id        Int      @id @default(autoincrement())
+  pedidoId  Int
+  produtoId Int
+  quantidade Int
+  preco     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relacionamentos
+  pedido    Pedido   @relation(fields: [pedidoId], references: [id])
+  produto   Produto  @relation(fields: [produtoId], references: [id])
+
+  @@map("itens_pedido")
 }
 
 model Usuario {
