@@ -1,11 +1,13 @@
 'use client';
 import AdminTemplate from "@/templates/AdminTemplate";
-import { Shield, Edit, Trash2, Plus } from "lucide-react";
+import { Shield, Edit, Trash2 } from "lucide-react";
+import AddButton from "@/components/ADM/AddButton";
+import Link from "next/link";
 
 const adminsData = [
   { id: 1, nome: "SysOP", login: "susop@hof.com", poder: 9 },
   { id: 2, nome: "dann.ksz", login: "dann.ksz@hof.com", poder: 8 },
-  { id: 3, nome: "zaratustra", login: "zaratustra@hof.com", poder: 7 },
+  { id: 3, nome: "zaratustra", login: "gervasio@hof.com", poder: 7 },
 ];
 
 export default function AdministradoresPage() {
@@ -17,10 +19,7 @@ export default function AdministradoresPage() {
           <Shield className="w-8 h-8 text-primary" />
           <h1 className="text-3xl font-bold text-gray-800">Gerenciar Administradores</h1>
         </div>
-        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-          <Plus className="w-5 h-5" />
-          <span>Adicionar administrador</span>
-        </button>
+        <AddButton href="/adm/administrador/adicionar" text="Adicionar administrador" />
       </div>
 
       {/* Tabela de Administradores */}
@@ -44,9 +43,9 @@ export default function AdministradoresPage() {
                 <td className="px-6 py-4 text-sm text-gray-800">{admin.poder}</td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex items-center justify-center gap-3">
-                    <button className="text-blue-500 hover:text-blue-700 transition-colors">
+                    <Link href={`/adm/administrador/alterar/${admin.id}`} className="text-blue-500 hover:text-blue-700 transition-colors">
                       <Edit className="w-5 h-5" />
-                    </button>
+                    </Link>
                     <button className="text-red-500 hover:text-red-700 transition-colors">
                       <Trash2 className="w-5 h-5" />
                     </button>
