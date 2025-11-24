@@ -1,13 +1,47 @@
 import prisma from '../../../../lib/db';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '../../auth/[...nextauth]/route';
+// import { getServerSession } from 'next-auth';
+// import { authOptions } from '../../auth/[...nextauth]/route';
 
 // GET /api/produtos/[id] - Buscar produto específico
 export async function GET(req, { params }) {
   try {
     const { id } = await params;
     const produto = await prisma.produto.findUnique({
-      where: { id: parseInt(id) }
+      where: { 
+        id: parseInt(id),
+        ativo: true 
+      },
+      include: {
+        liga: {
+          select: {
+            id: true,
+            nome: true,
+            sigla: true
+          }
+        },
+        time: {
+          select: {
+            id: true,
+            nome: true,
+            sigla: true,
+            cidade: true
+          }
+        },
+        cor: {
+          select: {
+            id: true,
+            nome: true,
+            codigo: true
+          }
+        },
+        tamanho: {
+          select: {
+            id: true,
+            nome: true,
+            ordem: true
+          }
+        }
+      }
     });
 
     if (!produto) {

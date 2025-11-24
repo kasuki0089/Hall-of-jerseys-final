@@ -6,7 +6,7 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const ligaId = searchParams.get('ligaId');
 
-    const where = { ativo: true };
+    const where = {};
     
     if (ligaId) {
       where.ligaId = parseInt(ligaId);
@@ -15,7 +15,13 @@ export async function GET(req) {
     const times = await prisma.time.findMany({
       where,
       include: {
-        liga: true,
+        liga: {
+          select: {
+            id: true,
+            nome: true,
+            sigla: true
+          }
+        },
         _count: {
           select: { produtos: true }
         }

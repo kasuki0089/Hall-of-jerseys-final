@@ -8,13 +8,14 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     
     // Parâmetros de filtro
-    const categoria = searchParams.get('categoria');
     const ligaId = searchParams.get('ligaId');
     const timeId = searchParams.get('timeId');
-    const tamanho = searchParams.get('tamanho');
+    const corId = searchParams.get('corId');
+    const tamanhoId = searchParams.get('tamanhoId');
     const busca = searchParams.get('busca');
     const sale = searchParams.get('sale');
     const serie = searchParams.get('serie');
+    const modelo = searchParams.get('modelo');
     
     // Parâmetros de paginação
     const pagina = parseInt(searchParams.get('pagina')) || 1;
@@ -22,10 +23,29 @@ export async function GET(req) {
     const offset = (pagina - 1) * limite;
 
     // Construir condições de filtro
-    const where = {};
+    const where = { ativo: true };
     
-    if (categoria && categoria !== 'todas') {
-      where.categoria = categoria.toUpperCase();
+    if (ligaId) {
+      where.ligaId = parseInt(ligaId);
+    }
+    
+    if (timeId) {
+      where.timeId = parseInt(timeId);
+    }
+    
+    if (corId) {
+      where.corId = parseInt(corId);
+    }
+    
+    if (tamanhoId) {
+      where.tamanhoId = parseInt(tamanhoId);
+    }
+    
+    if (modelo) {
+      where.modelo = {
+        contains: modelo,
+        mode: 'insensitive'
+      };
     }
     
     if (ligaId && ligaId !== 'todas') {
