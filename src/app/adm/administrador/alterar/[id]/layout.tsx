@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Produtos - Hall Of Jerseys Admin",
+  title: "Alterar Administrador - Hall Of Jerseys Admin",
 };
 
-export default function ProdutosLayout({
+export default function AlterarAdministradorLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

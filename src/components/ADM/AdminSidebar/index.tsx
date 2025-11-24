@@ -16,13 +16,13 @@ import {
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, href: "/adm/home" },
-  { name: "Administradores", icon: Shield, href: "/adm/administradores" },
-  { name: "Usuários", icon: Users, href: "/adm/usuarios" },
-  { name: "Produtos", icon: Package, href: "/adm/produtos" },
+  { name: "Administradores", icon: Shield, href: "/adm/administrador/gerenciarAdministradores" },
+  { name: "Usuários", icon: Users, href: "/adm/usuario/gerenciarUsuarios" },
+  { name: "Produtos", icon: Package, href: "/adm/produto/gerenciarProdutos" },
   { name: "Pedidos", icon: Send, href: "/adm/pedidos" },
   { name: "Avaliações", icon: Star, href: "/adm/avaliacoes" },
   { name: "Mensagens", icon: MessageSquare, href: "/adm/mensagens" },
-  { name: "Carrossel", icon: ImageIcon, href: "/adm/carrossel" },
+  { name: "Carrossel", icon: ImageIcon, href: "/adm/carrossel/gerenciarCarrossel" },
   { name: "Logs", icon: List, href: "/adm/logs" },
   { name: "Configurações", icon: Settings, href: "/adm/configuracoes" },
 ];
