@@ -7,241 +7,334 @@ async function main() {
   await prisma.itemPedido.deleteMany();
   await prisma.pedido.deleteMany();
   await prisma.produto.deleteMany();
+  await prisma.formaPagamento.deleteMany();
+  await prisma.usuario.deleteMany();
+  await prisma.endereco.deleteMany();
+  await prisma.estado.deleteMany();
   await prisma.time.deleteMany();
   await prisma.liga.deleteMany();
-  await prisma.usuario.deleteMany();
+  await prisma.cor.deleteMany();
+  await prisma.tamanho.deleteMany();
 
   console.log('🗑️  Dados existentes removidos');
 
-  // === CRIAR LIGAS ===
-  const nba = await prisma.liga.create({
-    data: { nome: 'National Basketball Association', sigla: 'NBA' }
-  });
+  // === CRIAR ESTADOS ===
+  const estados = [
+    { uf: 'SP', nome: 'São Paulo' },
+    { uf: 'RJ', nome: 'Rio de Janeiro' },
+    { uf: 'MG', nome: 'Minas Gerais' },
+    { uf: 'RS', nome: 'Rio Grande do Sul' },
+    { uf: 'PR', nome: 'Paraná' },
+    { uf: 'SC', nome: 'Santa Catarina' },
+    { uf: 'BA', nome: 'Bahia' },
+    { uf: 'GO', nome: 'Goiás' },
+    { uf: 'PE', nome: 'Pernambuco' },
+    { uf: 'CE', nome: 'Ceará' }
+  ];
 
-  const nfl = await prisma.liga.create({
-    data: { nome: 'National Football League', sigla: 'NFL' }
-  });
+  for (const estado of estados) {
+    await prisma.estado.create({ data: estado });
+  }
 
-  const brasileirao = await prisma.liga.create({
-    data: { nome: 'Campeonato Brasileiro Série A', sigla: 'BRASILEIRÃO' }
-  });
+  console.log('✅ Estados criados');
 
-  const championsLeague = await prisma.liga.create({
-    data: { nome: 'UEFA Champions League', sigla: 'UCL' }
-  });
+  // === CRIAR CORES ===
+  const cores = [
+    { nome: 'Branco', codigo: '#FFFFFF' },
+    { nome: 'Preto', codigo: '#000000' },
+    { nome: 'Azul', codigo: '#0000FF' },
+    { nome: 'Vermelho', codigo: '#FF0000' },
+    { nome: 'Amarelo', codigo: '#FFFF00' },
+    { nome: 'Verde', codigo: '#008000' },
+    { nome: 'Roxo', codigo: '#800080' },
+    { nome: 'Laranja', codigo: '#FFA500' },
+    { nome: 'Rosa', codigo: '#FFC0CB' },
+    { nome: 'Cinza', codigo: '#808080' },
+    { nome: 'Azul Marinho', codigo: '#000080' },
+    { nome: 'Dourado', codigo: '#FFD700' }
+  ];
 
-  const premierLeague = await prisma.liga.create({
-    data: { nome: 'Premier League', sigla: 'EPL' }
-  });
+  for (const cor of cores) {
+    await prisma.cor.create({ data: cor });
+  }
 
-  const laLiga = await prisma.liga.create({
-    data: { nome: 'La Liga', sigla: 'LALIGA' }
-  });
+  console.log('✅ Cores criadas');
 
-  const bundesliga = await prisma.liga.create({
-    data: { nome: 'Bundesliga', sigla: 'BUNDESLIGA' }
-  });
+  // === CRIAR TAMANHOS ===
+  const tamanhos = [
+    { nome: 'PP', ordem: 1 },
+    { nome: 'P', ordem: 2 },
+    { nome: 'M', ordem: 3 },
+    { nome: 'G', ordem: 4 },
+    { nome: 'GG', ordem: 5 },
+    { nome: 'XGG', ordem: 6 }
+  ];
 
-  const serieA = await prisma.liga.create({
-    data: { nome: 'Serie A', sigla: 'SERIEA' }
-  });
+  for (const tamanho of tamanhos) {
+    await prisma.tamanho.create({ data: tamanho });
+  }
 
-  const ligue1 = await prisma.liga.create({
-    data: { nome: 'Ligue 1', sigla: 'LIGUE1' }
-  });
+  console.log('✅ Tamanhos criados');
+
+  // === CRIAR LIGAS (APENAS MLS, NBA, NHL, NFL) ===
+  const ligas = [
+    { nome: 'National Basketball Association', sigla: 'NBA' },
+    { nome: 'National Football League', sigla: 'NFL' },
+    { nome: 'National Hockey League', sigla: 'NHL' },
+    { nome: 'Major League Soccer', sigla: 'MLS' }
+  ];
+
+  const ligasCreated = {};
+  for (const liga of ligas) {
+    const created = await prisma.liga.create({ data: liga });
+    ligasCreated[liga.sigla] = created;
+  }
 
   console.log('✅ Ligas criadas');
 
   // === CRIAR TIMES ===
   
   // NBA Teams
-  const lakers = await prisma.time.create({
-    data: { nome: 'Los Angeles Lakers', sigla: 'LAL', cidade: 'Los Angeles', ligaId: nba.id }
-  });
+  const nbaTeams = [
+    { nome: 'Los Angeles Lakers', sigla: 'LAL', cidade: 'Los Angeles' },
+    { nome: 'Golden State Warriors', sigla: 'GSW', cidade: 'San Francisco' },
+    { nome: 'Miami Heat', sigla: 'MIA', cidade: 'Miami' },
+    { nome: 'Chicago Bulls', sigla: 'CHI', cidade: 'Chicago' },
+    { nome: 'Boston Celtics', sigla: 'BOS', cidade: 'Boston' },
+    { nome: 'Brooklyn Nets', sigla: 'BKN', cidade: 'Brooklyn' }
+  ];
 
-  const warriors = await prisma.time.create({
-    data: { nome: 'Golden State Warriors', sigla: 'GSW', cidade: 'San Francisco', ligaId: nba.id }
-  });
-
-  const heat = await prisma.time.create({
-    data: { nome: 'Miami Heat', sigla: 'MIA', cidade: 'Miami', ligaId: nba.id }
-  });
-
-  const bulls = await prisma.time.create({
-    data: { nome: 'Chicago Bulls', sigla: 'CHI', cidade: 'Chicago', ligaId: nba.id }
-  });
-
-  const celtics = await prisma.time.create({
-    data: { nome: 'Boston Celtics', sigla: 'BOS', cidade: 'Boston', ligaId: nba.id }
-  });
+  const timesCreated = {};
+  for (const team of nbaTeams) {
+    const created = await prisma.time.create({
+      data: { ...team, ligaId: ligasCreated.NBA.id }
+    });
+    timesCreated[team.sigla] = created;
+  }
 
   // NFL Teams
-  const chiefs = await prisma.time.create({
-    data: { nome: 'Kansas City Chiefs', sigla: 'KC', cidade: 'Kansas City', ligaId: nfl.id }
-  });
+  const nflTeams = [
+    { nome: 'Kansas City Chiefs', sigla: 'KC', cidade: 'Kansas City' },
+    { nome: 'New England Patriots', sigla: 'NE', cidade: 'Foxborough' },
+    { nome: 'Green Bay Packers', sigla: 'GB', cidade: 'Green Bay' },
+    { nome: 'Dallas Cowboys', sigla: 'DAL', cidade: 'Dallas' }
+  ];
 
-  const patriots = await prisma.time.create({
-    data: { nome: 'New England Patriots', sigla: 'NE', cidade: 'Foxborough', ligaId: nfl.id }
-  });
+  for (const team of nflTeams) {
+    const created = await prisma.time.create({
+      data: { ...team, ligaId: ligasCreated.NFL.id }
+    });
+    timesCreated[team.sigla] = created;
+  }
 
-  const packers = await prisma.time.create({
-    data: { nome: 'Green Bay Packers', sigla: 'GB', cidade: 'Green Bay', ligaId: nfl.id }
-  });
+  // NHL Teams
+  const nhlTeams = [
+    { nome: 'Boston Bruins', sigla: 'BOS', cidade: 'Boston' },
+    { nome: 'Chicago Blackhawks', sigla: 'CHI', cidade: 'Chicago' },
+    { nome: 'Toronto Maple Leafs', sigla: 'TOR', cidade: 'Toronto' }
+  ];
 
-  // Brasileirão Teams
-  const flamengo = await prisma.time.create({
-    data: { nome: 'Flamengo', sigla: 'FLA', cidade: 'Rio de Janeiro', ligaId: brasileirao.id }
-  });
+  for (const team of nhlTeams) {
+    const created = await prisma.time.create({
+      data: { ...team, ligaId: ligasCreated.NHL.id }
+    });
+    timesCreated[team.sigla + '_NHL'] = created;
+  }
 
-  const palmeiras = await prisma.time.create({
-    data: { nome: 'Palmeiras', sigla: 'PAL', cidade: 'São Paulo', ligaId: brasileirao.id }
-  });
+  // MLS Teams
+  const mlsTeams = [
+    { nome: 'LA Galaxy', sigla: 'LAG', cidade: 'Los Angeles' },
+    { nome: 'Inter Miami CF', sigla: 'MIA', cidade: 'Miami' },
+    { nome: 'New York City FC', sigla: 'NYC', cidade: 'New York' }
+  ];
 
-  const corinthians = await prisma.time.create({
-    data: { nome: 'Corinthians', sigla: 'COR', cidade: 'São Paulo', ligaId: brasileirao.id }
-  });
-
-  const santos = await prisma.time.create({
-    data: { nome: 'Santos', sigla: 'SAN', cidade: 'Santos', ligaId: brasileirao.id }
-  });
-
-  // Premier League Teams
-  const manchester_united = await prisma.time.create({
-    data: { nome: 'Manchester United', sigla: 'MUN', cidade: 'Manchester', ligaId: premierLeague.id }
-  });
-
-  const liverpool = await prisma.time.create({
-    data: { nome: 'Liverpool', sigla: 'LIV', cidade: 'Liverpool', ligaId: premierLeague.id }
-  });
-
-  const chelsea = await prisma.time.create({
-    data: { nome: 'Chelsea', sigla: 'CHE', cidade: 'London', ligaId: premierLeague.id }
-  });
-
-  // La Liga Teams
-  const real_madrid = await prisma.time.create({
-    data: { nome: 'Real Madrid', sigla: 'RMA', cidade: 'Madrid', ligaId: laLiga.id }
-  });
-
-  const barcelona = await prisma.time.create({
-    data: { nome: 'Barcelona', sigla: 'BAR', cidade: 'Barcelona', ligaId: laLiga.id }
-  });
-
-  const atletico_madrid = await prisma.time.create({
-    data: { nome: 'Atlético Madrid', sigla: 'ATM', cidade: 'Madrid', ligaId: laLiga.id }
-  });
-
-  // Bundesliga Teams
-  const bayern_munich = await prisma.time.create({
-    data: { nome: 'Bayern Munich', sigla: 'BAY', cidade: 'Munich', ligaId: bundesliga.id }
-  });
-
-  const borussia_dortmund = await prisma.time.create({
-    data: { nome: 'Borussia Dortmund', sigla: 'BVB', cidade: 'Dortmund', ligaId: bundesliga.id }
-  });
-
-  // Serie A Teams  
-  const juventus = await prisma.time.create({
-    data: { nome: 'Juventus', sigla: 'JUV', cidade: 'Turin', ligaId: serieA.id }
-  });
-
-  const ac_milan = await prisma.time.create({
-    data: { nome: 'AC Milan', sigla: 'MIL', cidade: 'Milan', ligaId: serieA.id }
-  });
-
-  // Ligue 1 Teams
-  const psg = await prisma.time.create({
-    data: { nome: 'Paris Saint-Germain', sigla: 'PSG', cidade: 'Paris', ligaId: ligue1.id }
-  });
+  for (const team of mlsTeams) {
+    const created = await prisma.time.create({
+      data: { ...team, ligaId: ligasCreated.MLS.id }
+    });
+    timesCreated[team.sigla + '_MLS'] = created;
+  }
 
   console.log('✅ Times criados');
+
+  // === CRIAR ENDEREÇOS EXEMPLO ===
+  const endereco1 = await prisma.endereco.create({
+    data: {
+      endereco: 'Rua das Flores',
+      numero: '123',
+      complemento: 'Apto 45',
+      bairro: 'Centro',
+      cidade: 'São Paulo',
+      cep: '01234-567',
+      estadoUf: 'SP'
+    }
+  });
+
+  const endereco2 = await prisma.endereco.create({
+    data: {
+      endereco: 'Av. Copacabana',
+      numero: '789',
+      bairro: 'Copacabana',
+      cidade: 'Rio de Janeiro', 
+      cep: '22070-000',
+      estadoUf: 'RJ'
+    }
+  });
+
+  console.log('✅ Endereços exemplo criados');
+
+  // === CRIAR USUÁRIOS ===
+  const bcrypt = require('bcrypt');
+  const senhaHash = await bcrypt.hash('admin123', 10);
+
+  // Usuário Admin
+  const usuarioAdmin = await prisma.usuario.create({
+    data: {
+      nome: 'Administrador',
+      email: 'admin@hallofjerseyscom',
+      senha: senhaHash,
+      telefone: '(11) 99999-9999',
+      role: 'admin',
+      enderecoId: endereco1.id
+    }
+  });
+
+  // Usuário comum  
+  const senhaUserHash = await bcrypt.hash('user123', 10);
+  const usuarioComum = await prisma.usuario.create({
+    data: {
+      nome: 'João Silva',
+      email: 'joao@email.com',
+      senha: senhaUserHash,
+      telefone: '(21) 88888-8888',
+      role: 'user',
+      enderecoId: endereco2.id
+    }
+  });
+
+  console.log('✅ Usuários criados');
+
+  // === CRIAR FORMAS DE PAGAMENTO ===
+  await prisma.formaPagamento.create({
+    data: {
+      tipo: 'cartao_credito',
+      numeroCartao: '**** **** **** 1234',
+      nomeCartao: 'João Silva',
+      validadeCartao: '12/2028',
+      bandeiraCartao: 'Visa',
+      usuarioId: usuarioComum.id
+    }
+  });
+
+  await prisma.formaPagamento.create({
+    data: {
+      tipo: 'cartao_debito',
+      numeroCartao: '**** **** **** 5678',
+      nomeCartao: 'João Silva',
+      validadeCartao: '08/2027',
+      bandeiraCartao: 'Mastercard',
+      usuarioId: usuarioComum.id
+    }
+  });
+
+  console.log('✅ Formas de pagamento criadas');
+
+  // === BUSCAR IDs PARA PRODUTOS ===
+  const corAmarela = await prisma.cor.findFirst({ where: { nome: 'Amarelo' } });
+  const corVermelho = await prisma.cor.findFirst({ where: { nome: 'Vermelho' } });
+  const corAzul = await prisma.cor.findFirst({ where: { nome: 'Azul' } });
+  const corBranco = await prisma.cor.findFirst({ where: { nome: 'Branco' } });
+  
+  const tamanhoM = await prisma.tamanho.findFirst({ where: { nome: 'M' } });
+  const tamanhoG = await prisma.tamanho.findFirst({ where: { nome: 'G' } });
+  const tamanhoL = tamanhoG; // Considerando G como L
 
   // === CRIAR PRODUTOS EXEMPLO ===
   const produtos = [
     {
       nome: 'Camisa Lakers Home 2024',
-      codigo: 'LAL-HOME-2024',
+      codigo: 'LAL-HOME-2024-M-AMARELO',
       descricao: 'Camisa oficial dos Lakers temporada 2024',
+      modelo: 'Jersey Home',
       preco: 299.99,
-      tamanho: 'M',
-      cor: 'Amarelo',
-      sport: 'Basquete',
       year: 2024,
       serie: 'Home',
       estoque: 50,
       ativo: true,
       sale: false,
-      ligaId: nba.id,
-      timeId: lakers.id,
+      ligaId: ligasCreated.NBA.id,
+      timeId: timesCreated.LAL.id,
+      corId: corAmarela.id,
+      tamanhoId: tamanhoM.id,
       imagemUrl: '/images/lakers-home-2024.jpg'
     },
     {
-      nome: 'Camisa Flamengo Home 2024',
-      codigo: 'FLA-HOME-2024',
-      descricao: 'Camisa oficial do Flamengo temporada 2024',
-      preco: 249.99,
-      tamanho: 'G',
-      cor: 'Vermelho',
-      sport: 'Futebol',
-      year: 2024,
-      serie: 'Home',
-      estoque: 75,
-      ativo: true,
-      sale: true,
-      ligaId: brasileirao.id,
-      timeId: flamengo.id,
-      imagemUrl: '/images/flamengo-home-2024.jpg'
-    },
-    {
-      nome: 'Camisa Real Madrid Away 2024',
-      codigo: 'RMA-AWAY-2024',
-      descricao: 'Camisa oficial do Real Madrid temporada 2024',
-      preco: 279.99,
-      tamanho: 'M',
-      cor: 'Azul',
-      sport: 'Futebol',
-      year: 2024,
-      serie: 'Away',
-      estoque: 30,
-      ativo: true,
-      sale: false,
-      ligaId: laLiga.id,
-      timeId: real_madrid.id,
-      imagemUrl: '/images/real-madrid-away-2024.jpg'
-    },
-    {
       nome: 'Camisa Warriors Home 2024',
-      codigo: 'GSW-HOME-2024',
+      codigo: 'GSW-HOME-2024-G-AZUL',
       descricao: 'Camisa oficial dos Warriors temporada 2024',
+      modelo: 'Jersey Home',
       preco: 289.99,
-      tamanho: 'L',
-      cor: 'Azul',
-      sport: 'Basquete',
       year: 2024,
       serie: 'Home',
       estoque: 40,
       ativo: true,
       sale: true,
-      ligaId: nba.id,
-      timeId: warriors.id,
+      ligaId: ligasCreated.NBA.id,
+      timeId: timesCreated.GSW.id,
+      corId: corAzul.id,
+      tamanhoId: tamanhoG.id,
       imagemUrl: '/images/warriors-home-2024.jpg'
     },
     {
-      nome: 'Camisa PSG Home 2024',
-      codigo: 'PSG-HOME-2024',
-      descricao: 'Camisa oficial do PSG temporada 2024',
-      preco: 269.99,
-      tamanho: 'M',
-      cor: 'Azul Marinho',
-      sport: 'Futebol',
+      nome: 'Jersey Chiefs Home 2024',
+      codigo: 'KC-HOME-2024-M-VERMELHO',
+      descricao: 'Jersey oficial dos Chiefs temporada 2024',
+      modelo: 'Jersey Home',
+      preco: 319.99,
+      year: 2024,
+      serie: 'Home',
+      estoque: 30,
+      ativo: true,
+      sale: false,
+      ligaId: ligasCreated.NFL.id,
+      timeId: timesCreated.KC.id,
+      corId: corVermelho.id,
+      tamanhoId: tamanhoM.id,
+      imagemUrl: '/images/chiefs-home-2024.jpg'
+    },
+    {
+      nome: 'Jersey Bruins Home 2024',
+      codigo: 'BOS-NHL-HOME-2024-G-PRETO',
+      descricao: 'Jersey oficial dos Bruins temporada 2024',
+      modelo: 'Jersey Home',
+      preco: 279.99,
+      year: 2024,
+      serie: 'Home',
+      estoque: 25,
+      ativo: true,
+      sale: false,
+      ligaId: ligasCreated.NHL.id,
+      timeId: timesCreated.BOS_NHL.id,
+      corId: await prisma.cor.findFirst({ where: { nome: 'Preto' } }).then(c => c.id),
+      tamanhoId: tamanhoG.id,
+      imagemUrl: '/images/bruins-home-2024.jpg'
+    },
+    {
+      nome: 'Camisa LA Galaxy Home 2024',
+      codigo: 'LAG-MLS-HOME-2024-M-BRANCO',
+      descricao: 'Camisa oficial do LA Galaxy temporada 2024',
+      modelo: 'Jersey Home',
+      preco: 199.99,
       year: 2024,
       serie: 'Home',
       estoque: 60,
       ativo: true,
-      sale: false,
-      ligaId: ligue1.id,
-      timeId: psg.id,
-      imagemUrl: '/images/psg-home-2024.jpg'
+      sale: true,
+      ligaId: ligasCreated.MLS.id,
+      timeId: timesCreated.LAG_MLS.id,
+      corId: corBranco.id,
+      tamanhoId: tamanhoM.id,
+      imagemUrl: '/images/galaxy-home-2024.jpg'
     }
   ];
 
@@ -251,29 +344,21 @@ async function main() {
 
   console.log('✅ Produtos exemplo criados');
 
-  // === CRIAR USUÁRIO ADMIN ===
-  const bcrypt = require('bcrypt');
-  const senhaHash = await bcrypt.hash('admin123', 10);
-
-  await prisma.usuario.create({
-    data: {
-      nome: 'Administrador',
-      email: 'admin@hallofjerseyscom',
-      senha: senhaHash,
-      telefone: '(11) 99999-9999',
-      endereco: 'Rua Admin, 123 - São Paulo/SP',
-      role: 'admin'
-    }
-  });
-
-  console.log('✅ Usuário admin criado (admin@hallofjerseyscom / admin123)');
-
   console.log('\n🎉 Seed executado com sucesso!');
   console.log('\n📊 Resumo:');
-  console.log(`- ${await prisma.liga.count()} ligas criadas`);
+  console.log(`- ${await prisma.estado.count()} estados criados`);
+  console.log(`- ${await prisma.endereco.count()} endereços criados`);
+  console.log(`- ${await prisma.cor.count()} cores criadas`);
+  console.log(`- ${await prisma.tamanho.count()} tamanhos criados`);
+  console.log(`- ${await prisma.liga.count()} ligas criadas (NBA, NFL, NHL, MLS)`);
   console.log(`- ${await prisma.time.count()} times criados`);
   console.log(`- ${await prisma.produto.count()} produtos criados`);
-  console.log(`- ${await prisma.usuario.count()} usuário admin criado`);
+  console.log(`- ${await prisma.usuario.count()} usuários criados`);
+  console.log(`- ${await prisma.formaPagamento.count()} formas de pagamento criadas`);
+  
+  console.log('\n👤 Credenciais:');
+  console.log('Admin: admin@hallofjerseyscom / admin123');
+  console.log('User: joao@email.com / user123');
 }
 
 main()

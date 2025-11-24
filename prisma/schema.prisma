@@ -10,197 +10,148 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Liga {
-  id        Int       @id @default(autoincrement())
+// Tabela de Estados
+model Estado {
+  uf        String     @id @db.VarChar(2)
   nome      String
-  sigla     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  // Relacionamentos
-  times     Time[]
-  produtos  Produto[]
+  enderecos Endereco[]
+
+  @@map("estados")
+}
+
+// Tabela de Endereços  
+model Endereco {
+  id          Int       @id @default(autoincrement())
+  endereco    String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  cep         String    @db.VarChar(9)
+  estado      Estado    @relation(fields: [estadoUf], references: [uf])
+  estadoUf    String    @db.VarChar(2)
+  usuarios    Usuario[]
+
+  @@map("enderecos")
+}
+
+// Tabela de Cores
+model Cor {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  codigo   String?   @db.VarChar(7) // Para hex colors #FFFFFF
+  produtos Produto[]
+
+  @@map("cores")
+}
+
+// Tabela de Tamanhos
+model Tamanho {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique // PP, P, M, G, GG, XGG
+  ordem    Int       @unique // Para ordenação (1=PP, 2=P, etc)
+  produtos Produto[]
+
+  @@map("tamanhos")
+}
+
+// Tabela de Formas de Pagamento
+model FormaPagamento {
+  id             Int      @id @default(autoincrement())
+  tipo           String   // 'cartao_credito', 'cartao_debito', 'pix', 'boleto'
+  numeroCartao   String?  @db.VarChar(20) // Apenas últimos 4 dígitos para segurança
+  nomeCartao     String?
+  validadeCartao String?  @db.VarChar(7) // MM/YYYY
+  bandeiraCartao String?  // Visa, Mastercard, etc
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId      Int
+  ativo          Boolean  @default(true)
+  criadoEm       DateTime @default(now())
+  pedidos        Pedido[]
+
+  @@map("formas_pagamento")
+}
+
+model Liga {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  sigla    String    @unique
+  times    Time[]
+  produtos Produto[]
 
   @@map("ligas")
 }
 
 model Time {
-  id        Int       @id @default(autoincrement())
-  nome      String
-  sigla     String?
-  cidade    String?
-  ligaId    Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  // Relacionamentos
-  liga      Liga      @relation(fields: [ligaId], references: [id])
-  produtos  Produto[]
+  id       Int       @id @default(autoincrement())
+  nome     String
+  sigla    String
+  cidade   String
+  liga     Liga      @relation(fields: [ligaId], references: [id])
+  ligaId   Int
+  produtos Produto[]
 
   @@map("times")
 }
 
 model Produto {
-  id          Int      @id @default(autoincrement())
-  nome        String
-  codigo      String   @unique
-  descricao   String?  @db.Text
-  preco       Float
-  tamanho     String?
-  cor         String?
-  sport       String?
-  year        Int?
-  serie       String?
-  estoque     Int      @default(0)
-  ativo       Boolean  @default(true)
-  sale        Boolean  @default(false)
-  imagemUrl   String?  @db.Text
-  ligaId      Int
-  timeId      Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relacionamentos
-  liga        Liga     @relation(fields: [ligaId], references: [id])
-  time        Time?    @relation(fields: [timeId], references: [id])
-  itensPedido ItemPedido[]
+  id           Int           @id @default(autoincrement())
+  nome         String
+  codigo       String        @unique
+  descricao    String?       @db.Text
+  modelo       String        // Ex: "Jersey Home", "Jersey Away", "Regata", etc
+  preco        Float
+  year         Int
+  serie        String?       // Home, Away, Third, Special Edition
+  estoque      Int           @default(0)
+  ativo        Boolean       @default(true)
+  sale         Boolean       @default(false)
+  imagemUrl    String?
+  criadoEm     DateTime      @default(now())
+  atualizadoEm DateTime      @updatedAt
+  liga         Liga          @relation(fields: [ligaId], references: [id])
+  ligaId       Int
+  time         Time?         @relation(fields: [timeId], references: [id])
+  timeId       Int?
+  cor          Cor           @relation(fields: [corId], references: [id])
+  corId        Int
+  tamanho      Tamanho       @relation(fields: [tamanhoId], references: [id])
+  tamanhoId    Int
+  itensPedido  ItemPedido[]
 
   @@map("produtos")
 }
 
 model Usuario {
-  id        Int       @id @default(autoincrement())
-  nome      String
-  email     String    @unique
-  senha     String
-  telefone  String?
-  endereco  String?   @db.Text
-  role      String    @default("user") // user, admin
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
-  // Relacionamentos
-  pedidos   Pedido[]
+  id               Int               @id @default(autoincrement())
+  nome             String
+  email            String            @unique
+  senha            String
+  telefone         String?
+  role             String            @default("user") // user, admin
+  criadoEm         DateTime          @default(now())
+  atualizadoEm     DateTime          @updatedAt
+  endereco         Endereco?         @relation(fields: [enderecoId], references: [id])
+  enderecoId       Int?
+  formasPagamento  FormaPagamento[]
+  pedidos          Pedido[]
 
   @@map("usuarios")
 }
 
 model Pedido {
-  id        Int         @id @default(autoincrement())
-  usuarioId Int
-  total     Float
-  status    String      @default("pendente") // pendente, processando, enviado, entregue, cancelado
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  
-  // Relacionamentos
-  usuario   Usuario     @relation(fields: [usuarioId], references: [id])
-  itens     ItemPedido[]
+  id               Int             @id @default(autoincrement())
+  usuarioId        Int
+  total            Float
+  status           String          @default("pendente") // pendente, processando, enviado, entregue, cancelado
+  criadoEm         DateTime        @default(now())
+  atualizadoEm     DateTime        @updatedAt
+  usuario          Usuario         @relation(fields: [usuarioId], references: [id])
+  formaPagamento   FormaPagamento? @relation(fields: [formaPagamentoId], references: [id])
+  formaPagamentoId Int?
+  itens            ItemPedido[]
 
   @@map("pedidos")
-}
-
-model ItemPedido {
-  id        Int      @id @default(autoincrement())
-  pedidoId  Int
-  produtoId Int
-  quantidade Int
-  preco     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // Relacionamentos
-  pedido    Pedido   @relation(fields: [pedidoId], references: [id])
-  produto   Produto  @relation(fields: [produtoId], references: [id])
-
-  @@map("itens_pedido")
-}
-
-model Usuario {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String   @unique
-  senha     String
-  role      String   @default("cliente")
-  pedidos   Pedido[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Liga {
-  id     Int       @id @default(autoincrement())
-  nome   String    @unique
-  sigla  String    @unique
-  pais   String
-  ativo  Boolean   @default(true)
-  times  Time[]
-  produtos Produto[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([ativo])
-}
-
-model Time {
-  id       Int       @id @default(autoincrement())
-  nome     String
-  cidade   String?
-  ligaId   Int
-  liga     Liga      @relation(fields: [ligaId], references: [id])
-  ativo    Boolean   @default(true)
-  produtos Produto[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([nome, ligaId])
-  @@index([ligaId])
-  @@index([ativo])
-}
-
-model Produto {
-  id          Int          @id @default(autoincrement())
-  nome        String       // Nome do produto (ex: "Jersey Lakers #24 Kobe Bryant")
-  codigo      String       @unique  // Código único do produto
-  tamanho     String?      // P, M, G, GG, XGG
-  preco       Float        // Preço do produto
-  descricao   String?      
-  categoria   String       @default("JERSEY") // JERSEY, REGATA, CAMISA, CAMISA_MANGA_LONGA
-  cor         String?      // Cor do produto
-  sport       String?      // Esporte (Basquete, Futebol, etc)
-  year        Int?         // Ano da temporada
-  serie       String?      // Edição especial, retro, etc
-  estoque     Int          @default(0)
-  ativo       Boolean      @default(true)
-  sale        Boolean      @default(false)
-  imagemUrl   String?      // URL da imagem do produto
-  liga        String?      // Nome da liga (para compatibilidade)
-  ligue       String?      // Sigla da liga (para compatibilidade)  
-  time        String?      // Nome do time (para compatibilidade)
-  ligaId      Int
-  timeId      Int
-  ligaObj     Liga         @relation(fields: [ligaId], references: [id])
-  timeObj     Time         @relation(fields: [timeId], references: [id])
-  itens       ItemPedido[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-
-  @@index([categoria])
-  @@index([codigo])
-  @@index([ligaId])
-  @@index([timeId])
-  @@index([sale])
-  @@index([ativo])
-}
-
-model Pedido {
-  id        Int          @id @default(autoincrement())
-  usuarioId Int
-  usuario   Usuario      @relation(fields: [usuarioId], references: [id])
-  status    String       @default("pendente") // pendente, pago, enviado, entregue, cancelado
-  total     Float        @default(0)
-  itens     ItemPedido[]
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
 }
 
 model ItemPedido {
@@ -208,13 +159,10 @@ model ItemPedido {
   pedidoId   Int
   produtoId  Int
   quantidade Int
-  precoUnit  Float    // Preço no momento da compra
-  subtotal   Float    // quantidade * precoUnit
-  tamanho    String   // Tamanho escolhido
-  pedido     Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
-  produto    Produto  @relation(fields: [produtoId], references: [id], onDelete: Restrict)
-  createdAt  DateTime @default(now())
+  preco      Float
+  criadoEm   DateTime @default(now())
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id])
+  produto    Produto  @relation(fields: [produtoId], references: [id])
 
-  @@index([pedidoId])
-  @@index([produtoId])
+  @@map("itens_pedido")
 }
