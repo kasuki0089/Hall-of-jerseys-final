@@ -2,13 +2,13 @@
 // import { authOptions } from "../auth/[...nextauth]/route";
 import prisma from "../../../lib/db";
 
-// GET /api/profile - Obter dados do perfil do usuário
+// GET /api/profile - Obter dados do perfil do usuario
 export async function GET(request) {
   try {
-    // TODO: Implementar autenticação real
+    // TODO: Implementar autenticacao real
     // const session = await getServerSession(authOptions);
     // if (!session) {
-    //   return new Response(JSON.stringify({ error: "Não autenticado" }), { 
+    //   return new Response(JSON.stringify({ error: "Nao autenticado" }), { 
     //     status: 401 
     //   });
     // }
@@ -17,7 +17,7 @@ export async function GET(request) {
     const usuarioId = searchParams.get('usuarioId'); // Por enquanto via query param
 
     if (!usuarioId) {
-      return new Response(JSON.stringify({ error: 'usuarioId é obrigatório' }), {
+      return new Response(JSON.stringify({ error: 'usuarioId e obrigatorio' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -75,13 +75,13 @@ export async function GET(request) {
           orderBy: {
             criadoEm: 'desc'
           },
-          take: 10 // Últimos 10 pedidos
+          take: 10 // Ultimos 10 pedidos
         }
       }
     });
 
     if (!usuario) {
-      return new Response(JSON.stringify({ error: "Usuário não encontrado" }), { 
+      return new Response(JSON.stringify({ error: "Usuario nao encontrado" }), { 
         status: 404 
       });
     }
@@ -97,23 +97,43 @@ export async function GET(request) {
       status: 500 
     });
   }
-} 
+}
+
+// PUT /api/profile - Atualizar dados do perfil
+export async function PUT(request) {
+  try {
+    // TODO: Implementar autenticacao real
+    // const session = await getServerSession(authOptions);
+    // if (!session) {
+    //   return new Response(JSON.stringify({ error: "Nao autenticado" }), { 
+    //     status: 401 
+    //   });
+    // }
+
+    const { usuarioId, nome, email, telefone } = await request.json();
+
+    if (!usuarioId) {
+      return new Response(JSON.stringify({ error: "usuarioId e obrigatorio" }), { 
         status: 400 
       });
     }
 
     const updatedUser = await prisma.usuario.update({
-      where: { id: session.user.id },
-      data: { nome, email },
+      where: { id: parseInt(usuarioId) },
+      data: { nome, email, telefone },
       select: {
         id: true,
         nome: true,
         email: true,
+        telefone: true,
         role: true,
       },
     });
 
-    return new Response(JSON.stringify(updatedUser), { status: 200 });
+    return new Response(JSON.stringify(updatedUser), { 
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);
     return new Response(JSON.stringify({ error: "Erro interno do servidor" }), { 

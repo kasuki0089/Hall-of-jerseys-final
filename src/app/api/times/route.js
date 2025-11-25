@@ -4,7 +4,7 @@ import prisma from '../../../lib/db';
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
-    const ligaId = searchParams.get('ligaId');
+    const ligaId = searchParams.get('ligaId') || searchParams.get('liga');
 
     const where = {};
     

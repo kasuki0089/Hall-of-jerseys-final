@@ -6,13 +6,13 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Tabela de Estados
 model Estado {
-  uf        String     @id @db.VarChar(2)
+  uf        String     @id
   nome      String
   enderecos Endereco[]
 
@@ -27,9 +27,9 @@ model Endereco {
   complemento String?
   bairro      String
   cidade      String
-  cep         String    @db.VarChar(9)
+  cep         String
   estado      Estado    @relation(fields: [estadoUf], references: [uf])
-  estadoUf    String    @db.VarChar(2)
+  estadoUf    String
   usuarios    Usuario[]
 
   @@map("enderecos")
@@ -39,7 +39,7 @@ model Endereco {
 model Cor {
   id       Int       @id @default(autoincrement())
   nome     String    @unique
-  codigo   String?   @db.VarChar(7) // Para hex colors #FFFFFF
+  codigo   String? // Para hex colors #FFFFFF
   produtos Produto[]
 
   @@map("cores")
@@ -59,9 +59,9 @@ model Tamanho {
 model FormaPagamento {
   id             Int      @id @default(autoincrement())
   tipo           String   // 'cartao_credito', 'cartao_debito', 'pix', 'boleto'
-  numeroCartao   String?  @db.VarChar(20) // Apenas últimos 4 dígitos para segurança
+  numeroCartao   String?  // Apenas últimos 4 dígitos para segurança
   nomeCartao     String?
-  validadeCartao String?  @db.VarChar(7) // MM/YYYY
+  validadeCartao String?  // MM/YYYY
   bandeiraCartao String?  // Visa, Mastercard, etc
   usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId      Int
@@ -98,7 +98,7 @@ model Produto {
   id           Int           @id @default(autoincrement())
   nome         String
   codigo       String        @unique
-  descricao    String?       @db.Text
+  descricao    String?
   modelo       String        // Ex: "Jersey Home", "Jersey Away", "Regata", etc
   preco        Float
   year         Int
@@ -146,10 +146,13 @@ model Pedido {
   status           String          @default("pendente") // pendente, processando, enviado, entregue, cancelado
   criadoEm         DateTime        @default(now())
   atualizadoEm     DateTime        @updatedAt
+  confirmadoEm     DateTime?
+  transacaoId      String?         @unique
   usuario          Usuario         @relation(fields: [usuarioId], references: [id])
   formaPagamento   FormaPagamento? @relation(fields: [formaPagamentoId], references: [id])
   formaPagamentoId Int?
   itens            ItemPedido[]
+  transacao        Transacao?      @relation(fields: [transacaoId], references: [id])
 
   @@map("pedidos")
 }
@@ -165,4 +168,18 @@ model ItemPedido {
   produto    Produto  @relation(fields: [produtoId], references: [id])
 
   @@map("itens_pedido")
+}
+
+model Transacao {
+  id            String    @id
+  pedidoId      Int
+  tipo          String    // PIX, CARTAO, BOLETO
+  valor         Float
+  status        String    // PENDENTE, APROVADO, REJEITADO, CANCELADO
+  dadosGateway  String?   // JSON com dados do gateway
+  erro          String?
+  processadoEm  DateTime  @default(now())
+  pedido        Pedido?
+
+  @@map("transacoes")
 }

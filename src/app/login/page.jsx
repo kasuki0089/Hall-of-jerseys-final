@@ -3,31 +3,27 @@ import { User, Lock } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from '../../providers/AuthProvider';
 import MainTemplate from '../../templates/MainTemplate';
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { login, loading } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    try {
-      if (email && password) {
-        router.push("/");
-      } else {
-        setError("Email ou senha inválidos");
-      }
-    } catch (err) {
-      setError("Erro interno do servidor");
-    } finally {
-      setLoading(false);
+    const result = await login(email, password, rememberMe);
+    
+    if (result.success) {
+      router.push("/");
+    } else {
+      setError(result.error);
     }
   };
 

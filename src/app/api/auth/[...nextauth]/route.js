@@ -14,9 +14,3 @@ export async function POST() {
     headers: { 'Content-Type': 'application/json' }
   });
 }
-
-// Exportação temporária para evitar erros de import
-export const authOptions = {
-  providers: [],
-  callbacks: {}
-};

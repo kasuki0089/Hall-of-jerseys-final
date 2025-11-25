@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ProductModel } from "@/models/product/product-model";
+
+type ProductModel = {
+  id: string;
+  name: string;
+  price: string;
+  coverImageUrl: string;
+  sport?: string;
+};
 
 type ProductCardProps = {
   product: ProductModel;

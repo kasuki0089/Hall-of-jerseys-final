@@ -2,109 +2,143 @@ import prisma from '../../../lib/db';
 // import { getServerSession } from 'next-auth';
 // import { authOptions } from '../auth/[...nextauth]/route';
 
-// GET /api/produtos - Listar produtos com filtros e paginação
+// GET /api/produtos - Listar produtos com filtros avançados
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     
-    // Parâmetros de filtro
-    const ligaId = searchParams.get('ligaId');
-    const timeId = searchParams.get('timeId');
-    const corId = searchParams.get('corId');
-    const tamanhoId = searchParams.get('tamanhoId');
+    // Extrair parâmetros de filtro
+    const liga = searchParams.get('liga');
+    const time = searchParams.get('time');
+    const cor = searchParams.get('cor');
+    const tamanho = searchParams.get('tamanho');
+    const precoMin = searchParams.get('precoMin');
+    const precoMax = searchParams.get('precoMax');
     const busca = searchParams.get('busca');
-    const sale = searchParams.get('sale');
-    const serie = searchParams.get('serie');
-    const modelo = searchParams.get('modelo');
+    const ordenacao = searchParams.get('ordenacao') || 'nome';
     
-    // Parâmetros de paginação
-    const pagina = parseInt(searchParams.get('pagina')) || 1;
-    const limite = parseInt(searchParams.get('limite')) || 12;
-    const offset = (pagina - 1) * limite;
+    // Paginação
+    const page = parseInt(searchParams.get('page')) || 1;
+    const limit = parseInt(searchParams.get('limit')) || 20;
+    const skip = (page - 1) * limit;
 
-    // Construir condições de filtro
-    const where = { ativo: true };
-    
-    if (ligaId) {
-      where.ligaId = parseInt(ligaId);
-    }
-    
-    if (timeId) {
-      where.timeId = parseInt(timeId);
-    }
-    
-    if (corId) {
-      where.corId = parseInt(corId);
-    }
-    
-    if (tamanhoId) {
-      where.tamanhoId = parseInt(tamanhoId);
-    }
-    
-    if (modelo) {
-      where.modelo = {
-        contains: modelo,
-        mode: 'insensitive'
-      };
-    }
-    
-    if (ligaId && ligaId !== 'todas') {
-      where.ligaId = parseInt(ligaId);
-    }
-    
-    if (timeId && timeId !== 'todos') {
-      where.timeId = parseInt(timeId);
-    }
-    
-    if (tamanho) {
-      where.tamanho = tamanho;
-    }
-    
-    if (sale === 'true') {
-      where.sale = true;
-    }
-    
-    if (serie) {
-      where.serie = { contains: serie, mode: 'insensitive' };
-    }
-    
-    if (busca) {
+    // Construir where clause
+    const where = {};
+
+    // Filtro por busca (nome ou modelo)
+    if (busca && busca.trim()) {
       where.OR = [
-        { nome: { contains: busca, mode: 'insensitive' } },
-        { descricao: { contains: busca, mode: 'insensitive' } },
-        { serie: { contains: busca, mode: 'insensitive' } },
-        { liga: { nome: { contains: busca, mode: 'insensitive' } } },
-        { time: { nome: { contains: busca, mode: 'insensitive' } } }
+        { nome: { contains: busca.trim() } },
+        { modelo: { contains: busca.trim() } },
+        { 
+          time: {
+            nome: { contains: busca.trim() }
+          }
+        }
       ];
     }
 
-    // Executar consultas
-    const [produtos, totalItens] = await Promise.all([
+    // Filtro por liga
+    if (liga) {
+      where.time = {
+        ...where.time,
+        ligaId: parseInt(liga)
+      };
+    }
+
+    // Filtro por time
+    if (time) {
+      where.timeId = parseInt(time);
+    }
+
+    // Filtro por cor
+    if (cor) {
+      where.corId = parseInt(cor);
+    }
+
+    // Filtro por tamanho
+    if (tamanho) {
+      where.tamanhoId = parseInt(tamanho);
+    }
+
+    // Filtro por faixa de preço
+    if (precoMin || precoMax) {
+      where.preco = {};
+      if (precoMin) where.preco.gte = parseFloat(precoMin);
+      if (precoMax) where.preco.lte = parseFloat(precoMax);
+    }
+
+    // Construir orderBy
+    let orderBy = {};
+    switch (ordenacao) {
+      case 'preco-asc':
+        orderBy = { preco: 'asc' };
+        break;
+      case 'preco-desc':
+        orderBy = { preco: 'desc' };
+        break;
+      case 'mais-recentes':
+        orderBy = { criadoEm: 'desc' };
+        break;
+      case 'nome':
+      default:
+        orderBy = { nome: 'asc' };
+        break;
+    }
+
+    // Buscar produtos
+    const [produtos, total] = await Promise.all([
       prisma.produto.findMany({
         where,
-        skip: offset,
-        take: limite,
         include: {
-          liga: true,
-          time: true
+          time: {
+            include: {
+              liga: {
+                select: { id: true, nome: true, sigla: true }
+              }
+            }
+          },
+          cor: {
+            select: { id: true, nome: true, hex: true }
+          },
+          tamanho: {
+            select: { id: true, nome: true, ordem: true }
+          }
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy,
+        skip,
+        take: limit
       }),
       prisma.produto.count({ where })
     ]);
 
-    const totalPaginas = Math.ceil(totalItens / limite);
+    // Calcular metadados de paginação
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
 
     return Response.json({
       produtos,
-      paginacao: {
-        paginaAtual: pagina,
-        totalPaginas,
-        totalItens,
-        itemsPorPagina: limite
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage
+      },
+      filtros: {
+        liga,
+        time,
+        cor,
+        tamanho,
+        precoMin,
+        precoMax,
+        busca,
+        ordenacao
       }
     });
-
+    
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
     return Response.json({ error: 'Erro interno do servidor' }, { status: 500 });

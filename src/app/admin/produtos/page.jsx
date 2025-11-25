@@ -24,14 +24,8 @@ export default function AdminProdutos() {
   });
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else if (session?.user?.role !== 'admin') {
-      router.push('/');
-    } else {
-      carregarProdutos();
-    }
-  }, [session, status, router]);
+    carregarProdutos();
+  }, []);
 
   const carregarProdutos = async () => {
     try {
@@ -152,7 +146,7 @@ export default function AdminProdutos() {
     });
   };
 
-  if (status === 'loading' || loading) {
+  if (loading) {
     return <div className="p-8">Carregando...</div>;
   }
 
