@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/kasuk/Documents/GitHub/Hall-of-jerseys-final/src/app/cadastro/layout.tsx"],"sourcesContent":["import type { Metadata } from \"next\";\r\n\r\nexport const metadata: Metadata = {\r\n  title: \"Cadastro - Hall Of Jerseys\",\r\n  description: \"Crie sua conta na Hall Of Jerseys\",\r\n};\r\n\r\nexport default function CadastroLayout({\r\n  children,\r\n}: {\r\n  children: React.ReactNode;\r\n}) {\r\n  return <>{children}</>;\r\n}\r\n"],"names":[],"mappings":";;;;;;;;AAEO,MAAM,WAAqB;IAChC,OAAO;IACP,aAAa;AACf;AAEe,SAAS,eAAe,EACrC,QAAQ,EAGT;IACC,qBAAO;kBAAG;;AACZ","debugId":null}}]
-}
