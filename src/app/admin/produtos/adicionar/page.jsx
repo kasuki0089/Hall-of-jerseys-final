@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import MainTemplate from '../../../../templates/MainTemplate/index.jsx';
+import MainTemplate from '@/templates/MainTemplate/Index';
 
 export default function AdicionarProduto() {
   const [formData, setFormData] = useState({

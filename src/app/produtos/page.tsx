@@ -1,8 +1,5 @@
 import MainTemplate from "@/templates/MainTemplate/Index";
-import { JsonProductRepository } from "@/repositories/json-product-repository";
 import Link from "next/link";
-import { ProductModel } from "@/models/product/product-model";
-import ProductCard from "@/components/ProductCard";
 import ProductsClient from "./ProductsClient";
 
 export const metadata = {
@@ -10,10 +7,25 @@ export const metadata = {
   description: "Confira nossa coleção completa de jerseys esportivos americanos.",
 };
 
-const productRepository = new JsonProductRepository();
+async function getProducts() {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/produtos`, {
+      cache: 'no-store'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.produtos || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('Erro ao buscar produtos:', error);
+    return [];
+  }
+}
 
 export default async function ProductsPage() {
-  const allProducts = await productRepository.findAll();
+  const allProducts = await getProducts();
 
   return (
     <MainTemplate>
