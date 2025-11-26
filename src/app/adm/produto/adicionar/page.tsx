@@ -21,6 +21,7 @@ export default function AdicionarProduto() {
   const [codigo, setCodigo] = useState("");
   const [tamanhosSelecionados, setTamanhosSelecionados] = useState<number[]>([]);
   const [imagem, setImagem] = useState<File | null>(null);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
   
   const [ligas, setLigas] = useState<any[]>([]);
   const [times, setTimes] = useState<any[]>([]);
@@ -81,6 +82,24 @@ export default function AdicionarProduto() {
     );
   };
 
+  const uploadImagem = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Erro no upload da imagem');
+    }
+
+    return data.imageUrl;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -97,6 +116,19 @@ export default function AdicionarProduto() {
       // Por enquanto, vamos usar apenas o primeiro tamanho selecionado
       // TODO: Atualizar schema para suportar múltiplos tamanhos por produto
       const tamanhoId = tamanhosSelecionados[0];
+
+      let imagemUrl = null;
+      
+      // Fazer upload da imagem se foi selecionada
+      if (imagem) {
+        try {
+          imagemUrl = await uploadImagem(imagem);
+        } catch (uploadError: any) {
+          setError('Erro ao fazer upload da imagem: ' + uploadError.message);
+          setSaving(false);
+          return;
+        }
+      }
 
       const response = await fetch('/api/produtos', {
         method: 'POST',
@@ -116,7 +148,7 @@ export default function AdicionarProduto() {
           corId: corId ? parseInt(corId) : null,
           tamanhoId: tamanhoId,
           estoque: 10, // Valor padrão
-          imagemUrl: null
+          imagemUrl: imagemUrl
         }),
       });
 
@@ -359,7 +391,7 @@ export default function AdicionarProduto() {
           </div>
 
           <ImageUpload
-            label="Imagem do produto (em breve)"
+            label="Imagem do produto"
             value={imagem}
             onChange={setImagem}
           />

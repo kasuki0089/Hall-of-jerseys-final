@@ -20,11 +20,10 @@ export async function GET(req, { params }) {
           }
         },
         time: {
-          select: {
-            id: true,
-            nome: true,
-            sigla: true,
-            cidade: true
+          include: {
+            liga: {
+              select: { id: true, nome: true, sigla: true }
+            }
           }
         },
         cor: {

@@ -1,6 +1,4 @@
 import MainTemplate from "@/templates/MainTemplate/Index";
-import { JsonProductRepository } from "@/repositories/json-product-repository";
-import { ProductModel } from "@/models/product/product-model";
 import Link from "next/link";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
@@ -12,12 +10,58 @@ type ProductPageProps = {
   };
 };
 
-const productRepository = new JsonProductRepository();
+async function getProduct(id: string) {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/produtos/${id}`, {
+      cache: 'no-store'
+    });
+    
+    if (response.ok) {
+      return await response.json();
+    }
+    return null;
+  } catch (error) {
+    console.error('Erro ao buscar produto:', error);
+    return null;
+  }
+}
+
+async function getRelatedProducts() {
+  try {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/produtos?limit=4`, {
+      cache: 'no-store'
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.produtos || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('Erro ao buscar produtos relacionados:', error);
+    return [];
+  }
+}
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-  const product = await productRepository.findById(id);
-  const relatedProducts = await productRepository.findFirstSeven();
+  const product = await getProduct(id);
+  const relatedProducts = await getRelatedProducts();
+
+  if (!product) {
+    return (
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">Produto não encontrado</h1>
+            <Link href="/produtos" className="text-blue-600 hover:text-blue-800">
+              Voltar para produtos
+            </Link>
+          </div>
+        </div>
+      </MainTemplate>
+    );
+  }
 
   return (
     <MainTemplate>
@@ -29,7 +73,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <span className="mx-2">/</span>
             <Link href="/produtos" className="hover:text-blue-600">PRODUTOS</Link>
             <span className="mx-2">/</span>
-            <span>{product.name}</span>
+            <span>{product.nome}</span>
           </div>
         </div>
 
@@ -39,44 +83,46 @@ export default async function ProductPage({ params }: ProductPageProps) {
             {/* Imagem do produto */}
             <div className="aspect-square bg-gray-200 rounded-lg relative overflow-hidden">
               <Image
-                src={product.coverImageUrl}
-                alt={product.name}
+                src={product.imagemUrl || '/images/produto-placeholder.jpg'}
+                alt={product.nome}
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"
+                unoptimized
               />
             </div>
 
             {/* Detalhes do produto */}
             <div className="space-y-6">
               <div>
-                <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.name}</h1>
-                <p className="text-gray-600">Código: #{product.code}</p>
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.nome}</h1>
+                <p className="text-gray-600">Código: #{product.codigo}</p>
+                <p className="text-sm text-gray-600">{product.time?.nome} - {product.time?.liga?.nome}</p>
               </div>
 
               <div>
-                <p className="text-gray-700 mb-4">Selecione uma opção para tamanho:</p>
+                <p className="text-gray-700 mb-4">Tamanho disponível:</p>
                 <div className="flex gap-2">
-                  {Array.isArray(product.size) ? (
-                    product.size.map((size) => (
-                      <button
-                        key={size}
-                        className="w-12 h-12 bg-gray-200 border border-gray-200 hover:bg-gray-300 hover:border-gray-300 transition-colors cursor-pointer duration-300 shadow-md"
-                      >
-                        {size}
-                      </button>
-                    ))
-                  ) : (
-                    <button className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors duration-300">
-                      {product.size}
-                    </button>
-                  )}
+                  <button className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors duration-300">
+                    {product.tamanho?.nome}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-gray-700 mb-2">Cor:</p>
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-8 h-8 rounded border border-gray-300"
+                    style={{ backgroundColor: product.cor?.codigo }}
+                  ></div>
+                  <span className="text-gray-700">{product.cor?.nome}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <p className="text-3xl font-bold text-gray-800">{product.price}</p>
-                <p className="text-sm text-gray-600">ou 3x de R$ 100,00</p>
+                <p className="text-3xl font-bold text-gray-800">R$ {product.preco?.toFixed(2)}</p>
+                <p className="text-sm text-gray-600">ou 3x de R$ {(product.preco / 3)?.toFixed(2)}</p>
               </div>
 
               <button className="w-full flex justify-center items-center bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer">
@@ -89,11 +135,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">DESCRIÇÃO</h2>
             <p className="text-gray-700 leading-relaxed">
-              {product.description}
+              {product.descricao || `Jersey oficial do ${product.time?.nome} da temporada ${product.year}. ${product.modelo} de alta qualidade com tecnologia avançada para máximo conforto.`}
             </p>
             <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <strong>Time:</strong> {product.time}
+                <strong>Time:</strong> {product.time?.nome}
               </div>
               <div>
                 <strong>Liga:</strong> {product.ligue}
@@ -102,15 +148,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <strong>Esporte:</strong> {product.sport}
               </div>
               <div>
+                <strong>Liga:</strong> {product.time?.liga?.sigla}
+              </div>
+              <div>
                 <strong>Ano:</strong> {product.year}
               </div>
-              {product.color && (
-                <div>
-                  <strong>Cor:</strong> {product.color}
-                </div>
-              )}
               <div>
-                <strong>Série:</strong> {product.serie}
+                <strong>Modelo:</strong> {product.modelo}
+              </div>
+              <div>
+                <strong>Série:</strong> {product.serie || 'Home'}
               </div>
             </div>
           </div>
@@ -119,8 +166,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-8">Mais produtos</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {relatedProducts.slice(0, 4).map((relatedProduct: ProductModel) => (
-                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              {relatedProducts.slice(0, 4).map((relatedProduct: any) => (
+                <ProductCard 
+                  key={relatedProduct.id} 
+                  product={{
+                    id: relatedProduct.id.toString(),
+                    nome: relatedProduct.nome,
+                    preco: relatedProduct.preco.toString(),
+                    imagemUrl: relatedProduct.imagemUrl || '/images/produto-placeholder.jpg',
+                    liga: relatedProduct.time?.liga?.sigla
+                  }} 
+                />
               ))}
             </div>
           </div>
@@ -132,10 +188,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
 export async function generateMetadata({ params }: ProductPageProps) {
   const { id } = await params;
-  const product = await productRepository.findById(id);
+  const product = await getProduct(id);
+  
+  if (!product) {
+    return {
+      title: 'Produto não encontrado - Hall Of Jerseys',
+      description: 'Produto não encontrado',
+    };
+  }
   
   return {
-    title: `${product.name} - Hall Of Jerseys`,
-    description: product.description,
+    title: `${product.nome} - Hall Of Jerseys`,
+    description: product.descricao || `Jersey oficial do ${product.time?.nome}`,
   };
 }

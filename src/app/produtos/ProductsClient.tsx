@@ -33,23 +33,15 @@ export default function ProductsClient({ products }: ProductsClientProps) {
   const [activeFilter, setActiveFilter] = useState("ALL");
 
   const filteredProducts = useMemo(() => {
-    console.log('Filtrando produtos:', {
-      activeFilter,
-      totalProducts: products.length,
-      exampleProduct: products[0] // Para debug
-    });
-    
     if (activeFilter === "ALL") {
       return products;
     }
     
     const filtered = products.filter(product => {
       const liga = product.time?.liga?.sigla;
-      console.log(`Produto ${product.nome}: liga=${liga}, match=${liga === activeFilter}`);
       return liga === activeFilter;
     });
     
-    console.log('Produtos filtrados:', filtered.length);
     return filtered;
   }, [products, activeFilter]);
 
@@ -111,26 +103,17 @@ export default function ProductsClient({ products }: ProductsClientProps) {
       {/* Grid de produtos 4x4 */}
       <div className="container mx-auto px-4 pb-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {currentProducts.map((product: Product) => {
-            console.log('Produto sendo renderizado:', {
-              id: product.id,
-              nome: product.nome,
-              imagemUrl: product.imagemUrl,
-              liga: product.time?.liga?.sigla
-            });
-            
-            return (
-              <ProductCard 
-                key={product.id} 
-                product={{
-                  id: product.id.toString(),
-                  nome: product.nome,
-                  preco: product.preco.toString(),
-                  imagemUrl: product.imagemUrl || '/images/produto-placeholder.jpg',
-                  liga: product.time?.liga?.sigla
-                }} 
-              />
-            );
+          {currentProducts.map((product: Product) => (
+            <ProductCard 
+              key={product.id} 
+              product={{
+                id: product.id.toString(),
+                nome: product.nome,
+                preco: product.preco.toString(),
+                imagemUrl: product.imagemUrl || '/images/produto-placeholder.jpg',
+                liga: product.time?.liga?.sigla
+              }} 
+            />
           ))}
         </div>
       </div>
