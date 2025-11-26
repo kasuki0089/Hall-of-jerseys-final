@@ -122,10 +122,12 @@ export async function GET(request) {
         skip,
         take: limit,
         include: {
-          ligaObj: true,
-          timeObj: true
+          liga: true,
+          time: true,
+          cor: true,
+          tamanho: true
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { criadoEm: 'desc' }
       }),
       prisma.produto.count()
     ]);
