@@ -1,0 +1,82 @@
+'use client';
+import AdminTemplate from "@/templates/AdminTemplate";
+import { Package, Edit, Trash2, Search } from "lucide-react";
+import productsData from "@/db/seed/products.json";
+import { useState } from "react";
+import AddButton from "@/components/ADM/AddButton";
+import Link from "next/link";
+
+export default function GerenciarProdutosPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const totalProducts = productsData.length;
+
+  const filteredProducts = productsData.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <AdminTemplate>
+      {/* Header da Página */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Package className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-bold text-gray-800">
+              Gerenciar Produtos ({totalProducts})
+            </h1>
+          </div>
+          <AddButton href="/adm/produto/adicionar" text="Adicionar produto" />
+        </div>
+
+        {/* Campo de Pesquisa */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder="Pesquisar"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+        </div>
+      </div>
+
+      {/* Tabela de Produtos */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">ID</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">NOME DO PRODUTO</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">CATEGORIA</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">PREÇO</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredProducts.map((product) => (
+                <tr key={product.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm text-gray-800">#{product.id}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800 uppercase">{product.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{product.serie}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{product.price.replace('R$ ', '').replace(',', '.')}</td>
+                  <td className="px-6 py-4 text-sm">
+                    <div className="flex items-center justify-center gap-3">
+                      <Link href={`/adm/produto/alterar/${product.id}`} className="text-blue-500 hover:text-blue-700 transition-colors">
+                        <Edit className="w-5 h-5" />
+                      </Link>
+                      <button className="text-red-500 hover:text-red-700 transition-colors">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </AdminTemplate>
+  );
+}
