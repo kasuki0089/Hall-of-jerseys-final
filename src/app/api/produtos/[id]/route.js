@@ -1,6 +1,6 @@
 import prisma from '../../../../lib/db';
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '../../auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 // GET /api/produtos/[id] - Buscar produto específico
 export async function GET(req, { params }) {
@@ -125,8 +125,9 @@ export async function DELETE(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores.' }), { 
+    // Verificar se está logado e é admin
+    if (!session || session.user.tipo !== 'ADMIN') {
+      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem excluir produtos.' }), { 
         status: 403,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -137,7 +138,9 @@ export async function DELETE(req, { params }) {
     // Verificar se o produto existe e se tem pedidos associados
     const produto = await prisma.produto.findUnique({
       where: { id: parseInt(id) },
-      include: { itens: true }
+      include: { 
+        itensPedido: true  // Nome correto da relação
+      }
     });
 
     if (!produto) {
@@ -147,26 +150,37 @@ export async function DELETE(req, { params }) {
       });
     }
 
-    if (produto.itens.length > 0) {
+    // Se tem pedidos associados, apenas desativa ao invés de deletar
+    if (produto.itensPedido.length > 0) {
+      const produtoDesativado = await prisma.produto.update({
+        where: { id: parseInt(id) },
+        data: { ativo: false }
+      });
+
       return new Response(JSON.stringify({ 
-        error: 'Não é possível deletar produto com pedidos associados. Desative-o ao invés disso.' 
+        message: 'Produto desativado com sucesso (havia pedidos associados)',
+        produto: produtoDesativado
       }), { 
-        status: 400,
+        status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
+    // Se não tem pedidos, pode deletar completamente
     await prisma.produto.delete({
       where: { id: parseInt(id) }
     });
 
-    return new Response(JSON.stringify({ message: 'Produto deletado com sucesso' }), { 
+    return new Response(JSON.stringify({ message: 'Produto excluído com sucesso' }), { 
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
     console.error('Erro ao deletar produto:', error);
-    return new Response(JSON.stringify({ error: 'Erro ao deletar produto' }), { 
+    return new Response(JSON.stringify({ 
+      error: 'Erro interno do servidor',
+      details: error.message 
+    }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

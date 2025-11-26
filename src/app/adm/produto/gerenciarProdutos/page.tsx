@@ -36,16 +36,18 @@ export default function GerenciarProdutosPage() {
         method: 'DELETE',
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        alert('Produto excluído com sucesso!');
-        carregarProdutos();
+        alert(data.message || 'Produto processado com sucesso!');
+        carregarProdutos(); // Recarrega a lista
       } else {
-        const data = await res.json();
         alert(data.error || 'Erro ao excluir produto');
+        console.error('Erro do servidor:', data);
       }
     } catch (error) {
       console.error('Erro ao excluir produto:', error);
-      alert('Erro ao excluir produto');
+      alert('Erro de conexão. Tente novamente.');
     }
   };
 
