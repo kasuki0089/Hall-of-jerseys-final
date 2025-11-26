@@ -23,7 +23,7 @@ export default async function BestSellers() {
       <div className="w-full max-w-[1750px] px-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-7 gap-8">
           {products.map((product: any) => {
-            const imagePath = product.imagem_url || '/images/produto-placeholder.jpg';
+            const imagePath = product.imagemUrl || '/images/produto-placeholder.jpg';
 
             return (
               <article

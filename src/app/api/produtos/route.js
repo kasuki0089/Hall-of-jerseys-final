@@ -99,7 +99,7 @@ export async function GET(req) {
             }
           },
           cor: {
-            select: { id: true, nome: true, hex: true }
+            select: { id: true, nome: true, codigo: true }
           },
           tamanho: {
             select: { id: true, nome: true, ordem: true }

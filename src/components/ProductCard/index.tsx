@@ -6,14 +6,14 @@ type ProductCardProps = {
     id: string;
     nome: string;
     preco: string;
-    imagem_url: string;
+    imagemUrl: string;
     esporte?: string;
     liga?: string;
   };
 };
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const imagePath = product.imagem_url || '/images/produto-placeholder.jpg';
+  const imagePath = product.imagemUrl || '/images/produto-placeholder.jpg';
   const preco = product.preco ? `R$ ${parseFloat(product.preco).toFixed(2)}` : 'Preço não disponível';
 
   return (

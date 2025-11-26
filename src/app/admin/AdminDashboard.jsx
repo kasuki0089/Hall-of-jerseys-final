@@ -19,15 +19,26 @@ export default function AdminDashboard({ session }) {
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showUserForm, setShowUserForm] = useState(false);
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    setMounted(true);
+    if (mounted) {
+      loadData();
+    }
+  }, [mounted]);
+
+  if (!mounted) {
+    return (
+      <MainTemplate>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-2">Carregando painel administrativo...</h2>
+          </div>
+        </div>
+      </MainTemplate>
+    );
+  }
 
   const loadData = async () => {
     setLoading(true);

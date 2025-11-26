@@ -1,108 +1,85 @@
-"use client"; // necessário para permitir estado e efeitos no Next.js App Router
+"use client";
 
 import React, { useState } from "react";
-import Image, { StaticImageData } from "next/image";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// -----------------------------
-// Imports das imagens locais
-// -----------------------------
-import img1 from "@/public/images/banner/lebron_lakers.jpg";
-import img2 from "@/public/images/banner/intermiami.jpg";
-import img3 from "@/public/images/banner/bronw_eagles.jpg";
-import img4 from "@/public/images/banner/okc.jpg";
+const bannerImages = [
+  {
+    id: 1,
+    title: "Coleção NBA",
+    subtitle: "Os melhores jerseys da temporada",
+    color: "from-blue-600 to-purple-600"
+  },
+  {
+    id: 2,
+    title: "Novidades NFL", 
+    subtitle: "Equipamentos oficiais dos times",
+    color: "from-green-600 to-blue-600"
+  },
+  {
+    id: 3,
+    title: "Ofertas Especiais",
+    subtitle: "Descontos imperdíveis", 
+    color: "from-red-600 to-orange-600"
+  }
+];
 
-// Tipo das props que o Carousel recebe
-interface Slide {
-  src: StaticImageData; // imagem local importada
-  alt: string;          // texto alternativo (acessibilidade)
-}
+export default function Carousel() {
+  const [currentSlide, setCurrentSlide] = useState(0);
 
-interface CarouselProps {
-  slides: Slide[];
-}
-
-
-// COMPONENTE: Carousel
-const Carousel: React.FC<CarouselProps> = ({ slides }) => {
-  const [current, setCurrent] = useState(0); // índice do slide atual
-
-  // Avança para o próximo slide (loopa ao final)
   const nextSlide = () => {
-    setCurrent((prev) => (prev + 1) % slides.length);
+    setCurrentSlide((prev) => (prev + 1) % bannerImages.length);
   };
 
-  // Volta para o slide anterior (loopa ao início)
   const prevSlide = () => {
-    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
+    setCurrentSlide((prev) => (prev - 1 + bannerImages.length) % bannerImages.length);
   };
 
   return (
-    <div className="relative w-[100%] h-[100%] mx-auto overflow-hidden shadow-lg">
-      {/* Área das imagens */}
-      <div className="relative w-[100%] h-[100%]">
-        {slides.map((slide, index) => (
+    <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 rounded-lg mx-auto max-w-[1750px] mb-8">
+      <div className="relative w-full h-full">
+        {bannerImages.map((slide, index) => (
           <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              index === current ? "opacity-100" : "opacity-0"
+            key={slide.id}
+            className={`absolute inset-0 transition-opacity duration-500 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            {/* next/image otimiza automaticamente imagens importadas */}
-            <Image
-              src={slide.src}
-              alt={slide.alt}
-              fill
-              className="object-cover"
-              placeholder="blur" // aplica blur automático para imagens locais
-            />
-
+            <div className={`w-full h-full bg-gradient-to-r ${slide.color} flex items-center justify-center`}>
+              <div className="text-center text-white px-4">
+                <h1 className="text-4xl md:text-6xl font-bold mb-4">{slide.title}</h1>
+                <p className="text-xl md:text-2xl">{slide.subtitle}</p>
+              </div>
+            </div>
           </div>
         ))}
+
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transition-all"
+        >
+          <ChevronLeft size={24} />
+        </button>
+
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-2 rounded-full transition-all"
+        >
+          <ChevronRight size={24} />
+        </button>
+
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          {bannerImages.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                index === currentSlide ? 'bg-white' : 'bg-white bg-opacity-50'
+              }`}
+            />
+          ))}
+        </div>
       </div>
-
-      {/* Botões de navegação */}
-      <button
-        onClick={prevSlide}
-        className="absolute top-1/2 left-4 -translate-y-1/2 bg-black bg-opacity-40 text-white px-3 py-1 rounded-full hover:bg-opacity-70 transition"
-      >
-        ❮
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute top-1/2 right-4 -translate-y-1/2 bg-black bg-opacity-40 text-white px-3 py-1 rounded-full hover:bg-opacity-70 transition"
-      >
-        ❯
-      </button>
-
-      {/* Indicadores de posição */}
-      <div className="absolute bottom-3 left-0 right-0 flex justify-center space-x-2">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrent(index)}
-            className={`w-3 h-3 rounded-full transition ${
-              index === current ? "bg-white" : "bg-gray-400"
-            }`}
-          />
-        ))}
-      </div>
-    </div>
+    </section>
   );
-};
-
-const CarouselExample: React.FC = () => {
-  const slides: Slide[] = [
-    { src: img1, alt: "Imagem 1"},
-    { src: img2, alt: "Imagem 2" },
-    { src: img3, alt: "Imagem 3"},
-    { src: img4, alt: "Imagem 4"},
-  ];
-
-  return (
-    <div className="flex flex-col items-center justify-center bg-gray-50 h-[85vh]">
-      <Carousel slides={slides} />
-    </div>
-  );
-};
-
-export default CarouselExample;
+}
