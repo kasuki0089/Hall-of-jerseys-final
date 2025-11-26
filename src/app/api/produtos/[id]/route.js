@@ -70,7 +70,7 @@ export async function PUT(req, { params }) {
     const session = await getServerSession(authOptions);
     
     if (!session || session.user.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores.' }), { 
+      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem editar produtos.' }), { 
         status: 403,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -126,8 +126,19 @@ export async function DELETE(req, { params }) {
     const session = await getServerSession(authOptions);
     
     // Verificar se está logado e é admin
-    if (!session || session.user.tipo !== 'ADMIN') {
-      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem excluir produtos.' }), { 
+    if (!session) {
+      return new Response(JSON.stringify({ 
+        error: 'Você precisa estar logado para excluir produtos.'
+      }), { 
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (session.user.role !== 'admin') {
+      return new Response(JSON.stringify({ 
+        error: 'Apenas administradores podem excluir produtos.'
+      }), { 
         status: 403,
         headers: { 'Content-Type': 'application/json' }
       });

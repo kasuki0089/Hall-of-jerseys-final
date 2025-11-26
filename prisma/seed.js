@@ -293,7 +293,7 @@ async function main() {
       timeId: timesCreated.LAL.id,
       corId: corAmarela.id,
       tamanhoId: tamanhoM.id,
-      imagemUrl: '/images/lakers-home-2024.jpg'
+      imagemUrl: '/images/prodImages/lebron_lakers_6_2024.jpg'
     },
     {
       nome: 'Camisa Warriors Home 2024',
@@ -310,7 +310,7 @@ async function main() {
       timeId: timesCreated.GSW.id,
       corId: corAzul.id,
       tamanhoId: tamanhoG.id,
-      imagemUrl: '/images/warriors-home-2024.jpg'
+      imagemUrl: '/images/prodImages/curry_30_2024.jpg'
     },
     {
       nome: 'Jersey Chiefs Home 2024',
@@ -327,7 +327,7 @@ async function main() {
       timeId: timesCreated.KC.id,
       corId: corVermelho.id,
       tamanhoId: tamanhoM.id,
-      imagemUrl: '/images/chiefs-home-2024.jpg'
+      imagemUrl: '/images/prodImages/mahomes_15_2024.jpg'
     },
     {
       nome: 'Jersey Bruins Home 2024',
@@ -344,7 +344,7 @@ async function main() {
       timeId: timesCreated.BOS_NHL.id,
       corId: await prisma.cor.findFirst({ where: { nome: 'Preto' } }).then(c => c.id),
       tamanhoId: tamanhoG.id,
-      imagemUrl: '/images/bruins-home-2024.jpg'
+      imagemUrl: '/images/prodImages/corsby_87_2024.jpg'
     },
     {
       nome: 'Camisa LA Galaxy Home 2024',
@@ -361,7 +361,7 @@ async function main() {
       timeId: timesCreated.LAG_MLS.id,
       corId: corBranco.id,
       tamanhoId: tamanhoM.id,
-      imagemUrl: '/images/galaxy-home-2024.jpg'
+      imagemUrl: '/images/prodImages/zlatan_9_2019.jpg'
     }
   ];
 

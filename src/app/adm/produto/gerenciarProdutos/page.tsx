@@ -42,8 +42,12 @@ export default function GerenciarProdutosPage() {
         alert(data.message || 'Produto processado com sucesso!');
         carregarProdutos(); // Recarrega a lista
       } else {
-        alert(data.error || 'Erro ao excluir produto');
-        console.error('Erro do servidor:', data);
+        if (res.status === 401) {
+          alert('Você precisa fazer login como administrador.');
+          window.location.href = '/login';
+        } else {
+          alert(data.error || 'Erro ao excluir produto');
+        }
       }
     } catch (error) {
       console.error('Erro ao excluir produto:', error);

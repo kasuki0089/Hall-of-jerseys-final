@@ -22,6 +22,7 @@ export default function Navbar() {
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/about">SOBRE</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/contact">CONTATO</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/suporte">SUPORTE</Link>
+          <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/login?callbackUrl=/adm/home">ADMIN</Link>
         </ul>
 
         <div className="flex items-center gap-2 md:gap-4">
