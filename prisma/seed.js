@@ -94,14 +94,51 @@ async function main() {
 
   // === CRIAR TIMES ===
   
-  // NBA Teams
+  // NBA Teams - TODOS OS 30 TIMES DA NBA
   const nbaTeams = [
-    { nome: 'Los Angeles Lakers', sigla: 'LAL', cidade: 'Los Angeles' },
-    { nome: 'Golden State Warriors', sigla: 'GSW', cidade: 'San Francisco' },
-    { nome: 'Miami Heat', sigla: 'MIA', cidade: 'Miami' },
-    { nome: 'Chicago Bulls', sigla: 'CHI', cidade: 'Chicago' },
+    // CONFERÊNCIA LESTE
+    // Divisão Atlântica
     { nome: 'Boston Celtics', sigla: 'BOS', cidade: 'Boston' },
-    { nome: 'Brooklyn Nets', sigla: 'BKN', cidade: 'Brooklyn' }
+    { nome: 'Brooklyn Nets', sigla: 'BKN', cidade: 'Brooklyn' },
+    { nome: 'New York Knicks', sigla: 'NYK', cidade: 'New York' },
+    { nome: 'Philadelphia 76ers', sigla: 'PHI', cidade: 'Philadelphia' },
+    { nome: 'Toronto Raptors', sigla: 'TOR', cidade: 'Toronto' },
+    
+    // Divisão Central
+    { nome: 'Chicago Bulls', sigla: 'CHI', cidade: 'Chicago' },
+    { nome: 'Cleveland Cavaliers', sigla: 'CLE', cidade: 'Cleveland' },
+    { nome: 'Detroit Pistons', sigla: 'DET', cidade: 'Detroit' },
+    { nome: 'Indiana Pacers', sigla: 'IND', cidade: 'Indianapolis' },
+    { nome: 'Milwaukee Bucks', sigla: 'MIL', cidade: 'Milwaukee' },
+    
+    // Divisão Sudeste
+    { nome: 'Atlanta Hawks', sigla: 'ATL', cidade: 'Atlanta' },
+    { nome: 'Charlotte Hornets', sigla: 'CHA', cidade: 'Charlotte' },
+    { nome: 'Miami Heat', sigla: 'MIA', cidade: 'Miami' },
+    { nome: 'Orlando Magic', sigla: 'ORL', cidade: 'Orlando' },
+    { nome: 'Washington Wizards', sigla: 'WAS', cidade: 'Washington' },
+    
+    // CONFERÊNCIA OESTE
+    // Divisão Noroeste
+    { nome: 'Denver Nuggets', sigla: 'DEN', cidade: 'Denver' },
+    { nome: 'Minnesota Timberwolves', sigla: 'MIN', cidade: 'Minneapolis' },
+    { nome: 'Oklahoma City Thunder', sigla: 'OKC', cidade: 'Oklahoma City' },
+    { nome: 'Portland Trail Blazers', sigla: 'POR', cidade: 'Portland' },
+    { nome: 'Utah Jazz', sigla: 'UTA', cidade: 'Salt Lake City' },
+    
+    // Divisão Pacífico
+    { nome: 'Golden State Warriors', sigla: 'GSW', cidade: 'San Francisco' },
+    { nome: 'Los Angeles Clippers', sigla: 'LAC', cidade: 'Los Angeles' },
+    { nome: 'Los Angeles Lakers', sigla: 'LAL', cidade: 'Los Angeles' },
+    { nome: 'Phoenix Suns', sigla: 'PHX', cidade: 'Phoenix' },
+    { nome: 'Sacramento Kings', sigla: 'SAC', cidade: 'Sacramento' },
+    
+    // Divisão Sudoeste
+    { nome: 'Dallas Mavericks', sigla: 'DAL', cidade: 'Dallas' },
+    { nome: 'Houston Rockets', sigla: 'HOU', cidade: 'Houston' },
+    { nome: 'Memphis Grizzlies', sigla: 'MEM', cidade: 'Memphis' },
+    { nome: 'New Orleans Pelicans', sigla: 'NOP', cidade: 'New Orleans' },
+    { nome: 'San Antonio Spurs', sigla: 'SAS', cidade: 'San Antonio' }
   ];
 
   const timesCreated = {};
@@ -351,7 +388,7 @@ async function main() {
   console.log(`- ${await prisma.cor.count()} cores criadas`);
   console.log(`- ${await prisma.tamanho.count()} tamanhos criados`);
   console.log(`- ${await prisma.liga.count()} ligas criadas (NBA, NFL, NHL, MLS)`);
-  console.log(`- ${await prisma.time.count()} times criados`);
+  console.log(`- ${await prisma.time.count()} times criados (30 NBA + outros)`);
   console.log(`- ${await prisma.produto.count()} produtos criados`);
   console.log(`- ${await prisma.usuario.count()} usuários criados`);
   console.log(`- ${await prisma.formaPagamento.count()} formas de pagamento criadas`);

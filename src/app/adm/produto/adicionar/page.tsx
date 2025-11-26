@@ -191,17 +191,15 @@ export default function AdicionarProduto() {
               name="descricao"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
-              className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none resize-none"
+              className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 resize-none"
               rows={3}
-              placeholder=" "
+              placeholder="Digite uma descrição do produto..."
             />
             <label
               htmlFor="descricao"
-              className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 peer-placeholder-shown:translate-y-0 ${
-                descricao ? "-translate-y-6 text-sm" : ""
-              }`}
+              className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
             >
-              Descrição (opcional)
+              Descrição
             </label>
           </div>
 
@@ -212,23 +210,21 @@ export default function AdicionarProduto() {
                 name="ligaId"
                 value={ligaId}
                 onChange={(e) => setLigaId(e.target.value)}
-                className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
+                className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 cursor-pointer"
                 required
               >
-                <option value="" disabled></option>
+                <option value="" disabled className="text-gray-500">Selecione uma liga</option>
                 {ligas.map((liga) => (
-                  <option key={liga.id} value={liga.id}>
+                  <option key={liga.id} value={liga.id} className="text-gray-900 py-2">
                     {liga.sigla} - {liga.nome}
                   </option>
                 ))}
               </select>
               <label
                 htmlFor="ligaId"
-                className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                  ligaId ? "-translate-y-6 text-sm" : ""
-                }`}
+                className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
               >
-                Liga
+                Liga *
               </label>
             </div>
 
@@ -238,24 +234,30 @@ export default function AdicionarProduto() {
                 name="timeId"
                 value={timeId}
                 onChange={(e) => setTimeId(e.target.value)}
-                className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
+                className={`peer w-full border-2 rounded-lg px-4 py-3 text-gray-900 transition-all duration-200 focus:ring-2 focus:ring-blue-200 focus:outline-none cursor-pointer ${
+                  !ligaId 
+                    ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed' 
+                    : 'border-gray-300 bg-white hover:border-gray-400 focus:border-blue-500'
+                }`}
                 required
                 disabled={!ligaId}
               >
-                <option value="" disabled></option>
+                <option value="" disabled className="text-gray-500">
+                  {!ligaId ? 'Selecione uma liga primeiro' : 'Selecione um time'}
+                </option>
                 {timesFiltrados.map((time) => (
-                  <option key={time.id} value={time.id}>
+                  <option key={time.id} value={time.id} className="text-gray-900 py-2">
                     {time.nome}
                   </option>
                 ))}
               </select>
               <label
                 htmlFor="timeId"
-                className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                  timeId ? "-translate-y-6 text-sm" : ""
+                className={`absolute -top-3 left-3 bg-white px-2 text-sm font-medium transition-all duration-200 ${
+                  !ligaId ? 'text-gray-400' : 'text-gray-600'
                 }`}
               >
-                Time {!ligaId && "(selecione uma liga primeiro)"}
+                Time *
               </label>
             </div>
           </div>
@@ -266,21 +268,19 @@ export default function AdicionarProduto() {
               name="categoria"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
-              className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
+              className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 cursor-pointer"
               required
             >
-              <option value="" disabled></option>
-              <option value="JERSEY">Jersey</option>
-              <option value="REGATA">Regata</option>
-              <option value="CAMISA">Camisa</option>
+              <option value="" disabled className="text-gray-500">Selecione uma categoria</option>
+              <option value="JERSEY" className="text-gray-900 py-2">Jersey</option>
+              <option value="REGATA" className="text-gray-900 py-2">Regata</option>
+              <option value="CAMISA" className="text-gray-900 py-2">Camisa</option>
             </select>
             <label
               htmlFor="categoria"
-              className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                categoria ? "-translate-y-6 text-sm" : ""
-              }`}
+              className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
             >
-              Categoria
+              Categoria *
             </label>
           </div>
 
@@ -291,20 +291,18 @@ export default function AdicionarProduto() {
                 name="serie"
                 value={serie}
                 onChange={(e) => setSerie(e.target.value)}
-                className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
+                className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 cursor-pointer"
               >
-                <option value="">Nenhuma</option>
-                <option value="Atual temporada">Atual temporada</option>
-                <option value="Retrô">Retrô</option>
-                <option value="Especial">Especial</option>
+                <option value="" className="text-gray-500">Selecione uma série (opcional)</option>
+                <option value="Atual temporada" className="text-gray-900 py-2">⭐ Atual temporada</option>
+                <option value="Retrô" className="text-gray-900 py-2">🕰️ Retrô</option>
+                <option value="Especial" className="text-gray-900 py-2">✨ Especial</option>
               </select>
               <label
                 htmlFor="serie"
-                className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                  serie ? "-translate-y-6 text-sm" : ""
-                }`}
+                className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
               >
-                Série (opcional)
+                Série
               </label>
             </div>
 
@@ -314,22 +312,20 @@ export default function AdicionarProduto() {
                 name="corId"
                 value={corId}
                 onChange={(e) => setCorId(e.target.value)}
-                className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
+                className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 cursor-pointer"
               >
-                <option value="">Selecione uma cor</option>
+                <option value="" className="text-gray-500">Selecione uma cor (opcional)</option>
                 {cores.map((cor) => (
-                  <option key={cor.id} value={cor.id}>
-                    {cor.nome}
+                  <option key={cor.id} value={cor.id} className="text-gray-900 py-2">
+                    🎨 {cor.nome}
                   </option>
                 ))}
               </select>
               <label
                 htmlFor="corId"
-                className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                  corId ? "-translate-y-6 text-sm" : ""
-                }`}
+                className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
               >
-                Cor (opcional)
+                Cor
               </label>
             </div>
           </div>

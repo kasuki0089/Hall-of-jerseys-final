@@ -26,16 +26,13 @@ export default function AdminInput({
         onChange={onChange}
         required={required}
         step={step}
-        className="w-full border-b border-gray-400 focus:border-primary focus:outline-none py-2 peer bg-transparent"
+        className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+        placeholder=" "
       />
       <label 
-        className={`absolute left-0 top-2 text-sm transition-all pointer-events-none ${
-          value 
-            ? '-translate-y-6 text-primary font-bold text-xs' 
-            : 'text-gray-600 peer-focus:-translate-y-6 peer-focus:text-primary peer-focus:font-bold peer-focus:text-xs'
-        }`}
+        className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
       >
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
     </div>
   );
