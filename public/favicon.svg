@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <rect width="32" height="32" fill="#022F8E"/>
+  <rect x="6" y="8" width="20" height="16" fill="#EFBF04" rx="2"/>
+  <text x="16" y="20" text-anchor="middle" fill="#022F8E" font-family="Arial, sans-serif" font-size="10" font-weight="bold">HJ</text>
+</svg>
