@@ -15,6 +15,12 @@ type ProductCardProps = {
 export default function ProductCard({ product }: ProductCardProps) {
   const imagePath = product.imagemUrl || '/images/produto-placeholder.jpg';
   const preco = product.preco ? `R$ ${parseFloat(product.preco).toFixed(2)}` : 'Preço não disponível';
+  
+  console.log('ProductCard Debug:', {
+    nome: product.nome,
+    imagemUrl: product.imagemUrl,
+    finalPath: imagePath
+  });
 
   return (
     <Link href={`/produtos/${product.id}`}>
