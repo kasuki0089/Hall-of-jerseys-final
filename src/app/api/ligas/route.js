@@ -1,20 +1,10 @@
 import prisma from '../../../lib/db';
 
-// GET /api/ligas - Listar todas as ligas ativas
+// GET /api/ligas - Listar todas as ligas
 export async function GET() {
   try {
     const ligas = await prisma.liga.findMany({
-      where: { ativo: true },
-      include: {
-        times: {
-          where: { ativo: true },
-          orderBy: { nome: 'asc' }
-        },
-        _count: {
-          select: { produtos: true }
-        }
-      },
-      orderBy: { nome: 'asc' }
+      orderBy: { sigla: 'asc' }
     });
 
     return Response.json(ligas);

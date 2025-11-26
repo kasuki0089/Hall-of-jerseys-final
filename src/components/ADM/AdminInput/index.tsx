@@ -5,6 +5,7 @@ type AdminInputProps = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   required?: boolean;
+  step?: string;
 };
 
 export default function AdminInput({ 
@@ -13,7 +14,8 @@ export default function AdminInput({
   value, 
   onChange, 
   type = "text", 
-  required = true 
+  required = true,
+  step
 }: AdminInputProps) {
   return (
     <div className="relative w-full">
@@ -23,6 +25,7 @@ export default function AdminInput({
         value={value}
         onChange={onChange}
         required={required}
+        step={step}
         className="w-full border-b border-gray-400 focus:border-primary focus:outline-none py-2 peer bg-transparent"
       />
       <label 

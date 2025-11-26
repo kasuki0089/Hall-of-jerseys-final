@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import AdminTemplate from "@/templates/AdminTemplate";
 import { Edit } from "lucide-react";
 import AdminInput from "@/components/ADM/AdminInput";
@@ -9,35 +9,74 @@ import FormBox from "@/components/ADM/FormBox";
 
 export default function AlterarAdministrador() {
   const params = useParams();
+  const router = useRouter();
   const id = params.id;
 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [poder, setPoder] = useState("");
+  const [senha, setSenha] = useState("");
+  const [telefone, setTelefone] = useState("");
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    // Buscar dados do administrador pelo ID
-    const adminsData = [
-      { id: "1", nome: "SysOP", login: "susop@hof.com", poder: "9" },
-      { id: "2", nome: "dann.ksz", login: "dann.ksz@hof.com", poder: "8" },
-      { id: "3", nome: "zaratustra", login: "zaratustra@hof.com", poder: "7" },
-    ];
-
-    const admin = adminsData.find((a) => a.id === id);
-    
-    if (admin) {
-      setNome(admin.nome);
-      setEmail(admin.login);
-      setPoder(admin.poder);
-    }
-    setLoading(false);
+    carregarAdministrador();
   }, [id]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const carregarAdministrador = async () => {
+    try {
+      const response = await fetch(`/api/administradores/${id}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao carregar administrador');
+      }
+
+      setNome(data.nome);
+      setEmail(data.email);
+      setTelefone(data.telefone || '');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Administrador alterado:", { id, nome, email, poder });
-    // TODO: Implementar lógica de atualização do administrador
+    setSaving(true);
+    setError("");
+
+    try {
+      const body: any = { nome, email, cpf: telefone };
+      
+      // Só enviar senha se foi alterada
+      if (senha) {
+        body.senha = senha;
+      }
+
+      const response = await fetch(`/api/administradores/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao atualizar administrador');
+      }
+
+      alert('Administrador atualizado com sucesso!');
+      router.push('/adm/administrador/gerenciarAdministradores');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -64,6 +103,12 @@ export default function AlterarAdministrador() {
       </div>
 
       <FormBox>
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6 pt-2">
           <AdminInput
             label="Nome"
@@ -83,33 +128,25 @@ export default function AlterarAdministrador() {
             required
           />
 
-          <div className="relative">
-            <select
-              id="poder"
-              name="poder"
-              value={poder}
-              onChange={(e) => setPoder(e.target.value)}
-              className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
-              required
-            >
-              <option value="" disabled></option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select>
-            <label
-              htmlFor="poder"
-              className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                poder ? "-translate-y-6 text-sm" : ""
-              }`}
-            >
-              Poder
-            </label>
-          </div>
+          <AdminInput
+            label="Nova Senha (deixe em branco para não alterar)"
+            name="senha"
+            type="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
+
+          <AdminInput
+            label="Telefone (opcional)"
+            name="telefone"
+            type="text"
+            value={telefone}
+            onChange={(e) => setTelefone(e.target.value)}
+          />
 
           <AdminFormButtons
             cancelHref="/adm/administrador/gerenciarAdministradores"
-            submitText="Salvar"
+            submitText={saving ? "Salvando..." : "Salvar Alterações"}
           />
         </form>
       </FormBox>

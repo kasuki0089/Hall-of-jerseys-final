@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 // Tabela de Estados
@@ -95,31 +95,76 @@ model Time {
 }
 
 model Produto {
-  id           Int           @id @default(autoincrement())
-  nome         String
-  codigo       String        @unique
-  descricao    String?
-  modelo       String        // Ex: "Jersey Home", "Jersey Away", "Regata", etc
-  preco        Float
-  year         Int
-  serie        String?       // Home, Away, Third, Special Edition
-  estoque      Int           @default(0)
-  ativo        Boolean       @default(true)
-  sale         Boolean       @default(false)
-  imagemUrl    String?
-  criadoEm     DateTime      @default(now())
-  atualizadoEm DateTime      @updatedAt
-  liga         Liga          @relation(fields: [ligaId], references: [id])
-  ligaId       Int
-  time         Time?         @relation(fields: [timeId], references: [id])
-  timeId       Int?
-  cor          Cor           @relation(fields: [corId], references: [id])
-  corId        Int
-  tamanho      Tamanho       @relation(fields: [tamanhoId], references: [id])
-  tamanhoId    Int
-  itensPedido  ItemPedido[]
+  id                  Int                   @id @default(autoincrement())
+  nome                String
+  codigo              String                @unique
+  descricao           String?
+  modelo              String                // Ex: "Jersey Home", "Jersey Away", "Regata", etc
+  preco               Float
+  year                Int
+  serie               String?               // Home, Away, Third, Special Edition
+  estoque             Int                   @default(0)
+  ativo               Boolean               @default(true)
+  sale                Boolean               @default(false)
+  imagemUrl           String?
+  criadoEm            DateTime              @default(now())
+  atualizadoEm        DateTime              @updatedAt
+  liga                Liga                  @relation(fields: [ligaId], references: [id])
+  ligaId              Int
+  time                Time?                 @relation(fields: [timeId], references: [id])
+  timeId              Int?
+  cor                 Cor                   @relation(fields: [corId], references: [id])
+  corId               Int
+  tamanho             Tamanho               @relation(fields: [tamanhoId], references: [id])
+  tamanhoId           Int
+  itensPedido         ItemPedido[]
+  configuracaoEstoque ConfiguracaoEstoque?
+  movimentacoesEstoque MovimentacaoEstoque[]
 
   @@map("produtos")
+}
+
+// Tabela de Configuração de Estoque por Produto
+model ConfiguracaoEstoque {
+  id                    Int      @id @default(autoincrement())
+  produtoId             Int      @unique
+  quantidadeMinima      Int      @default(5)    // Alerta de estoque baixo
+  quantidadeMaxima      Int      @default(100)  // Limite de estoque
+  pontoReposicao        Int      @default(10)   // Quando atingir, criar alerta de reposição
+  tempoMedioReposicao   Int?                    // Em dias
+  fornecedor            String?                 // Nome do fornecedor principal
+  custoUltimaCompra     Float?                  // Custo da última compra
+  dataUltimaCompra      DateTime?               // Data da última compra
+  observacoes           String?
+  produto               Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  criadoEm              DateTime @default(now())
+  atualizadoEm          DateTime @updatedAt
+
+  @@map("configuracoes_estoque")
+}
+
+// Tabela de Movimentação de Estoque (Histórico)
+model MovimentacaoEstoque {
+  id                Int      @id @default(autoincrement())
+  produtoId         Int
+  tipo              String   // ENTRADA, SAIDA, AJUSTE, DEVOLUCAO
+  quantidade        Int      // Positivo para entrada, negativo para saída
+  quantidadeAntes   Int      // Estoque antes da movimentação
+  quantidadeDepois  Int      // Estoque depois da movimentação
+  motivo            String?  // Compra, Venda, Ajuste de inventário, etc
+  custo             Float?   // Custo unitário (para entradas)
+  valorTotal        Float?   // Quantidade * Custo
+  fornecedor        String?  // Para entradas
+  notaFiscal        String?  // Número da NF
+  responsavel       String?  // Quem fez a movimentação
+  observacoes       String?
+  produto           Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  criadoEm          DateTime @default(now())
+
+  @@index([produtoId])
+  @@index([tipo])
+  @@index([criadoEm])
+  @@map("movimentacoes_estoque")
 }
 
 model Usuario {

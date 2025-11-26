@@ -21,9 +21,6 @@ export async function GET(req) {
             nome: true,
             sigla: true
           }
-        },
-        _count: {
-          select: { produtos: true }
         }
       },
       orderBy: { nome: 'asc' }

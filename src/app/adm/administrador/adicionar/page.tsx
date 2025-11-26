@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import AdminTemplate from "@/templates/AdminTemplate";
 import { Plus } from "lucide-react";
 import AdminInput from "@/components/ADM/AdminInput";
@@ -9,12 +10,39 @@ import FormBox from "@/components/ADM/FormBox";
 export default function AdicionarAdministrador() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [poder, setPoder] = useState("");
+  const [senha, setSenha] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Administrador adicionado:", { nome, email, poder });
-    // TODO: Implementar lógica de criação do administrador
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch('/api/administradores', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nome, email, senha, cpf: telefone }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao criar administrador');
+      }
+
+      alert('Administrador criado com sucesso!');
+      router.push('/adm/administrador/gerenciarAdministradores');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,6 +54,12 @@ export default function AdicionarAdministrador() {
       </div>
 
       <FormBox>
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6 pt-2">
           <AdminInput
             label="Nome"
@@ -45,33 +79,26 @@ export default function AdicionarAdministrador() {
             required
           />
 
-          <div className="relative">
-            <select
-              id="poder"
-              name="poder"
-              value={poder}
-              onChange={(e) => setPoder(e.target.value)}
-              className="peer w-full border-b-2 border-gray-300 bg-transparent px-0 py-2 text-gray-900 focus:border-blue-600 focus:outline-none"
-              required
-            >
-              <option value="" disabled></option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select>
-            <label
-              htmlFor="poder"
-              className={`absolute left-0 top-2 text-gray-500 transition-all peer-focus:-translate-y-6 peer-focus:text-sm peer-focus:text-blue-600 ${
-                poder ? "-translate-y-6 text-sm" : ""
-              }`}
-            >
-              Poder
-            </label>
-          </div>
+          <AdminInput
+            label="Senha"
+            name="senha"
+            type="password"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+            required
+          />
+
+          <AdminInput
+            label="Telefone (opcional)"
+            name="telefone"
+            type="text"
+            value={telefone}
+            onChange={(e) => setTelefone(e.target.value)}
+          />
 
           <AdminFormButtons
             cancelHref="/adm/administrador/gerenciarAdministradores"
-            submitText="Enviar"
+            submitText={loading ? "Enviando..." : "Enviar"}
           />
         </form>
       </FormBox>

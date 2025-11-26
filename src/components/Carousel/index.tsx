@@ -36,7 +36,7 @@ export default function Carousel() {
   };
 
   return (
-    <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 rounded-lg mx-auto max-w-[1750px] mb-8">
+    <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 mx-auto max-w-[1750px] mb-8">
       <div className="relative w-full h-full">
         {bannerImages.map((slide, index) => (
           <div

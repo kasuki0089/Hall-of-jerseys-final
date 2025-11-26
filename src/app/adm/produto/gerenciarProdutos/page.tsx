@@ -1,18 +1,67 @@
 'use client';
 import AdminTemplate from "@/templates/AdminTemplate";
 import { Package, Edit, Trash2, Search } from "lucide-react";
-import productsData from "@/db/seed/products.json";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AddButton from "@/components/ADM/AddButton";
 import Link from "next/link";
 
 export default function GerenciarProdutosPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const totalProducts = productsData.length;
+  const [produtos, setProdutos] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProducts = productsData.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    carregarProdutos();
+  }, []);
+
+  const carregarProdutos = async () => {
+    try {
+      const res = await fetch('/api/produtos');
+      const data = await res.json();
+      // A API retorna { produtos: [...], pagination: {...} }
+      setProdutos(Array.isArray(data) ? data : (data.produtos || []));
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+      setProdutos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+
+    try {
+      const res = await fetch(`/api/produtos/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (res.ok) {
+        alert('Produto excluído com sucesso!');
+        carregarProdutos();
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Erro ao excluir produto');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir produto:', error);
+      alert('Erro ao excluir produto');
+    }
+  };
+
+  const filteredProducts = produtos.filter(product =>
+    product.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <AdminTemplate>
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">Carregando produtos...</p>
+        </div>
+      </AdminTemplate>
+    );
+  }
 
   return (
     <AdminTemplate>
@@ -22,7 +71,7 @@ export default function GerenciarProdutosPage() {
           <div className="flex items-center gap-3">
             <Package className="w-8 h-8 text-primary" />
             <h1 className="text-3xl font-bold text-gray-800">
-              Gerenciar Produtos ({totalProducts})
+              Gerenciar Produtos ({filteredProducts.length})
             </h1>
           </div>
           <AddButton href="/adm/produto/adicionar" text="Adicionar produto" />
@@ -58,15 +107,18 @@ export default function GerenciarProdutosPage() {
               {filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-800">#{product.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800 uppercase">{product.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">{product.serie}</td>
-                  <td className="px-6 py-4 text-sm text-gray-800">{product.price.replace('R$ ', '').replace(',', '.')}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800 uppercase">{product.nome}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">{product.serie || '-'}</td>
+                  <td className="px-6 py-4 text-sm text-gray-800">R$ {parseFloat(product.preco).toFixed(2)}</td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center justify-center gap-3">
                       <Link href={`/adm/produto/alterar/${product.id}`} className="text-blue-500 hover:text-blue-700 transition-colors">
                         <Edit className="w-5 h-5" />
                       </Link>
-                      <button className="text-red-500 hover:text-red-700 transition-colors">
+                      <button 
+                        onClick={() => handleDelete(product.id)}
+                        className="text-red-500 hover:text-red-700 transition-colors"
+                      >
                         <Trash2 className="w-5 h-5" />
                       </button>
                     </div>

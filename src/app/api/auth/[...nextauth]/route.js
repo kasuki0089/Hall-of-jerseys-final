@@ -39,7 +39,7 @@ export const authOptions = {
             id: user.id,
             email: user.email,
             nome: user.nome,
-            tipo: user.tipo
+            role: user.role
           };
         } catch (error) {
           console.error("Erro na autenticação:", error);
@@ -57,7 +57,7 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.tipo = user.tipo;
+        token.role = user.role;
         token.nome = user.nome;
       }
       return token;
@@ -65,7 +65,7 @@ export const authOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.id = token.sub;
-        session.user.tipo = token.tipo;
+        session.user.role = token.role;
         session.user.nome = token.nome;
       }
       return session;

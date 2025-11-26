@@ -158,27 +158,30 @@ export async function POST(req) {
     const {
       nome,
       descricao,
+      modelo,
       preco,
       codigo,
-      tamanho,
-      sale,
+      year,
       serie,
-      categoria,
+      estoque,
       ligaId,
-      timeId
+      timeId,
+      corId,
+      tamanhoId,
+      imagemUrl
     } = body;
 
     // Validações básicas
-    if (!nome || !preco || !codigo || !ligaId || !timeId) {
+    if (!nome || !preco || !codigo || !ligaId || !timeId || !corId || !tamanhoId || !modelo) {
       return Response.json(
-        { error: 'Campos obrigatórios: nome, preco, codigo, ligaId, timeId' },
+        { error: 'Campos obrigatórios: nome, modelo, preco, codigo, ligaId, timeId, corId, tamanhoId' },
         { status: 400 }
       );
     }
 
     // Verificar se código já existe
     const produtoExistente = await prisma.produto.findUnique({
-      where: { codigo: parseInt(codigo) }
+      where: { codigo: codigo.toString() }
     });
     
     if (produtoExistente) {
@@ -209,19 +212,24 @@ export async function POST(req) {
     const produto = await prisma.produto.create({
       data: {
         nome,
-        descricao,
-        preco: parseInt(preco),
-        codigo: parseInt(codigo),
-        tamanho,
-        sale: sale || false,
-        serie,
-        categoria: categoria || 'JERSEY',
+        descricao: descricao || null,
+        modelo,
+        preco: parseFloat(preco),
+        codigo: codigo.toString(),
+        year: year || new Date().getFullYear(),
+        serie: serie || null,
+        estoque: estoque || 0,
+        imagemUrl: imagemUrl || null,
         ligaId: parseInt(ligaId),
-        timeId: parseInt(timeId)
+        timeId: parseInt(timeId),
+        corId: parseInt(corId),
+        tamanhoId: parseInt(tamanhoId)
       },
       include: {
         liga: true,
-        time: true
+        time: true,
+        cor: true,
+        tamanho: true
       }
     });
 
@@ -235,6 +243,6 @@ export async function POST(req) {
       return Response.json({ error: 'Código já existe' }, { status: 400 });
     }
     
-    return Response.json({ error: 'Erro interno do servidor' }, { status: 500 });
+    return Response.json({ error: 'Erro interno do servidor: ' + error.message }, { status: 500 });
   }
 }

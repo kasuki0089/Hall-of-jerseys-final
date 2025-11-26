@@ -32,9 +32,9 @@ export default function LoginPage() {
         // Verificar se login foi bem sucedido
         const session = await getSession();
         if (session) {
-          // Redirecionar baseado no tipo de usuário
-          if (session.user?.tipo === 'ADMIN') {
-            router.push('/admin');
+          // Redirecionar baseado no role de usuário
+          if (session.user?.role === 'admin') {
+            router.push('/adm/home');
           } else {
             router.push('/');
           }
