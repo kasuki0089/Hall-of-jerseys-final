@@ -1,0 +1,185 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Tabela de Estados
+model Estado {
+  uf        String     @id
+  nome      String
+  enderecos Endereco[]
+
+  @@map("estados")
+}
+
+// Tabela de Endereços  
+model Endereco {
+  id          Int       @id @default(autoincrement())
+  endereco    String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  cep         String
+  estado      Estado    @relation(fields: [estadoUf], references: [uf])
+  estadoUf    String
+  usuarios    Usuario[]
+
+  @@map("enderecos")
+}
+
+// Tabela de Cores
+model Cor {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  codigo   String? // Para hex colors #FFFFFF
+  produtos Produto[]
+
+  @@map("cores")
+}
+
+// Tabela de Tamanhos
+model Tamanho {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique // PP, P, M, G, GG, XGG
+  ordem    Int       @unique // Para ordenação (1=PP, 2=P, etc)
+  produtos Produto[]
+
+  @@map("tamanhos")
+}
+
+// Tabela de Formas de Pagamento
+model FormaPagamento {
+  id             Int      @id @default(autoincrement())
+  tipo           String   // 'cartao_credito', 'cartao_debito', 'pix', 'boleto'
+  numeroCartao   String?  // Apenas últimos 4 dígitos para segurança
+  nomeCartao     String?
+  validadeCartao String?  // MM/YYYY
+  bandeiraCartao String?  // Visa, Mastercard, etc
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId      Int
+  ativo          Boolean  @default(true)
+  criadoEm       DateTime @default(now())
+  pedidos        Pedido[]
+
+  @@map("formas_pagamento")
+}
+
+model Liga {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  sigla    String    @unique
+  times    Time[]
+  produtos Produto[]
+
+  @@map("ligas")
+}
+
+model Time {
+  id       Int       @id @default(autoincrement())
+  nome     String
+  sigla    String
+  cidade   String
+  liga     Liga      @relation(fields: [ligaId], references: [id])
+  ligaId   Int
+  produtos Produto[]
+
+  @@map("times")
+}
+
+model Produto {
+  id           Int           @id @default(autoincrement())
+  nome         String
+  codigo       String        @unique
+  descricao    String?
+  modelo       String        // Ex: "Jersey Home", "Jersey Away", "Regata", etc
+  preco        Float
+  year         Int
+  serie        String?       // Home, Away, Third, Special Edition
+  estoque      Int           @default(0)
+  ativo        Boolean       @default(true)
+  sale         Boolean       @default(false)
+  imagemUrl    String?
+  criadoEm     DateTime      @default(now())
+  atualizadoEm DateTime      @updatedAt
+  liga         Liga          @relation(fields: [ligaId], references: [id])
+  ligaId       Int
+  time         Time?         @relation(fields: [timeId], references: [id])
+  timeId       Int?
+  cor          Cor           @relation(fields: [corId], references: [id])
+  corId        Int
+  tamanho      Tamanho       @relation(fields: [tamanhoId], references: [id])
+  tamanhoId    Int
+  itensPedido  ItemPedido[]
+
+  @@map("produtos")
+}
+
+model Usuario {
+  id               Int               @id @default(autoincrement())
+  nome             String
+  email            String            @unique
+  senha            String
+  telefone         String?
+  role             String            @default("user") // user, admin
+  criadoEm         DateTime          @default(now())
+  atualizadoEm     DateTime          @updatedAt
+  endereco         Endereco?         @relation(fields: [enderecoId], references: [id])
+  enderecoId       Int?
+  formasPagamento  FormaPagamento[]
+  pedidos          Pedido[]
+
+  @@map("usuarios")
+}
+
+model Pedido {
+  id               Int             @id @default(autoincrement())
+  usuarioId        Int
+  total            Float
+  status           String          @default("pendente") // pendente, processando, enviado, entregue, cancelado
+  criadoEm         DateTime        @default(now())
+  atualizadoEm     DateTime        @updatedAt
+  confirmadoEm     DateTime?
+  transacaoId      String?         @unique
+  usuario          Usuario         @relation(fields: [usuarioId], references: [id])
+  formaPagamento   FormaPagamento? @relation(fields: [formaPagamentoId], references: [id])
+  formaPagamentoId Int?
+  itens            ItemPedido[]
+  transacao        Transacao?      @relation(fields: [transacaoId], references: [id])
+
+  @@map("pedidos")
+}
+
+model ItemPedido {
+  id         Int      @id @default(autoincrement())
+  pedidoId   Int
+  produtoId  Int
+  quantidade Int
+  preco      Float
+  criadoEm   DateTime @default(now())
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id])
+  produto    Produto  @relation(fields: [produtoId], references: [id])
+
+  @@map("itens_pedido")
+}
+
+model Transacao {
+  id            String    @id
+  pedidoId      Int
+  tipo          String    // PIX, CARTAO, BOLETO
+  valor         Float
+  status        String    // PENDENTE, APROVADO, REJEITADO, CANCELADO
+  dadosGateway  String?   // JSON com dados do gateway
+  erro          String?
+  processadoEm  DateTime  @default(now())
+  pedido        Pedido?
+
+  @@map("transacoes")
+}

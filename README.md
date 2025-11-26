@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hall of Jerseys - Next.js 15
 
-## Getting Started
+Este é um projeto [Next.js](https://nextjs.org) criado com [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app) para e-commerce de camisetas esportivas.
 
-First, run the development server:
+## Como Começar
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1) **Configuração do ambiente**:
+   ```bash
+   cp .env.example .env
+   ```
+   Ajuste a `DATABASE_URL` no arquivo `.env`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2) **Instalação de dependências**:
+   ```bash
+   npm install
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3) **Configuração do banco de dados**:
+   ```bash
+   npx prisma generate
+   npx prisma migrate dev --name init
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4) **Seed do banco (dados iniciais)**:
+   ```bash
+   node prisma/seed.js
+   ```
 
-## Learn More
+5) **Executar o servidor de desenvolvimento**:
+   ```bash
+   npm run dev
+   # ou
+   yarn dev
+   # ou
+   pnpm dev
+   # ou
+   bun dev
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Funcionalidades
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **NextAuth** já configurado com Credentials provider
+- **Prisma** para ORM com MySQL
+- **Tailwind CSS** para estilização
+- **TypeScript** para tipagem
+- Sistema completo de autenticação
+- Painel administrativo
+- Catálogo de produtos
+- Sistema de pedidos
 
-## Deploy on Vercel
+## Credenciais Padrão
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Após executar o seed, você terá:
+- **Admin**: admin@hallofjerseys.com / admin123
+- Produtos de exemplo já cadastrados
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Tecnologias Utilizadas
+
+Este projeto usa [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) para otimizar automaticamente as fontes.
+
+## Saiba Mais
+
+Para aprender mais sobre Next.js:
+
+- [Next.js Documentation](https://nextjs.org/docs) - aprenda sobre recursos e API do Next.js
+- [Learn Next.js](https://nextjs.org/learn) - tutorial interativo do Next.js
+
+## Deploy
+
+A forma mais fácil de fazer deploy é usar a [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+
+Confira a [documentação de deployment do Next.js](https://nextjs.org/docs/app/building-your-application/deploying) para mais detalhes.
