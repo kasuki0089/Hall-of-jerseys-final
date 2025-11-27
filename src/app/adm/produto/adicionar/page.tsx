@@ -349,7 +349,7 @@ export default function AdicionarProduto() {
                 required
               >
                 <option value="" disabled className="text-gray-500">Selecione o ano</option>
-                {Array.from({ length: 15 }, (_, i) => new Date().getFullYear() - i).map(ano => (
+                {Array.from({ length: 35 }, (_, i) => new Date().getFullYear() - i).map(ano => (
                   <option key={ano} value={ano} className="text-gray-900 py-2">
                     {ano}
                   </option>
