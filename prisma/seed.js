@@ -141,10 +141,38 @@ async function main() {
 
   // NFL Teams
   const nflTeams = [
-    { nome: 'Kansas City Chiefs', sigla: 'KC', cidade: 'Kansas City' },
-    { nome: 'New England Patriots', sigla: 'NE', cidade: 'Foxborough' },
-    { nome: 'Green Bay Packers', sigla: 'GB', cidade: 'Green Bay' },
-    { nome: 'Dallas Cowboys', sigla: 'DAL', cidade: 'Dallas' }
+  { nome: 'Arizona Cardinals', sigla: 'ARI', cidade: 'Glendale' },
+  { nome: 'Atlanta Falcons', sigla: 'ATL', cidade: 'Atlanta' },
+  { nome: 'Baltimore Ravens', sigla: 'BAL', cidade: 'Baltimore' },
+  { nome: 'Buffalo Bills', sigla: 'BUF', cidade: 'Orchard Park' },
+  { nome: 'Carolina Panthers', sigla: 'CAR', cidade: 'Charlotte' },
+  { nome: 'Chicago Bears', sigla: 'CHI', cidade: 'Chicago' },
+  { nome: 'Cincinnati Bengals', sigla: 'CIN', cidade: 'Cincinnati' },
+  { nome: 'Cleveland Browns', sigla: 'CLE', cidade: 'Cleveland' },
+  { nome: 'Dallas Cowboys', sigla: 'DAL', cidade: 'Arlington' },
+  { nome: 'Denver Broncos', sigla: 'DEN', cidade: 'Denver' },
+  { nome: 'Detroit Lions', sigla: 'DET', cidade: 'Detroit' },
+  { nome: 'Green Bay Packers', sigla: 'GB', cidade: 'Green Bay' },
+  { nome: 'Houston Texans', sigla: 'HOU', cidade: 'Houston' },
+  { nome: 'Indianapolis Colts', sigla: 'IND', cidade: 'Indianapolis' },
+  { nome: 'Jacksonville Jaguars', sigla: 'JAX', cidade: 'Jacksonville' },
+  { nome: 'Kansas City Chiefs', sigla: 'KC', cidade: 'Kansas City' },
+  { nome: 'Las Vegas Raiders', sigla: 'LV', cidade: 'Paradise' },
+  { nome: 'Los Angeles Chargers', sigla: 'LAC', cidade: 'Inglewood' },
+  { nome: 'Los Angeles Rams', sigla: 'LAR', cidade: 'Inglewood' },
+  { nome: 'Miami Dolphins', sigla: 'MIA', cidade: 'Miami Gardens' },
+  { nome: 'Minnesota Vikings', sigla: 'MIN', cidade: 'Minneapolis' },
+  { nome: 'New England Patriots', sigla: 'NE', cidade: 'Foxborough' },
+  { nome: 'New Orleans Saints', sigla: 'NO', cidade: 'Nova Orleans' },
+  { nome: 'New York Giants', sigla: 'NYG', cidade: 'East Rutherford' },
+  { nome: 'New York Jets', sigla: 'NYJ', cidade: 'East Rutherford' },
+  { nome: 'Philadelphia Eagles', sigla: 'PHI', cidade: 'Filadélfia' },
+  { nome: 'Pittsburgh Steelers', sigla: 'PIT', cidade: 'Pittsburgh' },
+  { nome: 'San Francisco 49ers', sigla: 'SF', cidade: 'Santa Clara' },
+  { nome: 'Seattle Seahawks', sigla: 'SEA', cidade: 'Seattle' },
+  { nome: 'Tampa Bay Buccaneers', sigla: 'TB', cidade: 'Tampa' },
+  { nome: 'Tennessee Titans', sigla: 'TEN', cidade: 'Nashville' },
+  { nome: 'Washington Commanders', sigla: 'WAS', cidade: 'Landover' }
   ];
 
   for (const team of nflTeams) {
@@ -156,9 +184,38 @@ async function main() {
 
   // NHL Teams
   const nhlTeams = [
-    { nome: 'Boston Bruins', sigla: 'BOS', cidade: 'Boston' },
-    { nome: 'Chicago Blackhawks', sigla: 'CHI', cidade: 'Chicago' },
-    { nome: 'Toronto Maple Leafs', sigla: 'TOR', cidade: 'Toronto' }
+  { nome: 'Anaheim Ducks', sigla: 'ANA', cidade: 'Anaheim' },
+  { nome: 'Arizona Coyotes', sigla: 'ARI', cidade: 'Salt Lake City' },
+  { nome: 'Boston Bruins', sigla: 'BOS', cidade: 'Boston' },
+  { nome: 'Buffalo Sabres', sigla: 'BUF', cidade: 'Buffalo' },
+  { nome: 'Calgary Flames', sigla: 'CGY', cidade: 'Calgary' },
+  { nome: 'Carolina Hurricanes', sigla: 'CAR', cidade: 'Raleigh' },
+  { nome: 'Chicago Blackhawks', sigla: 'CHI', cidade: 'Chicago' },
+  { nome: 'Colorado Avalanche', sigla: 'COL', cidade: 'Denver' },
+  { nome: 'Columbus Blue Jackets', sigla: 'CBJ', cidade: 'Columbus' },
+  { nome: 'Dallas Stars', sigla: 'DAL', cidade: 'Dallas' },
+  { nome: 'Detroit Red Wings', sigla: 'DET', cidade: 'Detroit' },
+  { nome: 'Edmonton Oilers', sigla: 'EDM', cidade: 'Edmonton' },
+  { nome: 'Florida Panthers', sigla: 'FLA', cidade: 'Sunrise' },
+  { nome: 'Los Angeles Kings', sigla: 'LAK', cidade: 'Los Angeles' },
+  { nome: 'Minnesota Wild', sigla: 'MIN', cidade: 'Saint Paul' },
+  { nome: 'Montreal Canadiens', sigla: 'MTL', cidade: 'Montreal' },
+  { nome: 'Nashville Predators', sigla: 'NSH', cidade: 'Nashville' },
+  { nome: 'New Jersey Devils', sigla: 'NJD', cidade: 'Newark' },
+  { nome: 'New York Islanders', sigla: 'NYI', cidade: 'Nova Iorque' },
+  { nome: 'New York Rangers', sigla: 'NYR', cidade: 'Nova Iorque' },
+  { nome: 'Ottawa Senators', sigla: 'OTT', cidade: 'Ottawa' },
+  { nome: 'Philadelphia Flyers', sigla: 'PHI', cidade: 'Filadélfia' },
+  { nome: 'Pittsburgh Penguins', sigla: 'PIT', cidade: 'Pittsburgh' },
+  { nome: 'San Jose Sharks', sigla: 'SJS', cidade: 'San José' },
+  { nome: 'Seattle Kraken', sigla: 'SEA', cidade: 'Seattle' },
+  { nome: 'St. Louis Blues', sigla: 'STL', cidade: 'St. Louis' },
+  { nome: 'Tampa Bay Lightning', sigla: 'TBL', cidade: 'Tampa' },
+  { nome: 'Toronto Maple Leafs', sigla: 'TOR', cidade: 'Toronto' },
+  { nome: 'Vancouver Canucks', sigla: 'VAN', cidade: 'Vancouver' },
+  { nome: 'Vegas Golden Knights', sigla: 'VGK', cidade: 'Las Vegas' },
+  { nome: 'Washington Capitals', sigla: 'WSH', cidade: 'Washington' },
+  { nome: 'Winnipeg Jets', sigla: 'WPG', cidade: 'Winnipeg' }
   ];
 
   for (const team of nhlTeams) {
@@ -170,9 +227,35 @@ async function main() {
 
   // MLS Teams
   const mlsTeams = [
-    { nome: 'LA Galaxy', sigla: 'LAG', cidade: 'Los Angeles' },
-    { nome: 'Inter Miami CF', sigla: 'MIA', cidade: 'Miami' },
-    { nome: 'New York City FC', sigla: 'NYC', cidade: 'New York' }
+  { nome: 'Atlanta United', sigla: 'ATL', cidade: 'Atlanta' },
+  { nome: 'Austin FC', sigla: 'ATX', cidade: 'Austin' },
+  { nome: 'Charlotte FC', sigla: 'CLT', cidade: 'Charlotte' },
+  { nome: 'Chicago Fire', sigla: 'CHI', cidade: 'Chicago' },
+  { nome: 'FC Cincinnati', sigla: 'CIN', cidade: 'Cincinnati' },
+  { nome: 'Colorado Rapids', sigla: 'COL', cidade: 'Commerce City' },
+  { nome: 'Columbus Crew', sigla: 'CLB', cidade: 'Columbus' },
+  { nome: 'D.C. United', sigla: 'DC', cidade: 'Washington' },
+  { nome: 'FC Dallas', sigla: 'DAL', cidade: 'Frisco' },
+  { nome: 'Houston Dynamo', sigla: 'HOU', cidade: 'Houston' },
+  { nome: 'Inter Miami CF', sigla: 'MIA', cidade: 'Fort Lauderdale' },
+  { nome: 'LA Galaxy', sigla: 'LAG', cidade: 'Carson' },
+  { nome: 'Los Angeles FC', sigla: 'LAFC', cidade: 'Los Angeles' },
+  { nome: 'Minnesota United', sigla: 'MIN', cidade: 'Saint Paul' },
+  { nome: 'CF Montréal', sigla: 'MTL', cidade: 'Montreal' },
+  { nome: 'Nashville SC', sigla: 'NSH', cidade: 'Nashville' },
+  { nome: 'New England Revolution', sigla: 'NER', cidade: 'Foxborough' },
+  { nome: 'New York City FC', sigla: 'NYCFC', cidade: 'Nova Iorque' },
+  { nome: 'New York Red Bulls', sigla: 'RBNY', cidade: 'Harrison' },
+  { nome: 'Orlando City SC', sigla: 'ORL', cidade: 'Orlando' },
+  { nome: 'Philadelphia Union', sigla: 'PHI', cidade: 'Chester' },
+  { nome: 'Portland Timbers', sigla: 'POR', cidade: 'Portland' },
+  { nome: 'Real Salt Lake', sigla: 'RSL', cidade: 'Sandy' },
+  { nome: 'San Jose Earthquakes', sigla: 'SJ', cidade: 'San José' },
+  { nome: 'Seattle Sounders', sigla: 'SEA', cidade: 'Seattle' },
+  { nome: 'Sporting Kansas City', sigla: 'SKC', cidade: 'Kansas City' },
+  { nome: 'St. Louis City SC', sigla: 'STL', cidade: 'St. Louis' },
+  { nome: 'Toronto FC', sigla: 'TOR', cidade: 'Toronto' },
+  { nome: 'Vancouver Whitecaps', sigla: 'VAN', cidade: 'Vancouver' }
   ];
 
   for (const team of mlsTeams) {
