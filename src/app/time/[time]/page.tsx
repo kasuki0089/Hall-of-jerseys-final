@@ -5,68 +5,55 @@ import MainTemplate from "@/templates/MainTemplate/Index";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 
-// Mapeamento de nomes de ligas
-const ligaNames: { [key: string]: string } = {
-  'nba': 'NBA',
-  'nfl': 'NFL', 
-  'nhl': 'NHL',
-  'mls': 'MLS'
-};
-
-export default function LigaPage() {
+export default function TimePage() {
   const params = useParams();
-  const liga = params.liga as string;
+  const timeSlug = params.time as string;
   const [products, setProducts] = useState<any[]>([]);
+  const [timeInfo, setTimeInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  const ligaLower = liga?.toLowerCase() || '';
-  const ligaUpper = ligaNames[ligaLower] || liga?.toUpperCase() || '';
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log('🔍 Iniciando busca para liga:', ligaUpper);
+        console.log('🔍 Buscando produtos para time:', timeSlug);
         
-        // Estratégia simplificada: buscar todos os produtos e filtrar no cliente
-        // Isso é mais confiável para debug
-        const response = await fetch('/api/produtos');
+        // Primeiro, buscar todos os times
+        const timesResponse = await fetch('/api/times');
+        if (!timesResponse.ok) {
+          throw new Error('Erro ao buscar times');
+        }
+        
+        const timesData = await timesResponse.json();
+        console.log('📋 Times disponíveis:', timesData.length);
+        
+        // Encontrar o time correspondente (comparar por sigla ou nome)
+        const timeEncontrado = timesData.find((t: any) => 
+          t.sigla.toLowerCase() === timeSlug.toLowerCase() || 
+          t.nome.toLowerCase().replace(/\s+/g, '-') === timeSlug.toLowerCase()
+        );
+        
+        if (!timeEncontrado) {
+          console.log('❌ Time não encontrado:', timeSlug);
+          setProducts([]);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('✅ Time encontrado:', timeEncontrado);
+        setTimeInfo(timeEncontrado);
+        
+        // Agora buscar produtos desse time
+        const response = await fetch(`/api/produtos?time=${timeEncontrado.id}`);
         if (!response.ok) {
-          throw new Error(`Erro ${response.status}: ${response.statusText}`);
+          throw new Error('Erro ao buscar produtos');
         }
         
         const data = await response.json();
-        const allProducts = data.produtos || [];
-        console.log('📦 Total de produtos:', allProducts.length);
+        const timeProducts = data.produtos || [];
+        console.log(`🎯 Produtos encontrados para ${timeEncontrado.nome}:`, timeProducts.length);
         
-        // Log dos primeiros produtos para debug
-        allProducts.slice(0, 3).forEach((produto: any, index: number) => {
-          console.log(`Produto ${index + 1}:`, {
-            nome: produto.nome,
-            time: produto.time?.nome,
-            liga: produto.time?.liga?.nome,
-            sigla: produto.time?.liga?.sigla
-          });
-        });
-        
-        // Filtrar produtos por liga (múltiplas estratégias)
-        const ligaProducts = allProducts.filter((product: any) => {
-          if (!product.time?.liga) return false;
-          
-          const ligaNome = product.time.liga.nome || '';
-          const ligaSigla = product.time.liga.sigla || '';
-          
-          // Verificar tanto nome quanto sigla da liga
-          const matchNome = ligaNome.toLowerCase() === ligaLower;
-          const matchSigla = ligaSigla.toLowerCase() === ligaLower;
-          
-          return matchNome || matchSigla;
-        });
-        
-        console.log(`🎯 Produtos filtrados para ${ligaUpper}:`, ligaProducts.length);
-        console.log('Produtos encontrados:', ligaProducts.map(p => p.nome));
-        
-        setProducts(ligaProducts);
+        setProducts(timeProducts);
         
       } catch (err: any) {
         console.error('❌ Erro ao carregar produtos:', err);
@@ -76,16 +63,16 @@ export default function LigaPage() {
       }
     };
 
-    if (liga) {
+    if (timeSlug) {
       fetchProducts();
     }
-  }, [liga, ligaLower, ligaUpper]);
+  }, [timeSlug]);
 
   if (loading) {
     return (
       <MainTemplate>
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <p className="text-gray-600">Carregando produtos da {ligaUpper}...</p>
+          <p className="text-gray-600">Carregando produtos do time...</p>
         </div>
       </MainTemplate>
     );
@@ -114,19 +101,32 @@ export default function LigaPage() {
           <div className="text-sm text-gray-600">
             <Link href="/" className="hover:text-primary transition-colors">HALL OF JERSEYS</Link>
             <span className="mx-2">/</span>
-            <Link href="/produtos" className="hover:text-primary transition-colors">Ligas</Link>
+            <Link href="/produtos" className="hover:text-primary transition-colors">Produtos</Link>
             <span className="mx-2">/</span>
-            <span className="font-semibold text-primary">{ligaUpper}</span>
+            {timeInfo && (
+              <>
+                <Link href={`/liga/${timeInfo.liga?.sigla?.toLowerCase()}`} className="hover:text-primary transition-colors">
+                  {timeInfo.liga?.sigla}
+                </Link>
+                <span className="mx-2">/</span>
+              </>
+            )}
+            <span className="font-semibold text-primary">{timeInfo?.nome || timeSlug}</span>
           </div>
         </div>
 
         {/* Título da página */}
         <div className="container mx-auto px-4 mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
-            {ligaUpper}
+            {timeInfo?.nome || timeSlug}
           </h1>
           <p className="text-gray-600">
-            Confira nossa coleção de jerseys da liga {ligaUpper}. {products.length} produtos disponíveis.
+            {timeInfo && (
+              <>
+                Confira nossa coleção de jerseys do {timeInfo.nome} - {timeInfo.liga?.nome}. 
+              </>
+            )}
+            {products.length} produtos disponíveis.
           </p>
         </div>
 
@@ -142,7 +142,7 @@ export default function LigaPage() {
           ) : (
             <div className="text-center py-12 bg-white rounded-lg shadow-md">
               <p className="text-gray-500 text-lg mb-4">
-                Nenhum produto encontrado para a liga {ligaUpper}.
+                Nenhum produto encontrado para {timeInfo?.nome || timeSlug}.
               </p>
               <Link 
                 href="/produtos" 

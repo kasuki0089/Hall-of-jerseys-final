@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste de Filtragem</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 30px; padding: 20px; border: 1px solid #ccc; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Teste de API - Filtragem por Liga</h1>
+    
+    <div class="section">
+        <h2>1. Ligas Disponíveis</h2>
+        <div id="ligas">Carregando...</div>
+    </div>
+    
+    <div class="section">
+        <h2>2. Produtos (primeiros 3)</h2>
+        <div id="produtos">Carregando...</div>
+    </div>
+    
+    <div class="section">
+        <h2>3. Teste de Filtro (Liga ID = 1)</h2>
+        <div id="filtro">Carregando...</div>
+    </div>
+
+    <script>
+        async function testarAPIs() {
+            try {
+                // Teste 1: Ligas
+                const ligasResp = await fetch('/api/ligas');
+                const ligas = await ligasResp.json();
+                document.getElementById('ligas').innerHTML = `
+                    <h3>Total: ${ligas.length} ligas</h3>
+                    <pre>${JSON.stringify(ligas, null, 2)}</pre>
+                `;
+                
+                // Teste 2: Produtos
+                const produtosResp = await fetch('/api/produtos?limit=3');
+                const produtosData = await produtosResp.json();
+                const produtos = produtosData.produtos || [];
+                document.getElementById('produtos').innerHTML = `
+                    <h3>Total: ${produtos.length} produtos</h3>
+                    <pre>${JSON.stringify(produtos, null, 2)}</pre>
+                `;
+                
+                // Teste 3: Filtro por Liga
+                if (ligas.length > 0) {
+                    const primeiraLiga = ligas[0];
+                    const filtroResp = await fetch(`/api/produtos?liga=${primeiraLiga.id}`);
+                    const filtroData = await filtroResp.json();
+                    const produtosFiltrados = filtroData.produtos || [];
+                    document.getElementById('filtro').innerHTML = `
+                        <h3>Liga: ${primeiraLiga.nome} (ID: ${primeiraLiga.id})</h3>
+                        <h3>Produtos encontrados: ${produtosFiltrados.length}</h3>
+                        <pre>${JSON.stringify(produtosFiltrados, null, 2)}</pre>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Erro:', error);
+                document.body.innerHTML += `<div style="color: red;">Erro: ${error.message}</div>`;
+            }
+        }
+        
+        testarAPIs();
+    </script>
+</body>
+</html>

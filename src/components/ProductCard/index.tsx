@@ -3,10 +3,17 @@ import Image from "next/image";
 
 type ProductCardProps = {
   product: {
-    id: string;
+    id: number | string;
     nome: string;
-    preco: string;
-    imagemUrl: string;
+    preco: number | string;
+    imagemUrl?: string;
+    time?: {
+      nome: string;
+      liga?: {
+        nome: string;
+        sigla: string;
+      };
+    };
     esporte?: string;
     liga?: string;
   };
@@ -14,7 +21,11 @@ type ProductCardProps = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const imagePath = product.imagemUrl || '/images/produto-placeholder.jpg';
-  const preco = product.preco ? `R$ ${parseFloat(product.preco).toFixed(2)}` : 'Preço não disponível';
+  const preco = typeof product.preco === 'number' 
+    ? `R$ ${product.preco.toFixed(2)}` 
+    : product.preco 
+    ? `R$ ${parseFloat(product.preco.toString()).toFixed(2)}` 
+    : 'Preço não disponível';
 
   return (
     <Link href={`/produtos/${product.id}`}>
@@ -31,7 +42,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="p-4">
           <p className="text-[1.005rem] font-bold text-gray-600 mb-1">{product.nome}</p>
-          <p className="text-gray-600 mb-1">{product.liga || product.esporte}</p>
+          <p className="text-gray-600 mb-1">
+            {product.time?.liga?.sigla || product.liga || product.esporte || 'N/A'}
+          </p>
           <p className="text-xs text-gray-600 mb-2">Original</p>
           <p className="font-bold text-gray-800">{preco}</p>
         </div>

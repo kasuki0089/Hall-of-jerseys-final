@@ -9,7 +9,7 @@ export const metadata = {
 
 async function getProducts() {
   try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/produtos`, {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/produtos`, {
       cache: 'no-store'
     });
     
