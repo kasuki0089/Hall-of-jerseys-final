@@ -1,52 +1,107 @@
+"use client";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import MainTemplate from "@/templates/MainTemplate/Index";
 import Link from "next/link";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import { ShoppingCart } from "lucide-react";
 
-type ProductPageProps = {
-  params: {
-    id: string;
+export default function ProductPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  
+  const [product, setProduct] = useState<any>(null);
+  const [productSizes, setProductSizes] = useState<any>(null);
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [selectedSize, setSelectedSize] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (id) {
+      loadData();
+    }
+  }, [id]);
+
+  const loadData = async () => {
+    try {
+      console.log('🔄 Carregando produto ID:', id);
+      
+      // Buscar dados do produto
+      const productResponse = await fetch(`/api/produtos/${id}`);
+      let productData = null;
+      if (productResponse.ok) {
+        productData = await productResponse.json();
+        console.log('✅ Produto carregado:', productData);
+      }
+      
+      // Buscar tamanhos disponíveis
+      const sizesResponse = await fetch(`/api/produtos/${id}/tamanhos`);
+      let sizesData = null;
+      if (sizesResponse.ok) {
+        sizesData = await sizesResponse.json();
+        console.log('✅ Tamanhos carregados:', sizesData);
+      }
+      
+      // Buscar produtos relacionados
+      const relatedResponse = await fetch('/api/produtos?limit=4');
+      let relatedData = [];
+      if (relatedResponse.ok) {
+        const data = await relatedResponse.json();
+        relatedData = data.produtos || [];
+      }
+      
+      if (productData) {
+        setProduct(productData);
+        setSelectedSize(productData.tamanho);
+      }
+      setProductSizes(sizesData);
+      setRelatedProducts(relatedData);
+      
+    } catch (err: any) {
+      console.error('❌ Erro ao carregar dados:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
-};
 
-async function getProduct(id: string) {
-  try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/produtos/${id}`, {
-      cache: 'no-store'
-    });
-    
-    if (response.ok) {
-      return await response.json();
+  const handleSizeChange = (tamanho: any) => {
+    setSelectedSize(tamanho);
+    if (tamanho.produtoId && tamanho.produtoId !== parseInt(id)) {
+      router.push(`/produtos/${tamanho.produtoId}`);
     }
-    return null;
-  } catch (error) {
-    console.error('Erro ao buscar produto:', error);
-    return null;
-  }
-}
+  };
 
-async function getRelatedProducts() {
-  try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/produtos?limit=4`, {
-      cache: 'no-store'
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      return data.produtos || [];
-    }
-    return [];
-  } catch (error) {
-    console.error('Erro ao buscar produtos relacionados:', error);
-    return [];
+  if (loading) {
+    return (
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-600">Carregando produto {id}...</p>
+          </div>
+        </div>
+      </MainTemplate>
+    );
   }
-}
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = await params;
-  const product = await getProduct(id);
-  const relatedProducts = await getRelatedProducts();
+  if (error) {
+    return (
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">Erro</h1>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <Link href="/produtos" className="text-blue-600 hover:text-blue-800">
+              Voltar para produtos
+            </Link>
+          </div>
+        </div>
+      </MainTemplate>
+    );
+  }
 
   if (!product) {
     return (
@@ -54,6 +109,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">Produto não encontrado</h1>
+            <p className="text-gray-600 mb-4">O produto ID {id} não foi encontrado.</p>
             <Link href="/produtos" className="text-blue-600 hover:text-blue-800">
               Voltar para produtos
             </Link>
@@ -97,36 +153,89 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <div>
                 <h1 className="text-3xl font-bold text-gray-800 mb-2">{product.nome}</h1>
                 <p className="text-gray-600">Código: #{product.codigo}</p>
-                <p className="text-sm text-gray-600">{product.time?.nome} - {product.time?.liga?.nome}</p>
+                <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
+                  <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-medium">
+                    {product.time?.nome}
+                  </span>
+                  <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full">
+                    {product.time?.liga?.nome}
+                  </span>
+                </div>
               </div>
 
-              <div>
-                <p className="text-gray-700 mb-4">Tamanho disponível:</p>
-                <div className="flex gap-2">
-                  <button className="w-12 h-12 border border-gray-300 rounded hover:border-blue-600 hover:bg-blue-50 transition-colors duration-300">
-                    {product.tamanho?.nome}
-                  </button>
+              <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Categoria</p>
+                  <p className="text-gray-800">{product.modelo}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Série</p>
+                  <p className="text-gray-800">{product.serie || 'Standard'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Ano</p>
+                  <p className="text-gray-800">{product.year}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Estoque</p>
+                  <p className="text-gray-800">{product.estoque} unidades</p>
                 </div>
               </div>
 
               <div>
-                <p className="text-gray-700 mb-2">Cor:</p>
+                <p className="text-gray-700 mb-4 font-medium">Tamanhos disponíveis:</p>
+                <div className="flex gap-2 flex-wrap">
+                  {productSizes?.tamanhosDisponiveis?.map((tamanho: any) => (
+                    <button 
+                      key={tamanho.id}
+                      onClick={() => handleSizeChange(tamanho)}
+                      className={`w-12 h-12 border rounded transition-all duration-300 font-medium ${
+                        selectedSize?.id === tamanho.id
+                          ? 'border-blue-600 bg-blue-50 text-blue-600 scale-110 shadow-md' 
+                          : tamanho.disponivel
+                          ? 'border-gray-300 hover:border-blue-600 hover:bg-blue-50 hover:scale-105'
+                          : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                      }`}
+                      title={`Tamanho ${tamanho.nome}${!tamanho.disponivel ? ' (Indisponível)' : ''}`}
+                      disabled={!tamanho.disponivel}
+                    >
+                      {tamanho.nome}
+                    </button>
+                  )) || (
+                    <button className="w-12 h-12 border border-blue-600 bg-blue-50 text-blue-600 font-medium rounded scale-110 shadow-md">
+                      {product.tamanho?.nome}
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Tamanho selecionado: <strong>{selectedSize?.nome || product.tamanho?.nome}</strong>
+                  {selectedSize?.disponivel === false && ' (Indisponível)'}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-gray-700 mb-2 font-medium">Cor:</p>
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-8 h-8 rounded border border-gray-300"
+                    className="w-10 h-10 rounded-full border-2 border-gray-300 shadow-sm"
                     style={{ backgroundColor: product.cor?.codigo }}
+                    title={product.cor?.nome}
                   ></div>
-                  <span className="text-gray-700">{product.cor?.nome}</span>
+                  <span className="text-gray-700 font-medium">{product.cor?.nome}</span>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <p className="text-3xl font-bold text-gray-800">R$ {product.preco?.toFixed(2)}</p>
-                <p className="text-sm text-gray-600">ou 3x de R$ {(product.preco / 3)?.toFixed(2)}</p>
+              <div className="space-y-2 p-4 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-3xl font-bold text-green-800">R$ {product.preco?.toFixed(2)}</p>
+                <p className="text-sm text-green-600">ou 3x de R$ {(product.preco / 3)?.toFixed(2)} sem juros</p>
               </div>
 
-              <button className="w-full flex justify-center items-center bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer">
-                <ShoppingCart color="#ffffff" size={20} className="mr-3"/>COMPRAR
+              <button 
+                className="w-full flex justify-center items-center bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer text-lg"
+                disabled={!selectedSize?.disponivel}
+              >
+                <ShoppingCart color="#ffffff" size={24} className="mr-3"/>
+                {selectedSize?.disponivel !== false ? 'ADICIONAR AO CARRINHO' : 'PRODUTO INDISPONÍVEL'}
               </button>
             </div>
           </div>
@@ -184,21 +293,4 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </div>
     </MainTemplate>
   );
-}
-
-export async function generateMetadata({ params }: ProductPageProps) {
-  const { id } = await params;
-  const product = await getProduct(id);
-  
-  if (!product) {
-    return {
-      title: 'Produto não encontrado - Hall Of Jerseys',
-      description: 'Produto não encontrado',
-    };
-  }
-  
-  return {
-    title: `${product.nome} - Hall Of Jerseys`,
-    description: product.descricao || `Jersey oficial do ${product.time?.nome}`,
-  };
 }

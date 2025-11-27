@@ -18,6 +18,7 @@ export default function AdicionarProduto() {
   const [corId, setCorId] = useState("");
   const [categoria, setCategoria] = useState("");
   const [serie, setSerie] = useState("");
+  const [year, setYear] = useState("");
   const [codigo, setCodigo] = useState("");
   const [tamanhosSelecionados, setTamanhosSelecionados] = useState<number[]>([]);
   const [imagem, setImagem] = useState<File | null>(null);
@@ -141,7 +142,7 @@ export default function AdicionarProduto() {
           modelo: categoria || 'JERSEY',
           preco: parseFloat(preco),
           codigo,
-          year: new Date().getFullYear(),
+          year: parseInt(year),
           serie: serie || null,
           ligaId: parseInt(ligaId),
           timeId: parseInt(timeId),
@@ -338,6 +339,32 @@ export default function AdicionarProduto() {
               </label>
             </div>
 
+            <div className="relative">
+              <select
+                id="year"
+                name="year"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 cursor-pointer"
+                required
+              >
+                <option value="" disabled className="text-gray-500">Selecione o ano</option>
+                {Array.from({ length: 15 }, (_, i) => new Date().getFullYear() - i).map(ano => (
+                  <option key={ano} value={ano} className="text-gray-900 py-2">
+                    {ano}
+                  </option>
+                ))}
+              </select>
+              <label
+                htmlFor="year"
+                className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200"
+              >
+                Ano *
+              </label>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-6">
             <div className="relative">
               <select
                 id="corId"

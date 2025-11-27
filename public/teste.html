@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Produto API</title>
+</head>
+<body>
+    <div id="resultado">Carregando...</div>
+    
+    <script>
+        async function testarAPI() {
+            try {
+                console.log('Testando produto 29...');
+                
+                const response = await fetch('/api/produtos/29');
+                console.log('Status:', response.status);
+                
+                if (response.ok) {
+                    const produto = await response.json();
+                    console.log('Produto encontrado:', produto);
+                    
+                    document.getElementById('resultado').innerHTML = `
+                        <h1 style="color: green;">✅ PRODUTO ENCONTRADO!</h1>
+                        <p><strong>ID:</strong> ${produto.id}</p>
+                        <p><strong>Nome:</strong> ${produto.nome}</p>
+                        <p><strong>Preço:</strong> R$ ${produto.preco}</p>
+                        <p><strong>Time:</strong> ${produto.time?.nome || 'N/A'}</p>
+                        <p><strong>Liga:</strong> ${produto.time?.liga?.nome || 'N/A'}</p>
+                        <p><strong>Ano:</strong> ${produto.year || 'N/A'}</p>
+                        <p><strong>Categoria:</strong> ${produto.modelo || 'N/A'}</p>
+                    `;
+                } else {
+                    document.getElementById('resultado').innerHTML = '<h1 style="color: red;">❌ Produto não encontrado</h1>';
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('resultado').innerHTML = `<h1 style="color: red;">❌ Erro: ${error.message}</h1>`;
+            }
+        }
+        
+        testarAPI();
+    </script>
+</body>
+</html>
