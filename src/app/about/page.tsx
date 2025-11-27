@@ -13,8 +13,8 @@ export default function AboutPage(){
         <>
             <MainTemplate>
                 <section className="bg-black w-full h-[85vh] py-30 pl-30 ">
-                    <h1 className="w-[80%] text-white text-[8rem] leading-none font-bold">VESTINDO AS RUAS COM A MODA ESPORTIVA AMERICANA</h1>
-                    <h1 className="text-white text-[3rem] mt-6.5">Conheça mais sobre nós!</h1>
+                    <h1 className="w-[80%] ml-[3.5vw] text-white text-[8rem] leading-none font-bold">VESTINDO AS RUAS COM A MODA ESPORTIVA AMERICANA</h1>
+                    <h1 className="ml-[3.5vw] text-white text-[3rem] mt-6.5">Conheça mais sobre nós!</h1>
                 </section>
                 <section className="w-full h-[70vh] flex items-center justify-center">
                     <div className="w-[40vh] h-[40vh] bg-gray-200 rounded-2xl flex flex-col items-center justify-center">
