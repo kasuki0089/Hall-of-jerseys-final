@@ -163,6 +163,24 @@ export default function ProductPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Categoria</p>
+                  <p className="text-gray-800">{product.modelo}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Série</p>
+                  <p className="text-gray-800">{product.serie || 'Standard'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Ano</p>
+                  <p className="text-gray-800">{product.year}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 font-medium">Estoque</p>
+                  <p className="text-gray-800">{product.estoque} unidades</p>
+                </div>
+              </div>
 
               <div>
                 <p className="text-gray-700 mb-4 font-medium">Tamanhos disponíveis:</p>
@@ -193,13 +211,6 @@ export default function ProductPage() {
                   Tamanho selecionado: <strong>{selectedSize?.nome || product.tamanho?.nome}</strong>
                   {selectedSize?.disponivel === false && ' (Indisponível)'}
                 </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 py-1 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-[1.05rem] text-gray-600 font-medium">Estoque</p>
-                  <p className="text-[0.90rem] text-gray-800">{product.estoque} unidades</p>
-                </div>
               </div>
 
               <div>
@@ -240,7 +251,13 @@ export default function ProductPage() {
                 <strong>Time:</strong> {product.time?.nome}
               </div>
               <div>
-                <strong>Liga:</strong> {product.time?.liga?.sigla}
+                <strong>Liga:</strong> {product.time?.liga?.nome}
+              </div>
+              <div>
+                <strong>Sigla:</strong> {product.time?.liga?.sigla}
+              </div>
+              <div>
+                <strong>Cidade:</strong> {product.time?.cidade}
               </div>
               <div>
                 <strong>Ano:</strong> {product.year}
@@ -249,7 +266,10 @@ export default function ProductPage() {
                 <strong>Modelo:</strong> {product.modelo}
               </div>
               <div>
-                <strong>Série:</strong> {product.serie || 'Home'}
+                <strong>Série:</strong> {product.serie || 'Standard'}
+              </div>
+              <div>
+                <strong>Cor:</strong> {product.cor?.nome}
               </div>
             </div>
           </div>
