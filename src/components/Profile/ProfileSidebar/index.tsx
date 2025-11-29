@@ -26,7 +26,11 @@ const sidebarItems: SidebarItem[] = [
   { icon: Settings, label: "Acessibilidade", href: "/perfil/acessibilidade" },
 ];
 
-export default function ProfileSidebar() {
+type ProfileSidebarProps = {
+  activePage?: string;
+};
+
+export default function ProfileSidebar({ activePage }: ProfileSidebarProps = {}) {
   const pathname = usePathname();
 
   const handleLogout = async () => {

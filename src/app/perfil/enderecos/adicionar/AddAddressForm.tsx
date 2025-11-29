@@ -4,14 +4,18 @@ import { useState, useEffect } from "react";
 import MainTemplate from "@/templates/MainTemplate/Index";
 import ProfileSidebar from "@/components/Profile/ProfileSidebar";
 import AddressInput from "@/components/Profile/AddressInput";
-import { MapPin, X, Check } from "lucide-react";
+import { MapPin, X, Check, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function AddAddress({ session }) {
+type AddAddressProps = {
+  session: any;
+};
+
+export default function AddAddress({ session }: AddAddressProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [estados, setEstados] = useState([]);
+  const [estados, setEstados] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -175,24 +179,22 @@ export default function AddAddress({ session }) {
                       required
                     />
                     
-                    <div className="space-y-2">
-                      <label className="block text-lg font-medium text-gray-900">
-                        Unidade Federativa
-                      </label>
+                    <div className="relative w-full">
                       <select
                         name="uf"
                         value={formData.uf}
                         onChange={(e) => setFormData({ ...formData, uf: e.target.value })}
                         required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                        className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 pr-10 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 appearance-none cursor-pointer"
                       >
-                        <option value="">Unidade Federativa</option>
+                        <option value="">Selecione o estado</option>
                         {estados.map((estado: any) => (
                           <option key={estado.uf} value={estado.uf}>
                             {estado.uf} - {estado.nome}
                           </option>
                         ))}
                       </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
                     </div>
                   </div>
 
