@@ -28,7 +28,7 @@ export default function Navbar() {
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/about">SOBRE</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/contact">CONTATO</Link>
           <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/suporte">SUPORTE</Link>
-          {session?.user?.tipo === 'ADMIN' && (
+          {session?.user?.role === 'admin' && (
             <Link className="hover:text-secondary cursor-pointer transition duration-500" href="/adm">ADMIN</Link>
           )}
         </ul>

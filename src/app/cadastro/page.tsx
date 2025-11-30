@@ -19,6 +19,10 @@ export default function CadastroPage() {
     confirmarSenha: ""
   });
 
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     let formattedValue = value;
@@ -56,10 +60,77 @@ export default function CadastroPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Lógica de cadastro aqui
-    console.log(formData);
+    setLoading(true);
+    setMessage('');
+
+    // Validações
+    if (formData.senha !== formData.confirmarSenha) {
+      setMessage('As senhas não coincidem');
+      setSuccess(false);
+      setLoading(false);
+      return;
+    }
+
+    if (formData.senha.length < 6) {
+      setMessage('A senha deve ter pelo menos 6 caracteres');
+      setSuccess(false);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome: formData.nomeCompleto,
+          email: formData.email,
+          senha: formData.senha,
+          telefone: formData.telefone,
+          endereco: formData.endereco ? {
+            endereco: formData.endereco,
+            numero: '123', // Como não tem campo número no form, usar padrão
+            cidade: formData.cidade,
+            cep: formData.cep,
+            estadoUf: formData.estado.length === 2 ? formData.estado : 'SP'
+          } : null
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setMessage('Cadastro realizado com sucesso! Você já pode fazer login.');
+        // Limpar formulário
+        setFormData({
+          nomeCompleto: "",
+          email: "",
+          cpf: "",
+          telefone: "",
+          dataNascimento: "",
+          endereco: "",
+          cidade: "",
+          estado: "",
+          cep: "",
+          senha: "",
+          confirmarSenha: ""
+        });
+      } else {
+        setSuccess(false);
+        setMessage(result.error || 'Erro ao realizar cadastro');
+      }
+    } catch (error) {
+      console.error('Erro ao cadastrar:', error);
+      setSuccess(false);
+      setMessage('Erro ao conectar com o servidor');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -71,6 +142,18 @@ export default function CadastroPage() {
           </h1>
 
           <form onSubmit={handleSubmit} className="w-full mt-8 md:mt-12">
+            
+            {/* Mensagem de feedback */}
+            {message && (
+              <div className={`mb-6 p-4 rounded-md text-center ${
+                success 
+                  ? 'bg-green-100 text-green-800 border border-green-300' 
+                  : 'bg-red-100 text-red-800 border border-red-300'
+              }`}>
+                {message}
+              </div>
+            )}
+
             {/* Linha 1: Nome Completo e E-mail */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8">
               <div className="relative w-full">

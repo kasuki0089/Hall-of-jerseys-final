@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // Tabela de Estados
@@ -47,10 +47,12 @@ model Cor {
 
 // Tabela de Tamanhos
 model Tamanho {
-  id       Int       @id @default(autoincrement())
-  nome     String    @unique // PP, P, M, G, GG, XGG
-  ordem    Int       @unique // Para ordenação (1=PP, 2=P, etc)
-  produtos Produto[]
+  id            Int            @id @default(autoincrement())
+  nome          String         @unique // PP, P, M, G, GG, XGG
+  ordem         Int            @unique // Para ordenação (1=PP, 2=P, etc)
+  produtos      Produto[]
+  carrinhoItens CarrinhoItem[]
+  itensPedido   ItemPedido[]
 
   @@map("tamanhos")
 }
@@ -118,6 +120,7 @@ model Produto {
   tamanho             Tamanho               @relation(fields: [tamanhoId], references: [id])
   tamanhoId           Int
   itensPedido         ItemPedido[]
+  carrinhoItens       CarrinhoItem[]
   configuracaoEstoque ConfiguracaoEstoque?
   movimentacoesEstoque MovimentacaoEstoque[]
 
@@ -180,6 +183,7 @@ model Usuario {
   enderecoId       Int?
   formasPagamento  FormaPagamento[]
   pedidos          Pedido[]
+  carrinhoItens    CarrinhoItem[]
 
   @@map("usuarios")
 }
@@ -208,11 +212,29 @@ model ItemPedido {
   produtoId  Int
   quantidade Int
   preco      Float
+  tamanhoId  Int?
   criadoEm   DateTime @default(now())
   pedido     Pedido   @relation(fields: [pedidoId], references: [id])
   produto    Produto  @relation(fields: [produtoId], references: [id])
+  tamanho    Tamanho? @relation(fields: [tamanhoId], references: [id])
 
   @@map("itens_pedido")
+}
+
+model CarrinhoItem {
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int
+  produtoId  Int
+  quantidade Int
+  tamanhoId  Int?
+  criadoEm   DateTime @default(now())
+  
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  produto    Produto  @relation(fields: [produtoId], references: [id])
+  tamanho    Tamanho? @relation(fields: [tamanhoId], references: [id])
+
+  @@unique([usuarioId, produtoId, tamanhoId])
+  @@map("carrinho_itens")
 }
 
 model Transacao {

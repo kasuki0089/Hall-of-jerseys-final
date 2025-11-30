@@ -11,7 +11,7 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user.tipo !== 'ADMIN') {
+    if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 
@@ -44,7 +44,7 @@ export async function POST(request) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user.tipo !== 'ADMIN') {
+    if (!session || session.user.role !== 'admin') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 

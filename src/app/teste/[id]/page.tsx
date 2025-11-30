@@ -2,12 +2,30 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
+interface Product {
+  id: number;
+  nome: string;
+  preco: string;
+  year?: string;
+  modelo?: string;
+  time?: {
+    nome: string;
+    liga?: {
+      nome: string;
+    };
+  };
+  liga?: {
+    nome: string;
+  };
+  imagemUrl?: string;
+}
+
 export default function TestePage() {
   const params = useParams();
   const id = params.id;
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -25,7 +43,7 @@ export default function TestePage() {
         }
       } catch (err) {
         console.error('Erro ao carregar:', err);
-        setError(err.message);
+        setError(err instanceof Error ? err.message : 'Erro desconhecido');
       } finally {
         setLoading(false);
       }

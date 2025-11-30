@@ -1,248 +1,280 @@
+import { NextResponse } from 'next/server';
 import prisma from '../../../lib/db';
-// import { getServerSession } from 'next-auth';
-// import { authOptions } from '../auth/[...nextauth]/route';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
-// GET /api/produtos - Listar produtos com filtros avançados
-export async function GET(req) {
+export async function GET(request) {
   try {
-    const { searchParams } = new URL(req.url);
+    const { searchParams } = new URL(request.url);
     
-    // Extrair parâmetros de filtro
+    // Parâmetros de consulta
+    const page = parseInt(searchParams.get('page')) || 1;
+    const limit = parseInt(searchParams.get('limit')) || 12;
     const liga = searchParams.get('liga');
     const time = searchParams.get('time');
     const cor = searchParams.get('cor');
     const tamanho = searchParams.get('tamanho');
-    const precoMin = searchParams.get('precoMin');
-    const precoMax = searchParams.get('precoMax');
-    const busca = searchParams.get('busca');
+    const precoMin = searchParams.get('precoMin') ? parseFloat(searchParams.get('precoMin')) : null;
+    const precoMax = searchParams.get('precoMax') ? parseFloat(searchParams.get('precoMax')) : null;
     const ordenacao = searchParams.get('ordenacao') || 'nome';
-    
-    // Paginação
-    const page = parseInt(searchParams.get('page')) || 1;
-    const limit = parseInt(searchParams.get('limit')) || 20;
+    const pesquisa = searchParams.get('pesquisa');
+
+    console.log('🔍 Buscando produtos com filtros:', {
+      page, limit, liga, time, cor, tamanho, precoMin, precoMax, ordenacao, pesquisa
+    });
+
     const skip = (page - 1) * limit;
 
-    // Construir where clause
-    const where = {};
+    // Tentar buscar no banco primeiro
+    try {
+      // Construir filtros WHERE
+      const where = {};
 
-    // Filtro por busca (nome ou modelo)
-    if (busca && busca.trim()) {
-      where.OR = [
-        { nome: { contains: busca.trim() } },
-        { modelo: { contains: busca.trim() } },
-        { 
-          time: {
-            nome: { contains: busca.trim() }
+      if (liga) {
+        where.time = {
+          liga: {
+            sigla: {
+              equals: liga,
+              mode: 'insensitive'
+            }
           }
-        }
-      ];
-    }
+        };
+      }
 
-    // Filtro por liga
-    if (liga) {
-      where.time = {
-        ...where.time,
-        ligaId: parseInt(liga)
-      };
-    }
+      if (time) {
+        if (!where.time) where.time = {};
+        where.time.nome = {
+          contains: time,
+          mode: 'insensitive'
+        };
+      }
 
-    // Filtro por time
-    if (time) {
-      where.timeId = parseInt(time);
-    }
+      if (cor) {
+        where.cor = {
+          nome: {
+            contains: cor,
+            mode: 'insensitive'
+          }
+        };
+      }
 
-    // Filtro por cor
-    if (cor) {
-      where.corId = parseInt(cor);
-    }
+      if (precoMin !== null || precoMax !== null) {
+        where.preco = {};
+        if (precoMin !== null) where.preco.gte = precoMin;
+        if (precoMax !== null) where.preco.lte = precoMax;
+      }
 
-    // Filtro por tamanho
-    if (tamanho) {
-      where.tamanhoId = parseInt(tamanho);
-    }
-
-    // Filtro por faixa de preço
-    if (precoMin || precoMax) {
-      where.preco = {};
-      if (precoMin) where.preco.gte = parseFloat(precoMin);
-      if (precoMax) where.preco.lte = parseFloat(precoMax);
-    }
-
-    // Construir orderBy
-    let orderBy = {};
-    switch (ordenacao) {
-      case 'preco-asc':
-        orderBy = { preco: 'asc' };
-        break;
-      case 'preco-desc':
-        orderBy = { preco: 'desc' };
-        break;
-      case 'mais-recentes':
-        orderBy = { criadoEm: 'desc' };
-        break;
-      case 'nome':
-      default:
-        orderBy = { nome: 'asc' };
-        break;
-    }
-
-    // Buscar produtos
-    const [produtos, total] = await Promise.all([
-      prisma.produto.findMany({
-        where,
-        include: {
-          time: {
-            include: {
-              liga: {
-                select: { id: true, nome: true, sigla: true }
-              }
+      if (pesquisa) {
+        where.OR = [
+          {
+            nome: {
+              contains: pesquisa,
+              mode: 'insensitive'
             }
           },
-          cor: {
-            select: { id: true, nome: true, codigo: true }
+          {
+            descricao: {
+              contains: pesquisa,
+              mode: 'insensitive'
+            }
           },
-          tamanho: {
-            select: { id: true, nome: true, ordem: true }
+          {
+            time: {
+              nome: {
+                contains: pesquisa,
+                mode: 'insensitive'
+              }
+            }
           }
-        },
-        orderBy,
-        skip,
-        take: limit
-      }),
-      prisma.produto.count({ where })
-    ]);
-
-    // Calcular metadados de paginação
-    const totalPages = Math.ceil(total / limit);
-    const hasNextPage = page < totalPages;
-    const hasPreviousPage = page > 1;
-
-    return Response.json({
-      produtos,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasNextPage,
-        hasPreviousPage
-      },
-      filtros: {
-        liga,
-        time,
-        cor,
-        tamanho,
-        precoMin,
-        precoMax,
-        busca,
-        ordenacao
+        ];
       }
-    });
-    
+
+      // Definir ordenação
+      let orderBy = {};
+      switch (ordenacao) {
+        case 'preco-asc':
+          orderBy = { preco: 'asc' };
+          break;
+        case 'preco-desc':
+          orderBy = { preco: 'desc' };
+          break;
+        case 'mais-recentes':
+          orderBy = { criadoEm: 'desc' };
+          break;
+        case 'nome':
+        default:
+          orderBy = { nome: 'asc' };
+          break;
+      }
+
+      // Buscar produtos
+      const [produtos, total] = await Promise.all([
+        prisma.produto.findMany({
+          where,
+          include: {
+            time: {
+              include: {
+                liga: {
+                  select: { id: true, nome: true, sigla: true }
+                }
+              }
+            },
+            cor: {
+              select: { id: true, nome: true, codigo: true }
+            },
+            tamanho: {
+              select: { id: true, nome: true, ordem: true }
+            }
+          },
+          orderBy,
+          skip,
+          take: limit
+        }),
+        prisma.produto.count({ where })
+      ]);
+
+      // Calcular metadados de paginação
+      const totalPages = Math.ceil(total / limit);
+      const hasNextPage = page < totalPages;
+      const hasPreviousPage = page > 1;
+
+      return NextResponse.json({
+        success: true,
+        produtos,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage,
+          hasPreviousPage
+        },
+        filters: {
+          liga: liga || null,
+          time: time || null,
+          cor: cor || null,
+          tamanho: tamanho || null,
+          ordenacao: ordenacao || 'nome',
+          pesquisa: pesquisa || null
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Erro de conexão com banco:', dbError.message);
+      return NextResponse.json({
+        success: false,
+        error: 'Erro de conexão com o banco de dados. Verifique se o MySQL está rodando.'
+      }, { status: 500 });
+    }
+
   } catch (error) {
-    console.error('Erro ao buscar produtos:', error);
-    return Response.json({ error: 'Erro interno do servidor' }, { status: 500 });
+    console.error('❌ Erro ao buscar produtos:', error);
+    return NextResponse.json({
+      success: false,
+      error: 'Erro interno do servidor'
+    }, { status: 500 });
   }
 }
 
-// POST /api/produtos - Criar novo produto (apenas admins)
-export async function POST(req) {
+// POST - Criar novo produto (apenas admin)
+export async function POST(request) {
   try {
-    // const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions);
     
-    // if (!session || session.user.role !== 'admin') {
-    //   return Response.json({ error: 'Acesso negado' }, { status: 403 });
-    // }
+    // Verificar autorização de admin
+    if (!session || session.user.role !== 'admin') {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+    }
 
-    const body = await req.json();
-    const {
-      nome,
-      descricao,
-      modelo,
-      preco,
-      codigo,
-      year,
-      serie,
-      estoque,
+    const body = await request.json();
+    const { 
+      nome, 
+      descricao, 
+      preco, 
       ligaId,
-      timeId,
-      corId,
+      timeId, 
+      corId, 
       tamanhoId,
-      imagemUrl
+      imagemUrl,
+      modelo,
+      serie,
+      year,
+      codigo,
+      estoque
     } = body;
 
-    // Validações básicas
-    if (!nome || !preco || !codigo || !ligaId || !timeId || !corId || !tamanhoId || !modelo) {
-      return Response.json(
-        { error: 'Campos obrigatórios: nome, modelo, preco, codigo, ligaId, timeId, corId, tamanhoId' },
-        { status: 400 }
-      );
+    // Validações obrigatórias
+    if (!nome || !preco || !ligaId || !corId || !tamanhoId) {
+      return NextResponse.json({ 
+        error: 'Nome, preço, liga, cor e tamanho são obrigatórios' 
+      }, { status: 400 });
     }
 
-    // Verificar se código já existe
-    const produtoExistente = await prisma.produto.findUnique({
-      where: { codigo: codigo.toString() }
-    });
-    
-    if (produtoExistente) {
-      return Response.json({ error: 'Código já existe' }, { status: 400 });
+    if (preco < 0) {
+      return NextResponse.json({ 
+        error: 'Preço não pode ser negativo' 
+      }, { status: 400 });
     }
 
-    // Verificar se liga existe
-    const liga = await prisma.liga.findUnique({
-      where: { id: parseInt(ligaId) }
-    });
-    
-    if (!liga) {
-      return Response.json({ error: 'Liga não encontrada' }, { status: 400 });
+    if (estoque < 0) {
+      return NextResponse.json({ 
+        error: 'Estoque não pode ser negativo' 
+      }, { status: 400 });
     }
 
-    // Verificar se time existe e pertence à liga
-    const time = await prisma.time.findFirst({
-      where: { 
-        id: parseInt(timeId),
-        ligaId: parseInt(ligaId)
-      }
-    });
-    
-    if (!time) {
-      return Response.json({ error: 'Time não encontrado ou não pertence à liga especificada' }, { status: 400 });
-    }
+    // Gerar código único se não fornecido
+    const codigoProduto = codigo || `PROD-${Date.now()}`;
 
-    const produto = await prisma.produto.create({
+    // Criar produto
+    const novoProduto = await prisma.produto.create({
       data: {
         nome,
-        descricao: descricao || null,
-        modelo,
+        codigo: codigoProduto,
+        descricao: descricao || '',
+        modelo: modelo || 'CAMISA',
         preco: parseFloat(preco),
-        codigo: codigo.toString(),
-        year: year || new Date().getFullYear(),
-        serie: serie || null,
-        estoque: estoque || 0,
-        imagemUrl: imagemUrl || null,
+        year: parseInt(year) || new Date().getFullYear(),
+        serie: serie || 'HOME',
+        estoque: parseInt(estoque) || 0,
         ligaId: parseInt(ligaId),
-        timeId: parseInt(timeId),
+        timeId: timeId ? parseInt(timeId) : null,
         corId: parseInt(corId),
-        tamanhoId: parseInt(tamanhoId)
+        tamanhoId: parseInt(tamanhoId),
+        imagemUrl: imagemUrl || null,
+        ativo: true,
+        sale: false
       },
       include: {
         liga: true,
-        time: true,
+        time: {
+          include: {
+            liga: true
+          }
+        },
         cor: true,
         tamanho: true
       }
     });
 
-    return Response.json(produto, { status: 201 });
-
+    return NextResponse.json(novoProduto, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar produto:', error);
     
-    // Erro de constraint (código duplicado, etc)
     if (error.code === 'P2002') {
-      return Response.json({ error: 'Código já existe' }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Código de produto já existe. Tente outro código.' 
+      }, { status: 400 });
     }
-    
-    return Response.json({ error: 'Erro interno do servidor: ' + error.message }, { status: 500 });
+
+    if (error.code === 'P2003') {
+      return NextResponse.json({ 
+        error: 'Liga, time, cor ou tamanho especificado não existe' 
+      }, { status: 400 });
+    }
+
+    return NextResponse.json({ 
+      error: 'Erro ao criar produto',
+      details: error.message 
+    }, { status: 500 });
   }
 }

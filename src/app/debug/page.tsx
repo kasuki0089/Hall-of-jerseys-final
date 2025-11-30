@@ -1,9 +1,32 @@
 "use client";
 import { useState, useEffect } from "react";
 
+interface Liga {
+  id: number;
+  nome: string;
+  sigla: string;
+}
+
+interface Time {
+  id: number;
+  nome: string;
+  liga?: Liga;
+}
+
+interface Produto {
+  id: number;
+  nome: string;
+  time?: Time;
+}
+
+interface LigaStat extends Liga {
+  totalProdutos: number;
+  produtos: Produto[];
+}
+
 export default function DebugPage() {
-  const [produtos, setProdutos] = useState([]);
-  const [ligas, setLigas] = useState([]);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [ligas, setLigas] = useState<Liga[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -98,7 +121,7 @@ export default function DebugPage() {
             <a 
               href={`/liga/${liga.sigla.toLowerCase()}`}
               style={{ 
-                color: ligaStats.find(l => l.id === liga.id)?.totalProdutos > 0 ? 'green' : 'red'
+                color: (ligaStats.find(l => l.id === liga.id)?.totalProdutos || 0) > 0 ? 'green' : 'red'
               }}
             >
               /liga/{liga.sigla.toLowerCase()} - {liga.nome}

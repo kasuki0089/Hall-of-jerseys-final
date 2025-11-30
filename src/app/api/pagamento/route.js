@@ -1,280 +1,356 @@
-import prisma from '../../../lib/db';
-import crypto from 'crypto';
+// Sistema de simulação de pagamento independente do banco de dados
 
-// Simular processamento de pagamentos
-const processarPagamento = async (dadosPagamento) => {
-  const { tipo, valor, dados } = dadosPagamento;
-  
-  // Simular delay de processamento
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  
-  // Simular taxa de sucesso (95%)
-  const sucesso = Math.random() < 0.95;
-  
-  if (!sucesso) {
-    throw new Error('Pagamento recusado pelo gateway');
-  }
-  
-  const transacaoId = crypto.randomUUID();
-  
-  switch (tipo) {
-    case 'pix':
-      return {
-        transacaoId,
-        status: 'aprovado',
-        tipo: 'pix',
-        qrCode: `00020126580014BR.GOV.BCB.PIX${transacaoId}`,
-        codigoPix: `PIX${transacaoId.substring(0, 8).toUpperCase()}`,
-        prazoVencimento: new Date(Date.now() + 30 * 60 * 1000), // 30 minutos
-        observacoes: 'Pagamento via PIX processado instantaneamente'
-      };
-      
-    case 'cartao':
-      return {
-        transacaoId,
-        status: 'aprovado',
-        tipo: 'cartao',
-        bandeira: dados.numero.startsWith('4') ? 'Visa' : 'Mastercard',
-        ultimosDigitos: dados.numero.slice(-4),
-        autorizacao: `AUTH${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
-        parcelas: dados.parcelas || 1,
-        observacoes: `Pagamento aprovado em ${dados.parcelas || 1}x`
-      };
-      
-    case 'boleto':
-      return {
-        transacaoId,
-        status: 'pendente',
-        tipo: 'boleto',
-        codigoBarras: '34191234567890123456789012345678901234567890',
-        linhaDigitavel: '34191.23456 78901.234567 89012.345678 9 01234567890',
-        prazoVencimento: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 dias
-        urlBoleto: `/api/pagamento/boleto/${transacaoId}`,
-        observacoes: 'Boleto bancario com vencimento em 3 dias uteis'
-      };
-      
-    default:
-      throw new Error('Metodo de pagamento nao suportado');
-  }
-};
+// Simulação de dados de transações em memória
+const transacoesSimuladas = new Map();
+let contadorTransacao = 1;
 
-// POST /api/pagamento - Processar pagamento
 export async function POST(req) {
   try {
-    const {
-      pedidoId,
-      metodoPagamento,
+    const { 
+      pedidoId, 
+      formaPagamento, 
       dadosPagamento,
-      valorTotal,
-      dadosEntrega
+      valor 
     } = await req.json();
 
-    // Validacoes basicas
-    if (!pedidoId || !metodoPagamento || !valorTotal) {
-      return Response.json(
-        { error: 'Dados obrigatorios: pedidoId, metodoPagamento, valorTotal' },
-        { status: 400 }
-      );
-    }
-
-    if (valorTotal <= 0) {
-      return Response.json(
-        { error: 'Valor deve ser maior que zero' },
-        { status: 400 }
-      );
-    }
-
-    // Verificar se o pedido existe
-    const pedido = await prisma.pedido.findUnique({
-      where: { id: pedidoId },
-      include: {
-        itens: {
-          include: {
-            produto: true
-          }
-        },
-        usuario: true
-      }
+    console.log('🏦 Processando pagamento simulado:', {
+      pedidoId,
+      formaPagamento,
+      valor
     });
 
-    if (!pedido) {
-      return Response.json(
-        { error: 'Pedido nao encontrado' },
-        { status: 404 }
-      );
+    if (!pedidoId || !formaPagamento || !valor) {
+      return new Response(JSON.stringify({ error: 'Dados obrigatórios faltando' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    if (pedido.status !== 'PENDENTE') {
-      return Response.json(
-        { error: 'Pedido ja foi processado' },
-        { status: 400 }
-      );
-    }
+    // Gerar ID único para transação
+    const transacaoId = `TXN_${Date.now()}_${contadorTransacao++}`;
 
-    // Validacoes especificas por metodo de pagamento
-    switch (metodoPagamento) {
-      case 'cartao':
-        if (!dadosPagamento.numero || !dadosPagamento.cvv || !dadosPagamento.validade) {
-          return Response.json(
-            { error: 'Dados do cartao incompletos' },
-            { status: 400 }
-          );
-        }
+    let resultadoPagamento;
+
+    // Processar pagamento baseado na forma
+    switch (formaPagamento.toUpperCase()) {
+      case 'PIX':
+        resultadoPagamento = await processarPIX(dadosPagamento, valor, transacaoId);
         break;
-        
-      case 'pix':
-        // PIX nao precisa de dados adicionais
+      case 'CARTAO':
+        resultadoPagamento = await processarCartao(dadosPagamento, valor, transacaoId);
         break;
-        
-      case 'boleto':
-        // Boleto nao precisa de dados adicionais
+      case 'BOLETO':
+        resultadoPagamento = await processarBoleto(dadosPagamento, valor, transacaoId);
         break;
-        
       default:
-        return Response.json(
-          { error: 'Metodo de pagamento nao suportado' },
-          { status: 400 }
-        );
+        return new Response(JSON.stringify({ error: 'Forma de pagamento não suportada' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        });
     }
 
-    try {
-      // Processar pagamento
-      const resultadoPagamento = await processarPagamento({
-        tipo: metodoPagamento,
-        valor: valorTotal,
-        dados: dadosPagamento
-      });
+    // Salvar transação simulada na memória
+    const transacao = {
+      id: transacaoId,
+      pedidoId: parseInt(pedidoId),
+      tipo: formaPagamento.toUpperCase(),
+      valor: parseFloat(valor),
+      status: resultadoPagamento.status,
+      dadosGateway: JSON.stringify(resultadoPagamento.dados),
+      erro: resultadoPagamento.erro || null,
+      processadoEm: new Date(),
+      dados: resultadoPagamento.dados
+    };
 
-      // Salvar transacao
-      const transacao = await prisma.transacao.create({
-        data: {
-          id: resultadoPagamento.transacaoId,
-          pedidoId: pedido.id,
-          tipo: metodoPagamento.toUpperCase(),
-          valor: valorTotal,
-          status: resultadoPagamento.status.toUpperCase(),
-          dadosGateway: JSON.stringify(resultadoPagamento),
-          processadoEm: new Date()
-        }
-      });
+    transacoesSimuladas.set(transacaoId, transacao);
 
-      // Atualizar status do pedido
-      let novoStatusPedido = 'PENDENTE';
-      if (resultadoPagamento.status === 'aprovado') {
-        novoStatusPedido = 'CONFIRMADO';
-      } else if (resultadoPagamento.status === 'pendente') {
-        novoStatusPedido = 'AGUARDANDO_PAGAMENTO';
+    console.log('✅ Transação simulada criada:', transacaoId, transacao.status);
+
+    return new Response(JSON.stringify({
+      success: true,
+      transacao: {
+        id: transacao.id,
+        status: transacao.status,
+        tipo: transacao.tipo,
+        valor: transacao.valor,
+        dados: resultadoPagamento.dados,
+        message: resultadoPagamento.message
       }
-
-      await prisma.pedido.update({
-        where: { id: pedido.id },
-        data: {
-          status: novoStatusPedido,
-          transacaoId: transacao.id,
-          confirmadoEm: resultadoPagamento.status === 'aprovado' ? new Date() : null
-        }
-      });
-
-      return Response.json({
-        sucesso: true,
-        transacao: {
-          id: transacao.id,
-          status: resultadoPagamento.status,
-          tipo: metodoPagamento
-        },
-        pagamento: resultadoPagamento,
-        pedido: {
-          id: pedido.id,
-          status: novoStatusPedido
-        }
-      });
-
-    } catch (error) {
-      // Salvar tentativa de pagamento com erro
-      await prisma.transacao.create({
-        data: {
-          id: crypto.randomUUID(),
-          pedidoId: pedido.id,
-          tipo: metodoPagamento.toUpperCase(),
-          valor: valorTotal,
-          status: 'REJEITADO',
-          erro: error.message,
-          processadoEm: new Date()
-        }
-      });
-
-      return Response.json(
-        { error: error.message },
-        { status: 400 }
-      );
-    }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
 
   } catch (error) {
-    console.error('Erro ao processar pagamento:', error);
-    return Response.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    console.error('❌ Erro ao processar pagamento:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Erro interno do servidor',
+      details: error.message 
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
-// GET /api/pagamento - Listar metodos de pagamento disponiveis
+// Simulação de processamento PIX
+async function processarPIX(dados, valor, transacaoId) {
+  console.log('📱 Processando PIX simulado...');
+  
+  // Simular delay de processamento
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  // Gerar código PIX simulado
+  const codigoPIX = `00020101021243650016COM.MERCADOLIVRE02013063200007190204048154040`+Math.random().toString(36).substr(2, 20).toUpperCase();
+  
+  // Simular QR Code (base64 de uma imagem SVG simples)
+  const qrCodeSVG = `<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" fill="white"/>
+    <rect x="10" y="10" width="20" height="20" fill="black"/>
+    <rect x="40" y="10" width="20" height="20" fill="black"/>
+    <rect x="70" y="10" width="20" height="20" fill="black"/>
+    <text x="100" y="100" font-size="12" text-anchor="middle" fill="black">PIX</text>
+    <text x="100" y="120" font-size="10" text-anchor="middle" fill="black">${transacaoId}</text>
+    <text x="100" y="140" font-size="10" text-anchor="middle" fill="black">R$ ${parseFloat(valor).toFixed(2)}</text>
+  </svg>`;
+  
+  const qrCodeData = `data:image/svg+xml;base64,${Buffer.from(qrCodeSVG).toString('base64')}`;
+
+  // Simular aprovação instantânea (95% de chance)
+  const aprovado = Math.random() > 0.05;
+
+  console.log(`📱 PIX ${aprovado ? 'APROVADO' : 'REJEITADO'}`);
+
+  return {
+    status: aprovado ? 'APROVADO' : 'REJEITADO',
+    dados: {
+      codigoPIX: codigoPIX,
+      qrCode: qrCodeData,
+      validade: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutos
+      banco: 'BANCO_CENTRAL',
+      chave: dados.chavePix || 'hallojerseys@pix.com.br',
+      valor: parseFloat(valor),
+      beneficiario: 'HALL OF JERSEYS LTDA'
+    },
+    message: aprovado ? 'PIX gerado com sucesso! Escaneie o QR Code para pagar.' : 'Falha na geração do PIX',
+    erro: aprovado ? null : 'Erro na comunicação com o Banco Central'
+  };
+}
+
+// Simulação de processamento Cartão
+async function processarCartao(dados, valor, transacaoId) {
+  console.log('💳 Processando cartão simulado...');
+  
+  // Simular delay de processamento
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  // Validações básicas do cartão
+  const numeroCartao = dados.numero?.replace(/\s/g, '') || '';
+  const cvv = dados.cvv || '';
+  const validade = dados.validade || '';
+
+  if (!numeroCartao || numeroCartao.length < 16) {
+    console.log('❌ Cartão rejeitado: número inválido');
+    return {
+      status: 'REJEITADO',
+      dados: { motivo: 'Número do cartão inválido' },
+      message: 'Cartão rejeitado',
+      erro: 'Número do cartão inválido'
+    };
+  }
+
+  if (!cvv || cvv.length < 3) {
+    console.log('❌ Cartão rejeitado: CVV inválido');
+    return {
+      status: 'REJEITADO',
+      dados: { motivo: 'CVV inválido' },
+      message: 'Cartão rejeitado',
+      erro: 'CVV inválido'
+    };
+  }
+
+  // Simular diferentes cenários baseado no final do cartão
+  const ultimoDigito = numeroCartao.slice(-1);
+  let aprovado = true;
+  let motivo = '';
+
+  if (ultimoDigito === '1') {
+    aprovado = false;
+    motivo = 'Cartão bloqueado';
+  } else if (ultimoDigito === '2') {
+    aprovado = false;
+    motivo = 'Saldo insuficiente';
+  } else if (ultimoDigito === '3') {
+    aprovado = false;
+    motivo = 'Cartão expirado';
+  } else {
+    // 85% de chance de aprovação para outros casos
+    aprovado = Math.random() > 0.15;
+    motivo = aprovado ? '' : 'Transação não autorizada pela operadora';
+  }
+
+  const codigoAutorizacao = aprovado ? `AUTH_${Math.random().toString(36).substr(2, 8).toUpperCase()}` : null;
+
+  console.log(`💳 Cartão ${aprovado ? 'APROVADO' : 'REJEITADO'}${motivo ? ': ' + motivo : ''}`);
+
+  return {
+    status: aprovado ? 'APROVADO' : 'REJEITADO',
+    dados: {
+      codigoAutorizacao,
+      nsu: `NSU${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`,
+      bandeira: detectarBandeira(numeroCartao),
+      ultimosDigitos: numeroCartao.slice(-4),
+      parcelas: dados.parcelas || 1,
+      valor: parseFloat(valor),
+      motivo: motivo || undefined,
+      tid: `TID${Math.random().toString(36).substr(2, 10).toUpperCase()}`
+    },
+    message: aprovado ? `Transação aprovada! Código: ${codigoAutorizacao}` : `Transação rejeitada: ${motivo}`,
+    erro: aprovado ? null : motivo
+  };
+}
+
+// Simulação de processamento Boleto
+async function processarBoleto(dados, valor, transacaoId) {
+  console.log('🧾 Gerando boleto simulado...');
+  
+  // Simular delay de processamento
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // Gerar linha digitável do boleto
+  const linhaDigitavel = `34191.79001 01043.510047 91020.150008 1 ${Math.floor(Date.now() / 1000).toString().substr(-4)}${Math.floor(valor * 100).toString().padStart(10, '0')}`;
+  
+  // Gerar código de barras
+  const codigoBarras = `34191${Math.floor(Date.now() / 1000).toString().substr(-4)}${Math.floor(valor * 100).toString().padStart(10, '0')}7900010435100479102015000`;
+
+  // Data de vencimento (3 dias úteis)
+  const dataVencimento = new Date();
+  dataVencimento.setDate(dataVencimento.getDate() + 3);
+
+  // Gerar nosso número
+  const nossoNumero = `00000${Math.floor(Math.random() * 99999).toString().padStart(5, '0')}-${Math.floor(Math.random() * 9)}`;
+
+  console.log('🧾 Boleto gerado com sucesso');
+
+  return {
+    status: 'PENDENTE', // Boleto sempre fica pendente até o pagamento
+    dados: {
+      linhaDigitavel,
+      codigoBarras,
+      dataVencimento: dataVencimento.toISOString(),
+      valor: parseFloat(valor),
+      cedente: 'HALL OF JERSEYS LTDA',
+      cnpjCedente: '12.345.678/0001-90',
+      banco: '341 - Itaú Unibanco S.A.',
+      agencia: '1790',
+      conta: '01043-5',
+      nossoNumero,
+      documentoNumero: transacaoId,
+      instrucoes: [
+        '- Pagar até a data de vencimento',
+        '- Após vencimento multa de 2% + juros de 1% ao mês',
+        '- Em caso de dúvidas entre em contato conosco'
+      ]
+    },
+    message: 'Boleto gerado com sucesso! Efetue o pagamento até a data de vencimento.',
+    erro: null
+  };
+}
+
+// Função auxiliar para detectar bandeira do cartão
+function detectarBandeira(numero) {
+  const first4 = numero.substring(0, 4);
+  const first2 = numero.substring(0, 2);
+  const first1 = numero.substring(0, 1);
+
+  if (first1 === '4') return 'Visa';
+  if (first2 >= '51' && first2 <= '55') return 'Mastercard';
+  if (first4 >= '2221' && first4 <= '2720') return 'Mastercard'; // Nova faixa Mastercard
+  if (first2 === '34' || first2 === '37') return 'American Express';
+  if (first4 === '6011' || first2 === '65') return 'Discover';
+  if (first2 === '30' || first2 === '38') return 'Diners Club';
+  if (first4 === '5066' || first4 === '5067') return 'Elo';
+  if (first4 === '4011' || first4 === '4312') return 'Elo';
+  
+  return 'Desconhecida';
+}
+
+// GET /api/pagamento - Consultar status de transação
 export async function GET(req) {
   try {
-    const metodos = [
-      {
-        codigo: 'pix',
-        nome: 'PIX',
-        descricao: 'Pagamento instantaneo via PIX',
-        icone: '💰',
-        ativo: true,
-        taxas: {
-          percentual: 0,
-          fixo: 0
-        },
-        prazoProcessamento: 'Instantaneo',
-        observacoes: 'Aprovacao imediata, disponivel 24h'
-      },
-      {
-        codigo: 'cartao',
-        nome: 'Cartao de Credito',
-        descricao: 'Visa, Mastercard, Elo',
-        icone: '💳',
-        ativo: true,
-        parcelamento: {
-          maximo: 12,
-          semJuros: 3,
-          comJuros: 12
-        },
-        taxas: {
-          percentual: 2.99,
-          fixo: 0.39
-        },
-        prazoProcessamento: '1-2 dias uteis',
-        observacoes: 'Parcelamento em ate 12x, as 3 primeiras sem juros'
-      },
-      {
-        codigo: 'boleto',
-        nome: 'Boleto Bancario',
-        descricao: 'Pagamento via boleto',
-        icone: '📄',
-        ativo: true,
-        taxas: {
-          percentual: 0,
-          fixo: 3.99
-        },
-        prazoProcessamento: '1-3 dias uteis',
-        prazoVencimento: 3,
-        observacoes: 'Vencimento em 3 dias uteis, confirmacao em ate 3 dias'
-      }
-    ];
+    const { searchParams } = new URL(req.url);
+    const transacaoId = searchParams.get('transacaoId');
+    const pedidoId = searchParams.get('pedidoId');
 
-    return Response.json(metodos);
+    console.log('🔍 Consultando transação:', { transacaoId, pedidoId });
+
+    if (!transacaoId && !pedidoId) {
+      return new Response(JSON.stringify({ error: 'transacaoId ou pedidoId é obrigatório' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    let transacao;
+
+    if (transacaoId) {
+      transacao = transacoesSimuladas.get(transacaoId);
+    } else {
+      // Buscar por pedidoId
+      for (const [id, txn] of transacoesSimuladas.entries()) {
+        if (txn.pedidoId === parseInt(pedidoId)) {
+          transacao = txn;
+          break;
+        }
+      }
+    }
+
+    if (!transacao) {
+      console.log('❌ Transação não encontrada');
+      return new Response(JSON.stringify({ error: 'Transação não encontrada' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Simular mudança de status para boleto após um tempo
+    if (transacao.tipo === 'BOLETO' && transacao.status === 'PENDENTE') {
+      const tempoDecorrido = Date.now() - new Date(transacao.processadoEm).getTime();
+      
+      // Simular pagamento do boleto após 1 minuto (para demonstração)
+      if (tempoDecorrido > 1 * 60 * 1000 && Math.random() > 0.5) {
+        transacao.status = 'APROVADO';
+        transacao.dados.dataPagamento = new Date().toISOString();
+        console.log('🧾 Boleto pago automaticamente (simulação)');
+      }
+    }
+
+    console.log('✅ Transação encontrada:', transacao.id, transacao.status);
+
+    return new Response(JSON.stringify({
+      success: true,
+      transacao: {
+        id: transacao.id,
+        status: transacao.status,
+        tipo: transacao.tipo,
+        valor: transacao.valor,
+        dados: transacao.dados,
+        processadoEm: transacao.processadoEm,
+        erro: transacao.erro
+      }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
   } catch (error) {
-    console.error('Erro ao buscar metodos de pagamento:', error);
-    return Response.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
+    console.error('❌ Erro ao consultar transação:', error);
+    return new Response(JSON.stringify({ 
+      error: 'Erro interno do servidor',
+      details: error.message 
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import MainTemplate from "@/templates/MainTemplate/Index";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,6 +11,7 @@ import { ShoppingCart } from "lucide-react";
 export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
+  const { data: session } = useSession();
   const id = params.id as string;
   
   const [product, setProduct] = useState<any>(null);
@@ -18,6 +20,8 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [adicionandoCarrinho, setAdicionandoCarrinho] = useState(false);
+  const [quantidade, setQuantidade] = useState(1);
 
   useEffect(() => {
     if (id) {
@@ -72,6 +76,50 @@ export default function ProductPage() {
     setSelectedSize(tamanho);
     if (tamanho.produtoId && tamanho.produtoId !== parseInt(id)) {
       router.push(`/produtos/${tamanho.produtoId}`);
+    }
+  };
+
+  const adicionarAoCarrinho = async () => {
+    if (!session) {
+      alert('Você precisa estar logado para adicionar produtos ao carrinho.');
+      router.push('/login');
+      return;
+    }
+
+    if (!selectedSize?.disponivel) {
+      alert('Por favor, selecione um tamanho disponível.');
+      return;
+    }
+
+    try {
+      setAdicionandoCarrinho(true);
+      
+      const response = await fetch('/api/carrinho', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          produtoId: product.id,
+          quantidade: quantidade,
+          tamanhoId: selectedSize?.id
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert('Produto adicionado ao carrinho com sucesso!');
+        // Opcional: redirecionar para o carrinho
+        // router.push('/carrinho');
+      } else {
+        alert('Erro ao adicionar produto ao carrinho: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar ao carrinho:', error);
+      alert('Erro ao adicionar produto ao carrinho. Tente novamente.');
+    } finally {
+      setAdicionandoCarrinho(false);
     }
   };
 
@@ -230,12 +278,40 @@ export default function ProductPage() {
                 <p className="text-sm text-green-600">ou 3x de R$ {(product.preco / 3)?.toFixed(2)} sem juros</p>
               </div>
 
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-gray-700 font-medium">Quantidade:</label>
+                  <div className="flex items-center border border-gray-300 rounded">
+                    <button
+                      onClick={() => setQuantidade(Math.max(1, quantidade - 1))}
+                      className="px-3 py-1 hover:bg-gray-100"
+                    >
+                      -
+                    </button>
+                    <span className="px-4 py-1 border-x border-gray-300">{quantidade}</span>
+                    <button
+                      onClick={() => setQuantidade(quantidade + 1)}
+                      className="px-3 py-1 hover:bg-gray-100"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <div className="text-sm text-gray-600">
+                  Estoque: {product.estoque} unidades
+                </div>
+              </div>
+
               <button 
-                className="w-full flex justify-center items-center bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer text-lg"
-                disabled={!selectedSize?.disponivel}
+                onClick={adicionarAoCarrinho}
+                disabled={!selectedSize?.disponivel || adicionandoCarrinho || quantidade > product.estoque}
+                className="w-full flex justify-center items-center bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingCart color="#ffffff" size={24} className="mr-3"/>
-                {selectedSize?.disponivel !== false ? 'ADICIONAR AO CARRINHO' : 'PRODUTO INDISPONÍVEL'}
+                {adicionandoCarrinho ? 'ADICIONANDO...' : 
+                 !selectedSize?.disponivel ? 'PRODUTO INDISPONÍVEL' :
+                 quantidade > product.estoque ? 'ESTOQUE INSUFICIENTE' :
+                 'ADICIONAR AO CARRINHO'}
               </button>
             </div>
           </div>

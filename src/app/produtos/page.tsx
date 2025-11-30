@@ -7,25 +7,9 @@ export const metadata = {
   description: "Confira nossa coleção completa de jerseys esportivos americanos.",
 };
 
-async function getProducts() {
-  try {
-    const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3001'}/api/produtos`, {
-      cache: 'no-store'
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      return data.produtos || [];
-    }
-    return [];
-  } catch (error) {
-    console.error('Erro ao buscar produtos:', error);
-    return [];
-  }
-}
-
-export default async function ProductsPage() {
-  const allProducts = await getProducts();
+export default function ProductsPage() {
+  // Usar array vazio - ProductsClient vai carregar via API client-side
+  const allProducts: any[] = [];
 
   return (
     <MainTemplate>

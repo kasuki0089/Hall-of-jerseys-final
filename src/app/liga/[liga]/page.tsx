@@ -13,10 +13,30 @@ const ligaNames: { [key: string]: string } = {
   'mls': 'MLS'
 };
 
+interface Liga {
+  id: number;
+  nome: string;
+  sigla: string;
+}
+
+interface Time {
+  id: number;
+  nome: string;
+  liga?: Liga;
+}
+
+interface Produto {
+  id: number;
+  nome: string;
+  preco: string;
+  imagemUrl?: string;
+  time?: Time;
+}
+
 export default function LigaPage() {
   const params = useParams();
   const liga = params.liga as string;
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Produto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
@@ -64,7 +84,7 @@ export default function LigaPage() {
         });
         
         console.log(`🎯 Produtos filtrados para ${ligaUpper}:`, ligaProducts.length);
-        console.log('Produtos encontrados:', ligaProducts.map(p => p.nome));
+        console.log('Produtos encontrados:', ligaProducts.map((p: Produto) => p.nome));
         
         setProducts(ligaProducts);
         

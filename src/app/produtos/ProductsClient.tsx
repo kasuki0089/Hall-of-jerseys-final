@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ProductCard from "@/components/ProductCard";
 
 type Product = {
@@ -8,6 +8,7 @@ type Product = {
   nome: string;
   preco: number;
   imagemUrl?: string;
+  imagem?: string;
   time?: {
     liga?: {
       sigla: string;
@@ -28,9 +29,39 @@ const LEAGUES = [
   { id: "MLS", name: "MLS" },
 ];
 
-export default function ProductsClient({ products }: ProductsClientProps) {
+export default function ProductsClient({ products: initialProducts }: ProductsClientProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("ALL");
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(false);
+
+  // Carregar produtos da API se não foram fornecidos
+  useEffect(() => {
+    if (!initialProducts || initialProducts.length === 0) {
+      carregarProdutos();
+    }
+  }, []);
+
+  const carregarProdutos = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/produtos?limit=20');
+      const result = await response.json();
+      
+      if (result.success) {
+        setProducts(result.produtos || []);
+      } else {
+        console.error('Erro ao carregar produtos:', result.error);
+        // Mostrar erro para o usuário se não conseguir carregar
+        setProducts([]);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar produtos:', error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredProducts = useMemo(() => {
     if (activeFilter === "ALL") {
@@ -90,8 +121,8 @@ export default function ProductsClient({ products }: ProductsClientProps) {
               onClick={() => handleFilterChange(league.id)}
               className={`px-4 py-2 border rounded hover:cursor-pointer transition-colors duration-200 ${
                 activeFilter === league.id 
-                  ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700" 
-                  : "border-gray-300 hover:bg-gray-100"
+                  ? 'bg-blue-600 text-white border-blue-600' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
               }`}
             >
               {league.name}
@@ -100,56 +131,71 @@ export default function ProductsClient({ products }: ProductsClientProps) {
         </div>
       </div>
 
-      {/* Grid de produtos 4x4 */}
-      <div className="container mx-auto px-4 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {currentProducts.map((product: Product) => (
-            <ProductCard 
-              key={product.id} 
-              product={{
-                id: product.id.toString(),
-                nome: product.nome,
-                preco: product.preco.toString(),
-                imagemUrl: product.imagemUrl || '/images/produto-placeholder.jpg',
-                liga: product.time?.liga?.sigla
-              }} 
-            />
-          ))}
+      {/* Loading */}
+      {loading && (
+        <div className="container mx-auto px-4 mb-8">
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-4 text-gray-600">Carregando produtos...</span>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Lista de produtos */}
+      {!loading && (
+        <div className="container mx-auto px-4 mb-8">
+          {currentProducts.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 text-lg mb-4">
+                {filteredProducts.length === 0 
+                  ? `Nenhum produto encontrado para ${LEAGUES.find(l => l.id === activeFilter)?.name || 'esta categoria'}.`
+                  : 'Nenhum produto encontrado.'
+                }
+              </p>
+              <button
+                onClick={() => handleFilterChange('ALL')}
+                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+              >
+                Ver todos os produtos
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {currentProducts.map((product) => (
+                <ProductCard 
+                  key={product.id} 
+                  product={{
+                    id: product.id.toString(),
+                    nome: product.nome,
+                    preco: product.preco.toString(),
+                    imagemUrl: product.imagemUrl || product.imagem || '/images/prodImages/placeholder.svg',
+                    liga: product.time?.liga?.sigla
+                  }} 
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Paginação */}
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <div className="container mx-auto px-4 pb-8">
           <div className="flex justify-center">
             <div className="flex gap-2">
-              {/* Páginas visíveis */}
               {getVisiblePages().map((page) => (
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
                   className={`w-8 h-8 rounded flex items-center justify-center text-sm ${
                     currentPage === page
-                      ? "bg-blue-600 text-white"
-                      : "border border-gray-300 hover:bg-gray-100"
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
                   }`}
                 >
                   {page}
                 </button>
               ))}
-              
-              {/* Elipses e última página */}
-              {totalPages > 5 && currentPage < totalPages - 2 && (
-                <>
-                  <span className="px-2 flex items-center text-sm">...</span>
-                  <button
-                    onClick={() => handlePageChange(totalPages)}
-                    className="w-8 h-8 rounded flex items-center justify-center text-sm border border-gray-300 hover:bg-gray-100"
-                  >
-                    {totalPages}
-                  </button>
-                </>
-              )}
             </div>
           </div>
         </div>

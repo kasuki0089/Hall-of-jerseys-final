@@ -114,6 +114,13 @@ export default function AdicionarProduto() {
         return;
       }
 
+      // Validação: cor deve ser selecionada
+      if (!corId) {
+        setError('Selecione uma cor');
+        setSaving(false);
+        return;
+      }
+
       // Por enquanto, vamos usar apenas o primeiro tamanho selecionado
       // TODO: Atualizar schema para suportar múltiplos tamanhos por produto
       const tamanhoId = tamanhosSelecionados[0];
@@ -139,14 +146,14 @@ export default function AdicionarProduto() {
         body: JSON.stringify({
           nome,
           descricao,
-          modelo: categoria || 'JERSEY',
+          modelo: categoria || 'Jersey Home',
           preco: parseFloat(preco),
-          codigo,
-          year: parseInt(year),
-          serie: serie || null,
+          year: parseInt(year) || new Date().getFullYear(),
+          serie: serie || 'HOME',
+          codigo: codigo || `PROD-${Date.now()}`,
           ligaId: parseInt(ligaId),
-          timeId: parseInt(timeId),
-          corId: corId ? parseInt(corId) : null,
+          timeId: timeId ? parseInt(timeId) : null,
+          corId: parseInt(corId),
           tamanhoId: tamanhoId,
           estoque: 10, // Valor padrão
           imagemUrl: imagemUrl
