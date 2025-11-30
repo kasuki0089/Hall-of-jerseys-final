@@ -24,8 +24,8 @@ export async function GET() {
         nome: true,
         email: true,
         telefone: true,
-        createdAt: true,
-        updatedAt: true
+        criadoEm: true,
+        atualizadoEm: true
       },
       orderBy: {
         nome: 'asc'

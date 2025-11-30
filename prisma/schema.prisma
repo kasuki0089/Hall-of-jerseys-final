@@ -47,12 +47,12 @@ model Cor {
 
 // Tabela de Tamanhos
 model Tamanho {
-  id            Int            @id @default(autoincrement())
-  nome          String         @unique // PP, P, M, G, GG, XGG
-  ordem         Int            @unique // Para ordenação (1=PP, 2=P, etc)
-  produtos      Produto[]
+  id            Int                 @id @default(autoincrement())
+  nome          String              @unique // PP, P, M, G, GG, XGG
+  ordem         Int                 @unique // Para ordenação (1=PP, 2=P, etc)
   carrinhoItens CarrinhoItem[]
   itensPedido   ItemPedido[]
+  estoques      EstoquePorTamanho[]
 
   @@map("tamanhos")
 }
@@ -105,7 +105,6 @@ model Produto {
   preco               Float
   year                Int
   serie               String?               // Home, Away, Third, Special Edition
-  estoque             Int                   @default(0)
   ativo               Boolean               @default(true)
   sale                Boolean               @default(false)
   imagemUrl           String?
@@ -117,15 +116,29 @@ model Produto {
   timeId              Int?
   cor                 Cor                   @relation(fields: [corId], references: [id])
   corId               Int
-  tamanho             Tamanho               @relation(fields: [tamanhoId], references: [id])
-  tamanhoId           Int
   itensPedido         ItemPedido[]
   carrinhoItens       CarrinhoItem[]
   configuracaoEstoque ConfiguracaoEstoque?
   movimentacoesEstoque MovimentacaoEstoque[]
   avaliacoes          Avaliacao[]
+  estoques            EstoquePorTamanho[]
 
   @@map("produtos")
+}
+
+// Nova tabela para controlar estoque por tamanho
+model EstoquePorTamanho {
+  id         Int      @id @default(autoincrement())
+  produtoId  Int
+  tamanhoId  Int
+  quantidade Int      @default(0)
+  criadoEm   DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  produto    Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  tamanho    Tamanho  @relation(fields: [tamanhoId], references: [id])
+
+  @@unique([produtoId, tamanhoId]) // Um produto só pode ter um registro por tamanho
+  @@map("estoque_por_tamanho")
 }
 
 // Tabela de Configuração de Estoque por Produto

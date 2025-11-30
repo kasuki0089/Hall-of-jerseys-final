@@ -160,7 +160,7 @@ export async function GET(request) {
       });
 
     } catch (error) {
-      console.error('❌ Erro de conexão com banco:', dbError.message);
+      console.error('❌ Erro de conexão com banco:', error.message);
       return NextResponse.json({
         success: false,
         error: 'Erro de conexão com o banco de dados. Verifique se o MySQL está rodando.'
@@ -194,19 +194,18 @@ export async function POST(request) {
       ligaId,
       timeId, 
       corId, 
-      tamanhoId,
       imagemUrl,
       modelo,
       serie,
       year,
       codigo,
-      estoque
+      estoques // Array com {tamanhoId, quantidade}
     } = body;
 
     // Validações obrigatórias
-    if (!nome || !preco || !ligaId || !corId || !tamanhoId) {
+    if (!nome || !preco || !ligaId || !corId) {
       return NextResponse.json({ 
-        error: 'Nome, preço, liga, cor e tamanho são obrigatórios' 
+        error: 'Nome, preço, liga e cor são obrigatórios' 
       }, { status: 400 });
     }
 
@@ -216,34 +215,64 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    if (estoque < 0) {
+    if (!estoques || !Array.isArray(estoques) || estoques.length === 0) {
       return NextResponse.json({ 
-        error: 'Estoque não pode ser negativo' 
+        error: 'Pelo menos um tamanho com estoque deve ser informado' 
       }, { status: 400 });
+    }
+
+    // Validar estoques
+    for (const estoque of estoques) {
+      if (!estoque.tamanhoId || estoque.quantidade < 0) {
+        return NextResponse.json({ 
+          error: 'Todos os estoques devem ter tamanho e quantidade válidos' 
+        }, { status: 400 });
+      }
     }
 
     // Gerar código único se não fornecido
     const codigoProduto = codigo || `PROD-${Date.now()}`;
 
-    // Criar produto
-    const novoProduto = await prisma.produto.create({
-      data: {
-        nome,
-        codigo: codigoProduto,
-        descricao: descricao || '',
-        modelo: modelo || 'CAMISA',
-        preco: parseFloat(preco),
-        year: parseInt(year) || new Date().getFullYear(),
-        serie: serie || 'HOME',
-        estoque: parseInt(estoque) || 0,
-        ligaId: parseInt(ligaId),
-        timeId: timeId ? parseInt(timeId) : null,
-        corId: parseInt(corId),
-        tamanhoId: parseInt(tamanhoId),
-        imagemUrl: imagemUrl || null,
-        ativo: true,
-        sale: false
-      },
+    // Criar produto e estoques em transação
+    const resultado = await prisma.$transaction(async (tx) => {
+      // Criar produto
+      const produto = await tx.produto.create({
+        data: {
+          nome,
+          codigo: codigoProduto,
+          descricao: descricao || '',
+          modelo: modelo || 'CAMISA',
+          preco: parseFloat(preco),
+          year: parseInt(year) || new Date().getFullYear(),
+          serie: serie || 'HOME',
+          ligaId: parseInt(ligaId),
+          timeId: timeId ? parseInt(timeId) : null,
+          corId: parseInt(corId),
+          imagemUrl: imagemUrl || null,
+          ativo: true,
+          sale: false
+        }
+      });
+
+      // Criar registros de estoque
+      const estoquesCreated = await Promise.all(
+        estoques.map(estoque => 
+          tx.estoquePorTamanho.create({
+            data: {
+              produtoId: produto.id,
+              tamanhoId: parseInt(estoque.tamanhoId),
+              quantidade: parseInt(estoque.quantidade)
+            }
+          })
+        )
+      );
+
+      return { produto, estoques: estoquesCreated };
+    });
+
+    // Buscar produto completo para retorno
+    const produtoCompleto = await prisma.produto.findUnique({
+      where: { id: resultado.produto.id },
       include: {
         liga: true,
         time: {
@@ -252,11 +281,15 @@ export async function POST(request) {
           }
         },
         cor: true,
-        tamanho: true
+        estoques: {
+          include: {
+            tamanho: true
+          }
+        }
       }
     });
 
-    return NextResponse.json(novoProduto, { status: 201 });
+    return NextResponse.json(produtoCompleto, { status: 201 });
   } catch (error) {
     console.error('Erro ao criar produto:', error);
     

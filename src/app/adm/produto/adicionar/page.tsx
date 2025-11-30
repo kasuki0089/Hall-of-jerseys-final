@@ -20,7 +20,7 @@ export default function AdicionarProduto() {
   const [serie, setSerie] = useState("");
   const [year, setYear] = useState("");
   const [codigo, setCodigo] = useState("");
-  const [tamanhosSelecionados, setTamanhosSelecionados] = useState<number[]>([]);
+  const [tamanhosSelecionados, setTamanhosSelecionados] = useState<{[key: number]: number}>({});
   const [imagem, setImagem] = useState<File | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
   
@@ -75,12 +75,18 @@ export default function AdicionarProduto() {
     }
   };
 
-  const handleTamanhoChange = (tamanhoId: number) => {
-    setTamanhosSelecionados((prev) =>
-      prev.includes(tamanhoId)
-        ? prev.filter((t) => t !== tamanhoId)
-        : [...prev, tamanhoId]
-    );
+  const handleTamanhoChange = (tamanhoId: number, quantidade: number) => {
+    setTamanhosSelecionados(prev => {
+      if (quantidade <= 0) {
+        const newState = { ...prev };
+        delete newState[tamanhoId];
+        return newState;
+      }
+      return {
+        ...prev,
+        [tamanhoId]: quantidade
+      };
+    });
   };
 
   const uploadImagem = async (file: File): Promise<string> => {
@@ -108,8 +114,8 @@ export default function AdicionarProduto() {
 
     try {
       // Validação: pelo menos um tamanho deve ser selecionado
-      if (tamanhosSelecionados.length === 0) {
-        setError('Selecione pelo menos um tamanho');
+      if (Object.keys(tamanhosSelecionados).length === 0) {
+        setError('Selecione pelo menos um tamanho com estoque');
         setSaving(false);
         return;
       }
@@ -121,9 +127,11 @@ export default function AdicionarProduto() {
         return;
       }
 
-      // Por enquanto, vamos usar apenas o primeiro tamanho selecionado
-      // TODO: Atualizar schema para suportar múltiplos tamanhos por produto
-      const tamanhoId = tamanhosSelecionados[0];
+      // Preparar estoques
+      const estoques = Object.entries(tamanhosSelecionados).map(([tamanhoId, quantidade]) => ({
+        tamanhoId: parseInt(tamanhoId),
+        quantidade: quantidade
+      }));
 
       let imagemUrl = null;
       
@@ -154,9 +162,8 @@ export default function AdicionarProduto() {
           ligaId: parseInt(ligaId),
           timeId: timeId ? parseInt(timeId) : null,
           corId: parseInt(corId),
-          tamanhoId: tamanhoId,
-          estoque: 10, // Valor padrão
-          imagemUrl: imagemUrl
+          imagemUrl: imagemUrl,
+          estoques: estoques
         }),
       });
 
@@ -407,21 +414,34 @@ export default function AdicionarProduto() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
-              Tamanhos disponíveis
+              Estoque por tamanho
             </label>
-            <div className="flex gap-4 flex-wrap">
+            <div className="space-y-3">
               {tamanhos.map((tamanho) => (
-                <label key={tamanho.id} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={tamanhosSelecionados.includes(tamanho.id)}
-                    onChange={() => handleTamanhoChange(tamanho.id)}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-sm text-gray-700">{tamanho.nome}</span>
-                </label>
+                <div key={tamanho.id} className="flex items-center gap-4 p-3 border rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700 w-8">{tamanho.nome}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm text-gray-600">Quantidade:</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={tamanhosSelecionados[tamanho.id] || 0}
+                      onChange={(e) => handleTamanhoChange(tamanho.id, parseInt(e.target.value) || 0)}
+                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                      placeholder="0"
+                    />
+                  </div>
+                  {tamanhosSelecionados[tamanho.id] > 0 && (
+                    <span className="text-xs text-green-600">✓ Incluído</span>
+                  )}
+                </div>
               ))}
             </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Configure a quantidade disponível para cada tamanho. Deixe em 0 para não incluir o tamanho.
+            </p>
           </div>
 
           <ImageUpload

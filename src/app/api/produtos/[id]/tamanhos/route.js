@@ -19,9 +19,6 @@ export async function GET(req, { params }) {
         },
         cor: {
           select: { id: true, nome: true, codigo: true }
-        },
-        tamanho: {
-          select: { id: true, nome: true, ordem: true }
         }
       }
     });
@@ -37,33 +34,26 @@ export async function GET(req, { params }) {
       }
     });
 
-    // Buscar produtos similares para verificar disponibilidade por tamanho
-    const produtosSimilares = await prisma.produto.findMany({
+    // Buscar estoques para este produto
+    const estoquesProduto = await prisma.estoquePorTamanho.findMany({
       where: {
-        timeId: produto.timeId,
-        corId: produto.corId,
-        year: produto.year,
-        modelo: produto.modelo,
-        serie: produto.serie,
-        ativo: true
+        produtoId: parseInt(id)
       },
       include: {
-        tamanho: {
-          select: { id: true, nome: true, ordem: true }
-        }
+        tamanho: true
       }
     });
 
     // Mapear todos os tamanhos com disponibilidade
     const tamanhosDisponiveis = todosTamanhos.map(tamanho => {
-      const produtoComTamanho = produtosSimilares.find(p => p.tamanhoId === tamanho.id);
+      const estoqueItem = estoquesProduto.find(e => e.tamanhoId === tamanho.id);
       return {
         id: tamanho.id,
         nome: tamanho.nome,
         ordem: tamanho.ordem,
-        produtoId: produtoComTamanho?.id || produto.id,
-        disponivel: produtoComTamanho ? produtoComTamanho.estoque > 0 : false,
-        estoque: produtoComTamanho?.estoque || 0
+        produtoId: parseInt(id),
+        disponivel: estoqueItem ? estoqueItem.quantidade > 0 : false,
+        estoque: estoqueItem?.quantidade || 0
       };
     });
 

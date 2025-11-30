@@ -224,10 +224,6 @@ export default function ProductPage() {
                   <p className="text-sm text-gray-600 font-medium">Ano</p>
                   <p className="text-gray-800">{product.year}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 font-medium">Estoque</p>
-                  <p className="text-gray-800">{product.estoque} unidades</p>
-                </div>
               </div>
 
               <div>
@@ -289,7 +285,7 @@ export default function ProductPage() {
                     </button>
                     <span className="px-4 py-1 border-x border-gray-300">{quantidade}</span>
                     <button
-                      onClick={() => setQuantidade(quantidade + 1)}
+                      onClick={() => setQuantidade(Math.min(selectedSize?.estoque || 1, quantidade + 1))}
                       className="px-3 py-1 hover:bg-gray-100"
                     >
                       +
@@ -297,19 +293,19 @@ export default function ProductPage() {
                   </div>
                 </div>
                 <div className="text-sm text-gray-600">
-                  Estoque: {product.estoque} unidades
+                  Estoque: {selectedSize?.estoque || 0} unidades
                 </div>
               </div>
 
               <button 
                 onClick={adicionarAoCarrinho}
-                disabled={!selectedSize?.disponivel || adicionandoCarrinho || quantidade > product.estoque}
+                disabled={!selectedSize?.disponivel || adicionandoCarrinho || quantidade > (selectedSize?.estoque || 0)}
                 className="w-full flex justify-center items-center bg-blue-600 text-white py-4 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium cursor-pointer text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingCart color="#ffffff" size={24} className="mr-3"/>
                 {adicionandoCarrinho ? 'ADICIONANDO...' : 
                  !selectedSize?.disponivel ? 'PRODUTO INDISPONÍVEL' :
-                 quantidade > product.estoque ? 'ESTOQUE INSUFICIENTE' :
+                 quantidade > (selectedSize?.estoque || 0) ? 'ESTOQUE INSUFICIENTE' :
                  'ADICIONAR AO CARRINHO'}
               </button>
             </div>

@@ -32,13 +32,6 @@ export async function GET(req, { params }) {
             nome: true,
             codigo: true
           }
-        },
-        tamanho: {
-          select: {
-            id: true,
-            nome: true,
-            ordem: true
-          }
         }
       }
     });
