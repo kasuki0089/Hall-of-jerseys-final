@@ -15,11 +15,30 @@ declare module "next-auth" {
       role?: string;
     };
   }
+  interface Session {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+    };
+  }
+
+  interface User {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     role?: string;
+  }
+}
+    id: number;
+    role: string;
   }
 }

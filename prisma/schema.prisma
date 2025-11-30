@@ -123,6 +123,7 @@ model Produto {
   carrinhoItens       CarrinhoItem[]
   configuracaoEstoque ConfiguracaoEstoque?
   movimentacoesEstoque MovimentacaoEstoque[]
+  avaliacoes          Avaliacao[]
 
   @@map("produtos")
 }
@@ -184,6 +185,7 @@ model Usuario {
   formasPagamento  FormaPagamento[]
   pedidos          Pedido[]
   carrinhoItens    CarrinhoItem[]
+  avaliacoes       Avaliacao[]
 
   @@map("usuarios")
 }
@@ -249,4 +251,21 @@ model Transacao {
   pedido        Pedido?
 
   @@map("transacoes")
+}
+
+model Avaliacao {
+  id         Int      @id @default(autoincrement())
+  usuarioId  Int
+  produtoId  Int
+  nota       Float    // 1.0 a 5.0
+  comentario String?  @db.Text
+  criadoEm   DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  produto    Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, produtoId]) // Um usuário pode avaliar cada produto apenas uma vez
+  @@index([produtoId])
+  @@index([nota])
+  @@map("avaliacoes")
 }
