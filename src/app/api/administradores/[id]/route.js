@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
 
     const { id } = await params;
 
-    const administrador = await prisma.usuario.findUnique({
+    const administrador = await prisma.usuario.findFirst({
       where: {
         id: parseInt(id),
         role: 'admin'
@@ -26,9 +26,9 @@ export async function GET(request, { params }) {
         id: true,
         nome: true,
         email: true,
-        cpf: true,
-        createdAt: true,
-        updatedAt: true
+        telefone: true,
+        criadoEm: true,
+        atualizadoEm: true
       }
     });
 
@@ -57,7 +57,7 @@ export async function PUT(request, { params }) {
     const { nome, email, senha, cpf } = body;
 
     // Verificar se administrador existe
-    const adminExiste = await prisma.usuario.findUnique({
+    const adminExiste = await prisma.usuario.findFirst({
       where: {
         id: parseInt(id),
         role: 'admin'
@@ -99,8 +99,8 @@ export async function PUT(request, { params }) {
         id: true,
         nome: true,
         email: true,
-        cpf: true,
-        updatedAt: true
+        telefone: true,
+        atualizadoEm: true
       }
     });
 
@@ -123,7 +123,7 @@ export async function DELETE(request, { params }) {
     const { id } = await params;
 
     // Verificar se administrador existe
-    const adminExiste = await prisma.usuario.findUnique({
+    const adminExiste = await prisma.usuario.findFirst({
       where: {
         id: parseInt(id),
         role: 'admin'
