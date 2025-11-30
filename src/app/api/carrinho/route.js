@@ -23,9 +23,14 @@ export async function GET(req) {
             liga: { select: { nome: true, sigla: true } },
             time: { select: { nome: true, sigla: true } },
             cor: { select: { nome: true } },
-            tamanho: { select: { nome: true } }
+            estoques: {
+              include: {
+                tamanho: { select: { nome: true } }
+              }
+            }
           }
-        }
+        },
+        tamanho: { select: { nome: true } }
       }
     });
 
@@ -102,7 +107,7 @@ export async function POST(req) {
       }
     }
 
-    // Verificar se o produto existe e tem estoque
+    // Verificar se o produto existe
     const produto = await prisma.produto.findUnique({
       where: { 
         id: parseInt(produtoId),
@@ -112,7 +117,11 @@ export async function POST(req) {
         liga: { select: { nome: true, sigla: true } },
         time: { select: { nome: true, sigla: true } },
         cor: { select: { nome: true } },
-        tamanho: { select: { nome: true } }
+        estoques: {
+          include: {
+            tamanho: true
+          }
+        }
       }
     });
 
@@ -123,10 +132,13 @@ export async function POST(req) {
       });
     }
 
-    if (produto.estoque < quantidade) {
+    // Verificar estoque do tamanho específico
+    const estoqueDoTamanho = produto.estoques.find(e => e.tamanhoId === parseInt(tamanhoId));
+    
+    if (!estoqueDoTamanho || estoqueDoTamanho.quantidade < quantidade) {
       return new Response(JSON.stringify({ 
         error: 'Estoque insuficiente',
-        estoqueDisponivel: produto.estoque 
+        estoqueDisponivel: estoqueDoTamanho?.quantidade || 0
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -148,10 +160,10 @@ export async function POST(req) {
       // Atualizar quantidade
       const novaQuantidade = itemExistente.quantidade + quantidade;
       
-      if (produto.estoque < novaQuantidade) {
+      if (estoqueDoTamanho.quantidade < novaQuantidade) {
         return new Response(JSON.stringify({ 
           error: 'Estoque insuficiente para a quantidade solicitada',
-          estoqueDisponivel: produto.estoque,
+          estoqueDisponivel: estoqueDoTamanho.quantidade,
           quantidadeNoCarrinho: itemExistente.quantidade
         }), {
           status: 400,
@@ -168,9 +180,14 @@ export async function POST(req) {
               liga: { select: { nome: true, sigla: true } },
               time: { select: { nome: true, sigla: true } },
               cor: { select: { nome: true } },
-              tamanho: { select: { nome: true } }
+              estoques: {
+                include: {
+                  tamanho: true
+                }
+              }
             }
-          }
+          },
+          tamanho: true
         }
       });
     } else {
@@ -188,9 +205,14 @@ export async function POST(req) {
               liga: { select: { nome: true, sigla: true } },
               time: { select: { nome: true, sigla: true } },
               cor: { select: { nome: true } },
-              tamanho: { select: { nome: true } }
+              estoques: {
+                include: {
+                  tamanho: true
+                }
+              }
             }
-          }
+          },
+          tamanho: true
         }
       });
     }
@@ -240,7 +262,16 @@ export async function PUT(req) {
         usuarioId: usuarioId
       },
       include: {
-        produto: true
+        produto: {
+          include: {
+            estoques: {
+              include: {
+                tamanho: true
+              }
+            }
+          }
+        },
+        tamanho: true
       }
     });
 
@@ -251,11 +282,15 @@ export async function PUT(req) {
       });
     }
 
-    // Verificar estoque
-    if (itemCarrinho.produto.estoque < quantidade) {
+    // Verificar estoque do tamanho específico
+    const estoqueDoTamanho = itemCarrinho.produto.estoques.find(
+      e => e.tamanhoId === itemCarrinho.tamanhoId
+    );
+    
+    if (!estoqueDoTamanho || estoqueDoTamanho.quantidade < quantidade) {
       return new Response(JSON.stringify({ 
         error: 'Estoque insuficiente',
-        estoqueDisponivel: itemCarrinho.produto.estoque 
+        estoqueDisponivel: estoqueDoTamanho?.quantidade || 0
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -272,9 +307,14 @@ export async function PUT(req) {
             liga: { select: { nome: true, sigla: true } },
             time: { select: { nome: true, sigla: true } },
             cor: { select: { nome: true } },
-            tamanho: { select: { nome: true } }
+            estoques: {
+              include: {
+                tamanho: true
+              }
+            }
           }
-        }
+        },
+        tamanho: true
       }
     });
 

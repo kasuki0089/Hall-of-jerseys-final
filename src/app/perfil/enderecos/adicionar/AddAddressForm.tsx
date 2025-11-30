@@ -15,7 +15,6 @@ export default function AddAddress({ session }: AddAddressProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [estados, setEstados] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     nome: "",
@@ -27,22 +26,6 @@ export default function AddAddress({ session }: AddAddressProps) {
     cep: "",
     bairro: ""
   });
-
-  useEffect(() => {
-    loadEstados();
-  }, []);
-
-  const loadEstados = async () => {
-    try {
-      const response = await fetch("/api/estados");
-      if (response.ok) {
-        const data = await response.json();
-        setEstados(data);
-      }
-    } catch (error) {
-      console.error("Erro ao carregar estados:", error);
-    }
-  };
 
   const handleCepChange = async (cep: string) => {
     setFormData({ ...formData, cep });
@@ -188,11 +171,33 @@ export default function AddAddress({ session }: AddAddressProps) {
                         className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 pr-10 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 appearance-none cursor-pointer"
                       >
                         <option value="">Selecione o estado</option>
-                        {estados.map((estado: any) => (
-                          <option key={estado.uf} value={estado.uf}>
-                            {estado.uf} - {estado.nome}
-                          </option>
-                        ))}
+                        <option value="AC">AC - Acre</option>
+                        <option value="AL">AL - Alagoas</option>
+                        <option value="AP">AP - Amapá</option>
+                        <option value="AM">AM - Amazonas</option>
+                        <option value="BA">BA - Bahia</option>
+                        <option value="CE">CE - Ceará</option>
+                        <option value="DF">DF - Distrito Federal</option>
+                        <option value="ES">ES - Espírito Santo</option>
+                        <option value="GO">GO - Goiás</option>
+                        <option value="MA">MA - Maranhão</option>
+                        <option value="MT">MT - Mato Grosso</option>
+                        <option value="MS">MS - Mato Grosso do Sul</option>
+                        <option value="MG">MG - Minas Gerais</option>
+                        <option value="PA">PA - Pará</option>
+                        <option value="PB">PB - Paraíba</option>
+                        <option value="PR">PR - Paraná</option>
+                        <option value="PE">PE - Pernambuco</option>
+                        <option value="PI">PI - Piauí</option>
+                        <option value="RJ">RJ - Rio de Janeiro</option>
+                        <option value="RN">RN - Rio Grande do Norte</option>
+                        <option value="RS">RS - Rio Grande do Sul</option>
+                        <option value="RO">RO - Rondônia</option>
+                        <option value="RR">RR - Roraima</option>
+                        <option value="SC">SC - Santa Catarina</option>
+                        <option value="SP">SP - São Paulo</option>
+                        <option value="SE">SE - Sergipe</option>
+                        <option value="TO">TO - Tocantins</option>
                       </select>
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
                     </div>

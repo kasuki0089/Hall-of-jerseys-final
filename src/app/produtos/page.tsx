@@ -13,7 +13,7 @@ export default function ProductsPage() {
 
   return (
     <MainTemplate>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-100">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 py-4">
           <div className="text-sm text-gray-600">

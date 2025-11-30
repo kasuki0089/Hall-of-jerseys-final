@@ -13,10 +13,12 @@ type OrderItem = {
   produto: {
     nome: string;
     imagemUrl: string | null;
-    liga: { sigla: string };
-    time: { nome: string };
-    tamanho: { nome: string };
-    cor: { nome: string };
+    liga?: { nome: string; sigla: string };
+    time?: { nome: string; sigla: string };
+    cor?: { nome: string; codigo: string };
+  };
+  tamanho?: {
+    nome: string;
   };
 };
 
@@ -25,29 +27,16 @@ type Order = {
   status: string;
   total: number;
   criadoEm: string;
-  confirmadoEm: string | null;
+  confirmadoEm?: string | null;
   itens: OrderItem[];
-  usuario: {
+  usuario?: {
     nome: string;
     email: string;
-    telefone: string;
-    endereco?: {
-      endereco: string;
-      numero: string;
-      complemento?: string;
-      bairro: string;
-      cidade: string;
-      cep: string;
-      estado: {
-        uf: string;
-        nome: string;
-      };
-    };
   };
   formaPagamento?: {
     tipo: string;
-    numeroCartao: string;
-    bandeiraCartao: string;
+    numeroCartao?: string;
+    bandeiraCartao?: string;
   };
 };
 
@@ -72,7 +61,12 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
         throw new Error("Pedido não encontrado");
       }
       const data = await response.json();
-      setOrder(data);
+      
+      if (data.success && data.pedido) {
+        setOrder(data.pedido);
+      } else {
+        throw new Error("Pedido não encontrado");
+      }
     } catch (err) {
       setError("Erro ao carregar detalhes do pedido");
       console.error(err);
@@ -190,11 +184,15 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
                             {item.produto.nome}
                           </h3>
                           <p className="text-sm text-gray-600">
-                            {item.produto.time.nome} - {item.produto.liga.sigla}
+                            {item.produto.time?.nome} - {item.produto.liga?.sigla}
                           </p>
-                          <p className="text-sm text-gray-600">
-                            Tamanho: {item.produto.tamanho.nome} | Cor: {item.produto.cor.nome}
-                          </p>
+                          {(item.tamanho || item.produto.cor) && (
+                            <p className="text-sm text-gray-600">
+                              {item.tamanho && `Tamanho: ${item.tamanho.nome}`}
+                              {item.tamanho && item.produto.cor && ' | '}
+                              {item.produto.cor && `Cor: ${item.produto.cor.nome}`}
+                            </p>
+                          )}
                           <div className="mt-2 flex items-center justify-between">
                             <span className="text-sm text-gray-600">
                               Quantidade: {item.quantidade}
@@ -223,14 +221,14 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
               {/* Coluna Lateral - Informações */}
               <div className="space-y-6">
                 {/* Endereço de Entrega */}
-                {order.usuario.endereco && (
+                {order.usuario?.endereco && (
                   <div className="bg-white rounded-lg p-6 shadow-sm">
                     <div className="flex items-center gap-2 mb-4">
                       <MapPin size={20} className="text-gray-700" />
                       <h2 className="text-lg font-bold">Endereço de Entrega</h2>
                     </div>
                     <div className="text-gray-700 space-y-1">
-                      <p className="font-medium">{order.usuario.nome}</p>
+                      <p className="font-medium">{order.usuario?.nome}</p>
                       <p>
                         {order.usuario.endereco.endereco}, {order.usuario.endereco.numero}
                       </p>
@@ -241,7 +239,9 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
                         {order.usuario.endereco.bairro}, {order.usuario.endereco.cidade} - {order.usuario.endereco.estado.uf}
                       </p>
                       <p>CEP: {order.usuario.endereco.cep}</p>
-                      <p className="pt-2">{order.usuario.telefone}</p>
+                      {order.usuario.telefone && (
+                        <p className="pt-2">{order.usuario.telefone}</p>
+                      )}
                     </div>
                   </div>
                 )}

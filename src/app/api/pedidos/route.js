@@ -39,16 +39,16 @@ export async function GET(req) {
         usuario: {
           select: { nome: true, email: true }
         },
-        itensPedido: {
+        itens: {
           include: {
             produto: {
               include: {
                 liga: { select: { nome: true, sigla: true } },
                 time: { select: { nome: true, sigla: true } },
-                cor: { select: { nome: true } },
-                tamanho: { select: { nome: true } }
+                cor: { select: { nome: true } }
               }
-            }
+            },
+            tamanho: { select: { nome: true } }
           }
         }
       },
@@ -111,6 +111,13 @@ export async function POST(req) {
         where: { 
           id: parseInt(item.produtoId),
           ativo: true 
+        },
+        include: {
+          estoques: {
+            where: {
+              tamanhoId: parseInt(item.tamanhoId)
+            }
+          }
         }
       });
 
@@ -123,11 +130,13 @@ export async function POST(req) {
         });
       }
 
-      if (produto.estoque < item.quantidade) {
+      // Verificar estoque por tamanho
+      const estoqueDoTamanho = produto.estoques[0];
+      if (!estoqueDoTamanho || estoqueDoTamanho.quantidade < item.quantidade) {
         return new Response(JSON.stringify({ 
-          error: `Estoque insuficiente para ${produto.nome}. Disponível: ${produto.estoque}`,
+          error: `Estoque insuficiente para ${produto.nome} no tamanho selecionado. Disponível: ${estoqueDoTamanho?.quantidade || 0}`,
           produtoId: produto.id,
-          estoqueDisponivel: produto.estoque
+          estoqueDisponivel: estoqueDoTamanho?.quantidade || 0
         }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' }
@@ -141,7 +150,7 @@ export async function POST(req) {
         produtoId: produto.id,
         quantidade: item.quantidade,
         preco: precoItem,
-        tamanhoId: item.tamanhoId || null
+        tamanhoId: parseInt(item.tamanhoId)
       });
     }
 
@@ -184,12 +193,15 @@ export async function POST(req) {
         )
       );
 
-      // Atualizar estoque
+      // Atualizar estoque por tamanho
       for (const item of itensValidados) {
-        await tx.produto.update({
-          where: { id: item.produtoId },
+        await tx.estoquePorTamanho.updateMany({
+          where: { 
+            produtoId: item.produtoId,
+            tamanhoId: item.tamanhoId
+          },
           data: {
-            estoque: {
+            quantidade: {
               decrement: item.quantidade
             }
           }
@@ -214,10 +226,10 @@ export async function POST(req) {
               include: {
                 liga: { select: { nome: true, sigla: true } },
                 time: { select: { nome: true, sigla: true } },
-                cor: { select: { nome: true } },
-                tamanho: { select: { nome: true } }
+                cor: { select: { nome: true } }
               }
-            }
+            },
+            tamanho: { select: { nome: true } }
           }
         }
       }
@@ -296,7 +308,7 @@ export async function PUT(req) {
         usuario: {
           select: { nome: true, email: true }
         },
-        itensPedido: {
+        itens: {
           include: {
             produto: true
           }

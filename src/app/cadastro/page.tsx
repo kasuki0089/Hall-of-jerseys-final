@@ -137,11 +137,12 @@ export default function CadastroPage() {
     <MainTemplate>
       <div className="w-full flex flex-col items-center py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
         <div className="w-full max-w-5xl">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 md:mb-12 text-gray-800 border-b-2 border-gray-800 pb-2 inline-block">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-8 md:mb-12 text-gray-800">
             Cadastre-se
           </h1>
 
-          <form onSubmit={handleSubmit} className="w-full mt-8 md:mt-12">
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8">
+            <form onSubmit={handleSubmit} className="w-full">
             
             {/* Mensagem de feedback */}
             {message && (
@@ -163,10 +164,11 @@ export default function CadastroPage() {
                   value={formData.nomeCompleto}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.nomeCompleto ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Nome completo
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Nome completo <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -177,10 +179,11 @@ export default function CadastroPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.email ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  E-mail
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  E-mail <span className="text-red-500">*</span>
                 </label>
               </div>
             </div>
@@ -195,10 +198,11 @@ export default function CadastroPage() {
                   onChange={handleChange}
                   required
                   maxLength={14}
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.cpf ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  CPF
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  CPF <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -209,10 +213,11 @@ export default function CadastroPage() {
                   value={formData.telefone}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.telefone ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Telefone
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Telefone <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -224,10 +229,11 @@ export default function CadastroPage() {
                   onChange={handleChange}
                   required
                   maxLength={10}
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.dataNascimento ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Data de Nascimento
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Data de Nascimento <span className="text-red-500">*</span>
                 </label>
               </div>
             </div>
@@ -241,10 +247,11 @@ export default function CadastroPage() {
                   value={formData.endereco}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.endereco ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Endereço
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Endereço <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -255,10 +262,11 @@ export default function CadastroPage() {
                   value={formData.cidade}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.cidade ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Cidade
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Cidade <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -269,10 +277,11 @@ export default function CadastroPage() {
                   value={formData.estado}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.estado ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Estado
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Estado <span className="text-red-500">*</span>
                 </label>
               </div>
             </div>
@@ -287,10 +296,11 @@ export default function CadastroPage() {
                   onChange={handleChange}
                   required
                   maxLength={9}
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.cep ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  CEP
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  CEP <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -301,10 +311,11 @@ export default function CadastroPage() {
                   value={formData.senha}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.senha ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Senha
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Senha <span className="text-red-500">*</span>
                 </label>
               </div>
 
@@ -315,10 +326,11 @@ export default function CadastroPage() {
                   value={formData.confirmarSenha}
                   onChange={handleChange}
                   required
-                  className="w-full border-b-2 border-gray-400 focus:border-primary focus:outline-none py-3 peer"
+                  className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+                  placeholder=" "
                 />
-                <label className={`absolute left-0 top-3 text-sm transition-all pointer-events-none ${formData.confirmarSenha ? '-translate-y-6 text-primary font-bold' : 'text-primary peer-focus:-translate-y-6 peer-focus:font-bold'}`}>
-                  Confirmar senha
+                <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+                  Confirmar senha <span className="text-red-500">*</span>
                 </label>
               </div>
             </div>
@@ -333,7 +345,8 @@ export default function CadastroPage() {
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
-          </form>
+            </form>
+          </div>
 
           {/* Link para Login */}
           <div className="text-center mt-8 text-gray-600">

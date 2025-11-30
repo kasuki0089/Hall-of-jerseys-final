@@ -386,13 +386,11 @@ async function main() {
       preco: 299.99,
       year: 2024,
       serie: 'Home',
-      estoque: 50,
       ativo: true,
       sale: false,
       ligaId: ligasCreated.NBA.id,
       timeId: timesCreated.LAL.id,
       corId: corAmarela.id,
-      tamanhoId: tamanhoM.id,
       imagemUrl: '/images/prodImages/lebron_lakers_6_2024.jpg'
     },
     {
@@ -403,13 +401,11 @@ async function main() {
       preco: 289.99,
       year: 2024,
       serie: 'Home',
-      estoque: 40,
       ativo: true,
       sale: true,
       ligaId: ligasCreated.NBA.id,
       timeId: timesCreated.GSW.id,
       corId: corAzul.id,
-      tamanhoId: tamanhoG.id,
       imagemUrl: '/images/prodImages/curry_30_2024.jpg'
     },
     {
@@ -420,13 +416,11 @@ async function main() {
       preco: 319.99,
       year: 2024,
       serie: 'Home',
-      estoque: 30,
       ativo: true,
       sale: false,
       ligaId: ligasCreated.NFL.id,
       timeId: timesCreated.KC.id,
       corId: corVermelho.id,
-      tamanhoId: tamanhoM.id,
       imagemUrl: '/images/prodImages/mahomes_15_2024.jpg'
     },
     {
@@ -437,13 +431,11 @@ async function main() {
       preco: 279.99,
       year: 2024,
       serie: 'Home',
-      estoque: 25,
       ativo: true,
       sale: false,
       ligaId: ligasCreated.NHL.id,
       timeId: timesCreated.BOS_NHL.id,
       corId: await prisma.cor.findFirst({ where: { nome: 'Preto' } }).then(c => c.id),
-      tamanhoId: tamanhoG.id,
       imagemUrl: '/images/prodImages/corsby_87_2024.jpg'
     },
     {
@@ -454,13 +446,11 @@ async function main() {
       preco: 199.99,
       year: 2024,
       serie: 'Home',
-      estoque: 60,
       ativo: true,
       sale: true,
       ligaId: ligasCreated.MLS.id,
       timeId: timesCreated.LAG_MLS.id,
       corId: corBranco.id,
-      tamanhoId: tamanhoM.id,
       imagemUrl: '/images/prodImages/zlatan_9_2019.jpg'
     }
   ];
@@ -470,6 +460,24 @@ async function main() {
   }
 
   console.log('✅ Produtos exemplo criados');
+
+  // === CRIAR ESTOQUES POR TAMANHO ===
+  const produtosCriados = await prisma.produto.findMany();
+  const todosOsTamanhos = await prisma.tamanho.findMany();
+
+  for (const produto of produtosCriados) {
+    for (const tamanho of todosOsTamanhos) {
+      await prisma.estoquePorTamanho.create({
+        data: {
+          produtoId: produto.id,
+          tamanhoId: tamanho.id,
+          quantidade: Math.floor(Math.random() * 50) + 10 // Entre 10 e 60 unidades
+        }
+      });
+    }
+  }
+
+  console.log('✅ Estoques por tamanho criados');
 
   console.log('\n🎉 Seed executado com sucesso!');
   console.log('\n📊 Resumo:');

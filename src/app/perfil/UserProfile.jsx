@@ -50,6 +50,9 @@ export default function UserProfile({ session }) {
           novaSenha: "",
           confirmarSenha: ""
         });
+      } else {
+        const errorData = await response.json();
+        console.error("Erro ao carregar dados:", errorData);
       }
     } catch (error) {
       console.error("Erro ao carregar dados:", error);

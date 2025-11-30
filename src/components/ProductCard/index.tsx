@@ -29,7 +29,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/produtos/${product.id}`}>
-      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
         <div className="aspect-square bg-gray-200 rounded-t-lg relative overflow-hidden">
           <Image
             src={imagePath}
@@ -40,13 +40,13 @@ export default function ProductCard({ product }: ProductCardProps) {
             unoptimized
           />
         </div>
-        <div className="p-4">
-          <p className="text-[1.005rem] font-bold text-gray-600 mb-1">{product.nome}</p>
+        <div className="p-4 flex flex-col flex-grow">
+          <p className="text-[1.005rem] font-bold text-gray-600 mb-1 line-clamp-2 min-h-[3rem]">{product.nome}</p>
           <p className="text-gray-600 mb-1">
             {product.time?.liga?.sigla || product.liga || product.esporte || 'N/A'}
           </p>
           <p className="text-xs text-gray-600 mb-2">Original</p>
-          <p className="font-bold text-gray-800">{preco}</p>
+          <p className="font-bold text-gray-800 mt-auto">{preco}</p>
         </div>
       </div>
     </Link>

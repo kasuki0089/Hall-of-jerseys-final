@@ -45,7 +45,8 @@ export default function ProductsClient({ products: initialProducts }: ProductsCl
   const carregarProdutos = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/produtos?limit=20');
+      // Buscar todos os produtos sem limite para exibição na loja
+      const response = await fetch('/api/produtos?limit=1000');
       const result = await response.json();
       
       if (result.success) {

@@ -8,12 +8,14 @@ export const metadata = {
   description: "Edite seu endereço de entrega",
 };
 
-export default async function EditAddressPage({ params }) {
+export default async function EditAddressPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect("/login");
   }
 
-  return <EditAddressForm params={params} session={session} />;
+  const resolvedParams = await params;
+
+  return <EditAddressForm params={resolvedParams} session={session} />;
 }

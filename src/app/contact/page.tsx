@@ -79,7 +79,8 @@ export default function ContatoPage() {
       <div className="w-full flex flex-col items-center py-10 px-4">
         <h1 className="text-3xl font-semibold mb-10">Contato</h1>
 
-        <form onSubmit={handleSubmit} className="w-full max-w-xl flex flex-col gap-6">
+        <div className="w-full max-w-xl bg-white rounded-lg shadow-md border border-gray-200 p-8">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           
           {/* Mensagem de feedback */}
           {message && (
@@ -93,47 +94,50 @@ export default function ContatoPage() {
           )}
 
           {/* Nome */}
-          <div id="input-single" className="relative w-full">
+          <div className="relative w-full">
             <input
               type="text"
               name="nome"
               value={formData.nome}
               onChange={handleChange}
               required
-              className="w-full border-b border-gray-400 focus:border-primary focus:outline-none py-2 peer"
+              className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+              placeholder=" "
             />
-            <label className={`absolute left-0 top-2 text-sm transition-all pointer-events-none ${formData.nome ? '-translate-y-4 text-primary font-bold' : 'text-primary peer-focus:-translate-y-4 peer-focus:font-bold'}`}>
-              Nome
+            <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+              Nome <span className="text-red-500">*</span>
             </label>
           </div>
 
           {/* Email */}
-          <div id="input-single" className="relative w-full">
+          <div className="relative w-full">
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full border-b border-gray-400 focus:border-primary focus:outline-none py-2 peer"
+              className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+              placeholder=" "
             />
-            <label className={`absolute left-0 top-2 text-sm transition-all pointer-events-none ${formData.email ? '-translate-y-4 text-primary font-bold' : 'text-primary peer-focus:-translate-y-4 peer-focus:font-bold'}`}>
-              E-mail
+            <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+              E-mail <span className="text-red-500">*</span>
             </label>
           </div>
 
           {/* Telefone */}
-          <div id="input-single" className="relative w-full">
+          <div className="relative w-full">
             <input
               type="text"
               name="telefone"
               value={formData.telefone}
               onChange={handleChange}
               required
-              className="w-full border-b border-gray-400 focus:border-primary focus:outline-none py-2 peer"
+              className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400"
+              placeholder=" "
             />
-            <label className={`absolute left-0 top-2 text-sm transition-all pointer-events-none ${formData.telefone ? '-translate-y-4 text-primary font-bold' : 'text-primary peer-focus:-translate-y-4 peer-focus:font-bold'}`}>
-              Telefone
+            <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+              Telefone <span className="text-red-500">*</span>
             </label>
           </div>
 
@@ -160,16 +164,19 @@ export default function ContatoPage() {
           </div>
 
           {/* Problema */}
-          <div className="flex flex-col mt-4">
-            <label className="font-semibold text-lg mb-2 text-primary">
-              Nos diga o problema em rápidas palavras:
-            </label>
+          <div className="relative w-full mt-4">
             <textarea 
               name="problema"
               value={formData.problema}
               onChange={handleChange}
-              className="border border-gray-400 focus:border-primary rounded-md p-3 h-40 resize-none"
+              required
+              className="peer w-full border-2 border-gray-300 rounded-lg bg-white px-4 py-3 text-gray-900 transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none hover:border-gray-400 resize-none"
+              rows={5}
+              placeholder=" "
             ></textarea>
+            <label className="absolute -top-3 left-3 bg-white px-2 text-sm font-medium text-gray-600 transition-all duration-200">
+              Nos diga o problema em rápidas palavras <span className="text-red-500">*</span>
+            </label>
           </div>
 
           {/* Botão */}
@@ -177,12 +184,13 @@ export default function ContatoPage() {
             <button 
               type="submit" 
               disabled={loading}
-              className="px-8 py-2 border border-primary text-primary rounded-[0.5vw] hover:bg-primary hover:text-white transition duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
             >
               {loading ? 'Enviando...' : 'Enviar'}
             </button>
           </div>
-        </form>
+          </form>
+        </div>
       </div>
     </MainTemplate>
   );

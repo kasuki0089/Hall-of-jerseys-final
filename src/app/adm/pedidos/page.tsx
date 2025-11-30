@@ -40,7 +40,7 @@ interface Pedido {
   total?: string | number;
   usuario?: Usuario;
   valorTotal?: number;
-  itens?: any[];
+  itens?: ItemPedido[];
   itensPedido?: ItemPedido[];
   formaPagamento?: string;
   enderecoEntrega?: string | Endereco;
@@ -216,10 +216,10 @@ export default function PedidosAdmin() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900">
-                        {pedido.itensPedido?.length || 0} item(s)
+                        {(pedido.itens || pedido.itensPedido)?.length || 0} item(s)
                       </div>
                       <div className="text-xs text-gray-500">
-                        {pedido.itensPedido?.map(item => item.produto?.nome).join(', ').substring(0, 50)}...
+                        {(pedido.itens || pedido.itensPedido)?.map(item => item.produto?.nome).join(', ').substring(0, 50)}...
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -319,7 +319,7 @@ export default function PedidosAdmin() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
-                      {pedidoSelecionado.itensPedido?.map((item, index) => (
+                      {(pedidoSelecionado.itens || pedidoSelecionado.itensPedido)?.map((item, index) => (
                         <tr key={index}>
                           <td className="px-4 py-2">
                             <div>

@@ -122,8 +122,12 @@ export async function GET(request) {
             cor: {
               select: { id: true, nome: true, codigo: true }
             },
-            tamanho: {
-              select: { id: true, nome: true, ordem: true }
+            estoques: {
+              include: {
+                tamanho: {
+                  select: { id: true, nome: true, ordem: true }
+                }
+              }
             }
           },
           orderBy,

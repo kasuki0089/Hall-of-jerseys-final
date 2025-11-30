@@ -101,7 +101,7 @@ export default function PagamentoPage() {
         
         if (result.transacao.status === 'APROVADO') {
           setTimeout(() => {
-            router.push(`/pedidos/${pedidoId}`);
+            router.push(`/perfil/pedidos/${pedidoId}`);
           }, 5000);
         }
       } else {
@@ -127,7 +127,7 @@ export default function PagamentoPage() {
         if (result.transacao.status === 'APROVADO' && transacao.status !== 'APROVADO') {
           setMensagem('✅ Pagamento aprovado!');
           setTimeout(() => {
-            router.push(`/pedidos/${pedidoId}`);
+            router.push(`/perfil/pedidos/${pedidoId}`);
           }, 3000);
         }
       }
@@ -493,7 +493,7 @@ export default function PagamentoPage() {
                 <div className="mt-6 text-center">
                   <p className="text-green-600 mb-4">Redirecionando para seus pedidos em 5 segundos...</p>
                   <button
-                    onClick={() => router.push(`/pedidos/${pedidoId}`)}
+                    onClick={() => router.push(`/perfil/pedidos/${pedidoId}`)}
                     className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
                   >
                     Ver Meu Pedido

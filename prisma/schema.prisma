@@ -190,6 +190,9 @@ model Usuario {
   email            String            @unique
   senha            String
   telefone         String?
+  cpf              String?
+  dataNascimento   DateTime?
+  genero           String?
   role             String            @default("user") // user, admin
   criadoEm         DateTime          @default(now())
   atualizadoEm     DateTime          @updatedAt
@@ -281,4 +284,20 @@ model Avaliacao {
   @@index([produtoId])
   @@index([nota])
   @@map("avaliacoes")
+}
+
+model Contato {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  email     String
+  telefone  String?
+  motivo    String   // Compras, Vendas, Entregas, Feedback, Curriculo
+  mensagem  String
+  status    String   @default("novo") // novo, lido, respondido
+  criadoEm  DateTime @default(now())
+  respondidoEm DateTime?
+
+  @@index([status])
+  @@index([criadoEm])
+  @@map("contatos")
 }

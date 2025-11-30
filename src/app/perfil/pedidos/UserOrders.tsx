@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import MainTemplate from "@/templates/MainTemplate/Index";
 import ProfileSidebar from "@/components/Profile/ProfileSidebar";
 import OrderCard from "@/components/Profile/OrderCard";
 import OrderListItem from "@/components/Profile/OrderListItem";
@@ -14,6 +15,17 @@ type OrderItem = {
   produto: {
     nome: string;
     imagemUrl: string | null;
+    liga?: {
+      nome: string;
+      sigla: string;
+    };
+    time?: {
+      nome: string;
+      sigla: string;
+    };
+  };
+  tamanho?: {
+    nome: string;
   };
 };
 
@@ -24,6 +36,8 @@ type Order = {
   criadoEm: string;
   itens: OrderItem[];
   usuario?: {
+    nome: string;
+    email: string;
     endereco?: {
       endereco: string;
       numero: string;
@@ -49,12 +63,17 @@ export default function UserOrders() {
     }
 
     try {
-      const response = await fetch(`/api/pedidos?usuarioId=${session.user.id}`);
+      const response = await fetch(`/api/pedidos`);
       if (!response.ok) {
         throw new Error("Erro ao carregar pedidos");
       }
       const data = await response.json();
-      setOrders(data);
+      
+      if (data.success && Array.isArray(data.pedidos)) {
+        setOrders(data.pedidos);
+      } else {
+        setOrders([]);
+      }
     } catch (err) {
       setError("Erro ao carregar pedidos. Tente novamente.");
       console.error(err);
@@ -67,9 +86,10 @@ export default function UserOrders() {
   const otherOrders = orders.slice(1);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        <ProfileSidebar activePage="pedidos" />
+    <MainTemplate>
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex">
+          <ProfileSidebar activePage="pedidos" />
         
         <main className="flex-1 p-8">
           <div className="max-w-6xl mx-auto">
@@ -150,5 +170,6 @@ export default function UserOrders() {
         </main>
       </div>
     </div>
+    </MainTemplate>
   );
 }

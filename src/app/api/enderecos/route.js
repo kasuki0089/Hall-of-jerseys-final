@@ -37,46 +37,17 @@ export async function GET() {
 // POST /api/enderecos - Criar novo endereço
 export async function POST(req) {
   try {
-    const {
-      endereco,
-      numero,
-      complemento,
-      bairro,
-      cidade,
-      cep,
-      estadoUf
-    } = await req.json();
-
-    if (!endereco || !numero || !bairro || !cidade || !cep || !estadoUf) {
-      return new Response(JSON.stringify({ 
-        error: 'Campos obrigatórios: endereco, numero, bairro, cidade, cep, estadoUf' 
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Verificar se o estado existe
-    const estado = await prisma.estado.findUnique({
-      where: { uf: estadoUf }
-    });
-
-    if (!estado) {
-      return new Response(JSON.stringify({ error: 'Estado não encontrado' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+    const data = await req.json();
 
     const novoEndereco = await prisma.endereco.create({
       data: {
-        endereco,
-        numero,
-        complemento,
-        bairro,
-        cidade,
-        cep: cep.replace(/\D/g, ''), // Remove caracteres não numéricos
-        estadoUf
+        endereco: data.logradouro,
+        numero: data.numero,
+        complemento: data.complemento || null,
+        bairro: data.bairro,
+        cidade: data.cidade,
+        cep: data.cep.replace(/\D/g, ''), // Remove caracteres não numéricos
+        estadoUf: data.uf
       },
       include: {
         estado: {

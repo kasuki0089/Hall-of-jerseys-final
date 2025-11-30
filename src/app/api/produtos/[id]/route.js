@@ -32,6 +32,17 @@ export async function GET(req, { params }) {
             nome: true,
             codigo: true
           }
+        },
+        estoques: {
+          include: {
+            tamanho: {
+              select: {
+                id: true,
+                nome: true,
+                ordem: true
+              }
+            }
+          }
         }
       }
     });
@@ -71,24 +82,74 @@ export async function PUT(req, { params }) {
     const { id } = await params;
     const body = await req.json();
 
+    // Extrair estoques do body se existirem
+    const { estoques, ...dadosProduto } = body;
+
     // Validação básica
-    if (body.preco !== undefined && body.preco < 0) {
+    if (dadosProduto.preco !== undefined && dadosProduto.preco < 0) {
       return new Response(JSON.stringify({ error: 'Preço não pode ser negativo' }), { 
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    if (body.estoque !== undefined && body.estoque < 0) {
-      return new Response(JSON.stringify({ error: 'Estoque não pode ser negativo' }), { 
-        status: 400,
+    // Usar transação se tiver estoques para atualizar
+    if (estoques && Array.isArray(estoques)) {
+      const resultado = await prisma.$transaction(async (tx) => {
+        // Atualizar produto
+        const produto = await tx.produto.update({
+          where: { id: parseInt(id) },
+          data: dadosProduto
+        });
+
+        // Remover estoques antigos
+        await tx.estoquePorTamanho.deleteMany({
+          where: { produtoId: parseInt(id) }
+        });
+
+        // Criar novos estoques
+        if (estoques.length > 0) {
+          await tx.estoquePorTamanho.createMany({
+            data: estoques.map(e => ({
+              produtoId: parseInt(id),
+              tamanhoId: parseInt(e.tamanhoId),
+              quantidade: parseInt(e.quantidade)
+            }))
+          });
+        }
+
+        return produto;
+      });
+
+      // Buscar produto completo com estoques
+      const produtoCompleto = await prisma.produto.findUnique({
+        where: { id: parseInt(id) },
+        include: {
+          liga: true,
+          time: {
+            include: {
+              liga: true
+            }
+          },
+          cor: true,
+          estoques: {
+            include: {
+              tamanho: true
+            }
+          }
+        }
+      });
+
+      return new Response(JSON.stringify(produtoCompleto), { 
+        status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
+    // Se não tiver estoques, apenas atualizar o produto
     const produto = await prisma.produto.update({
       where: { id: parseInt(id) },
-      data: body
+      data: dadosProduto
     });
 
     return new Response(JSON.stringify(produto), { 

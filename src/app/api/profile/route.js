@@ -1,35 +1,29 @@
-// import { getServerSession } from "next-auth/next";
-// import { authOptions } from "../auth/[...nextauth]/route";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]/route";
 import prisma from "../../../lib/db";
 
 // GET /api/profile - Obter dados do perfil do usuario
 export async function GET(request) {
   try {
-    // TODO: Implementar autenticacao real
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return new Response(JSON.stringify({ error: "Nao autenticado" }), { 
-    //     status: 401 
-    //   });
-    // }
-
-    const { searchParams } = new URL(request.url);
-    const usuarioId = searchParams.get('usuarioId'); // Por enquanto via query param
-
-    if (!usuarioId) {
-      return new Response(JSON.stringify({ error: 'usuarioId e obrigatorio' }), {
-        status: 400,
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user) {
+      return new Response(JSON.stringify({ error: "Não autenticado" }), { 
+        status: 401,
         headers: { 'Content-Type': 'application/json' }
       });
     }
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: parseInt(usuarioId) },
+      where: { email: session.user.email },
       select: {
         id: true,
         nome: true,
         email: true,
         telefone: true,
+        cpf: true,
+        dataNascimento: true,
+        genero: true,
         role: true,
         criadoEm: true,
         endereco: {
@@ -41,6 +35,7 @@ export async function GET(request) {
             bairro: true,
             cidade: true,
             cep: true,
+            estadoUf: true,
             estado: {
               select: {
                 uf: true,
@@ -81,8 +76,9 @@ export async function GET(request) {
     });
 
     if (!usuario) {
-      return new Response(JSON.stringify({ error: "Usuario nao encontrado" }), { 
-        status: 404 
+      return new Response(JSON.stringify({ error: "Usuário não encontrado" }), { 
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
@@ -94,7 +90,8 @@ export async function GET(request) {
   } catch (error) {
     console.error('Erro ao buscar perfil:', error);
     return new Response(JSON.stringify({ error: "Erro interno do servidor" }), { 
-      status: 500 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }
@@ -102,30 +99,68 @@ export async function GET(request) {
 // PUT /api/profile - Atualizar dados do perfil
 export async function PUT(request) {
   try {
-    // TODO: Implementar autenticacao real
-    // const session = await getServerSession(authOptions);
-    // if (!session) {
-    //   return new Response(JSON.stringify({ error: "Nao autenticado" }), { 
-    //     status: 401 
-    //   });
-    // }
-
-    const { usuarioId, nome, email, telefone } = await request.json();
-
-    if (!usuarioId) {
-      return new Response(JSON.stringify({ error: "usuarioId e obrigatorio" }), { 
-        status: 400 
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user) {
+      return new Response(JSON.stringify({ error: "Não autenticado" }), { 
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
+    const data = await request.json();
+    const { nome, email, telefone, cpf, dataNascimento, genero } = data;
+
+    // Buscar usuário atual
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: session.user.email }
+    });
+
+    if (!usuario) {
+      return new Response(JSON.stringify({ error: "Usuário não encontrado" }), { 
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Se estiver alterando email, verificar se já existe
+    if (email && email !== usuario.email) {
+      const emailExistente = await prisma.usuario.findUnique({
+        where: { email }
+      });
+
+      if (emailExistente) {
+        return new Response(JSON.stringify({ 
+          error: "Este email já está em uso" 
+        }), { 
+          status: 409,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+
+    // Preparar dados para atualização (apenas campos fornecidos)
+    const updateData = {};
+    if (nome !== undefined) updateData.nome = nome;
+    if (email !== undefined) updateData.email = email;
+    if (telefone !== undefined) updateData.telefone = telefone;
+    if (cpf !== undefined) updateData.cpf = cpf;
+    if (dataNascimento !== undefined) {
+      updateData.dataNascimento = dataNascimento ? new Date(dataNascimento) : null;
+    }
+    if (genero !== undefined) updateData.genero = genero;
+
     const updatedUser = await prisma.usuario.update({
-      where: { id: parseInt(usuarioId) },
-      data: { nome, email, telefone },
+      where: { id: usuario.id },
+      data: updateData,
       select: {
         id: true,
         nome: true,
         email: true,
         telefone: true,
+        cpf: true,
+        dataNascimento: true,
+        genero: true,
         role: true,
       },
     });
@@ -137,7 +172,8 @@ export async function PUT(request) {
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);
     return new Response(JSON.stringify({ error: "Erro interno do servidor" }), { 
-      status: 500 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 }

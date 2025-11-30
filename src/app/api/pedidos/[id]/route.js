@@ -32,10 +32,10 @@ export async function GET(req, { params }) {
                 include: {
                   liga: { select: { nome: true, sigla: true } },
                   time: { select: { nome: true, sigla: true } },
-                  cor: { select: { nome: true, codigo: true } },
-                  tamanho: { select: { nome: true } }
+                  cor: { select: { nome: true, codigo: true } }
                 }
-              }
+              },
+              tamanho: { select: { nome: true } }
             }
           },
           formaPagamento: {

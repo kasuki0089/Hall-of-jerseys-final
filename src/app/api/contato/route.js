@@ -1,4 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import prisma from '../../../lib/db';
+
+// GET /api/contato - Listar todas as mensagens de contato (apenas admin)
+export async function GET(req) {
+  try {
+    const contatos = await prisma.contato.findMany({
+      orderBy: {
+        criadoEm: 'desc'
+      }
+    });
+
+    return NextResponse.json({
+      success: true,
+      contatos
+    });
+
+  } catch (error) {
+    console.error('❌ Erro ao buscar contatos:', error);
+    return NextResponse.json(
+      { error: 'Erro ao buscar mensagens de contato' },
+      { status: 500 }
+    );
+  }
+}
 
 // POST /api/contato - Processar formulário de contato
 export async function POST(req) {
@@ -22,40 +46,24 @@ export async function POST(req) {
       );
     }
 
-    console.log('📧 Nova mensagem de contato:');
-    console.log({
-      nome,
-      email,
-      telefone,
-      motivo,
-      problema,
-      dataEnvio: new Date().toISOString()
+    // Salvar no banco de dados
+    const contato = await prisma.contato.create({
+      data: {
+        nome,
+        email,
+        telefone: telefone || null,
+        motivo,
+        mensagem: problema,
+        status: 'novo'
+      }
     });
 
-    // Aqui você pode implementar:
-    // - Salvar no banco de dados
-    // - Enviar email para administradores
-    // - Integrar com serviços de email como SendGrid, Nodemailer, etc.
-    
-    // Por enquanto, vamos simular o salvamento
-    const mensagem = {
-      id: Date.now(),
-      nome,
-      email,
-      telefone,
-      motivo,
-      problema,
-      status: 'novo',
-      criadoEm: new Date().toISOString()
-    };
-
-    // Simular delay de processamento
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    console.log('📧 Nova mensagem de contato salva:', contato.id);
 
     return NextResponse.json({
       success: true,
       message: 'Mensagem enviada com sucesso! Nossa equipe entrará em contato em até 24 horas.',
-      id: mensagem.id
+      id: contato.id
     });
 
   } catch (error) {
