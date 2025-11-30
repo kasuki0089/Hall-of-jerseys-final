@@ -165,8 +165,6 @@ export async function POST(req) {
           usuarioId: usuarioId,
           status: 'PENDENTE',
           total: totalCalculado,
-          formaPagamento: formaPagamento,
-          enderecoEntrega: JSON.stringify(endereco),
           criadoEm: new Date()
         }
       });
@@ -210,7 +208,7 @@ export async function POST(req) {
     const pedidoCompleto = await prisma.pedido.findUnique({
       where: { id: resultado.pedido.id },
       include: {
-        itensPedido: {
+        itens: {
           include: {
             produto: {
               include: {

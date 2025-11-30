@@ -258,7 +258,7 @@ model Avaliacao {
   usuarioId  Int
   produtoId  Int
   nota       Float    // 1.0 a 5.0
-  comentario String?  @db.Text
+  comentario String?
   criadoEm   DateTime @default(now())
   atualizadoEm DateTime @updatedAt
   usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)

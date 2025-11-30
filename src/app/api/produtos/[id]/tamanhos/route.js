@@ -30,8 +30,14 @@ export async function GET(req, { params }) {
       return Response.json({ error: 'Produto não encontrado' }, { status: 404 });
     }
 
-    // Buscar TODOS os produtos similares (mesmo nome base, time, cor, ano)
-    const nomeBase = produto.nome.replace(/\s+(PP|P|M|G|GG|XGG)$/i, ''); // Remove tamanho do nome
+    // Buscar TODOS os tamanhos da tabela tamanhos ordenados
+    const todosTamanhos = await prisma.tamanho.findMany({
+      orderBy: {
+        ordem: 'asc'
+      }
+    });
+
+    // Buscar produtos similares para verificar disponibilidade por tamanho
     const produtosSimilares = await prisma.produto.findMany({
       where: {
         timeId: produto.timeId,
@@ -39,38 +45,31 @@ export async function GET(req, { params }) {
         year: produto.year,
         modelo: produto.modelo,
         serie: produto.serie,
-        ativo: true,
-        nome: {
-          startsWith: nomeBase
-        }
+        ativo: true
       },
       include: {
         tamanho: {
           select: { id: true, nome: true, ordem: true }
         }
-      },
-      orderBy: {
-        tamanho: {
-          ordem: 'asc'
-        }
       }
     });
 
-    // Extrair todos os tamanhos únicos
-    const todosOsTamanhos = produtosSimilares
-      .map(p => ({ 
-        ...p.tamanho, 
-        produtoId: p.id,
-        disponivel: p.estoque > 0 
-      }))
-      .filter((tamanho, index, self) => 
-        self.findIndex(t => t.id === tamanho.id) === index
-      )
-      .sort((a, b) => a.ordem - b.ordem);
+    // Mapear todos os tamanhos com disponibilidade
+    const tamanhosDisponiveis = todosTamanhos.map(tamanho => {
+      const produtoComTamanho = produtosSimilares.find(p => p.tamanhoId === tamanho.id);
+      return {
+        id: tamanho.id,
+        nome: tamanho.nome,
+        ordem: tamanho.ordem,
+        produtoId: produtoComTamanho?.id || produto.id,
+        disponivel: produtoComTamanho ? produtoComTamanho.estoque > 0 : false,
+        estoque: produtoComTamanho?.estoque || 0
+      };
+    });
 
     return Response.json({
       ...produto,
-      tamanhosDisponiveis: todosOsTamanhos
+      tamanhosDisponiveis: tamanhosDisponiveis
     });
     
   } catch (error) {

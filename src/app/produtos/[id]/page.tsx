@@ -236,16 +236,15 @@ export default function ProductPage() {
                   {productSizes?.tamanhosDisponiveis?.map((tamanho: any) => (
                     <button 
                       key={tamanho.id}
-                      onClick={() => handleSizeChange(tamanho)}
+                      onClick={() => setSelectedSize(tamanho)}
                       className={`w-12 h-12 border rounded transition-all duration-300 font-medium ${
                         selectedSize?.id === tamanho.id
                           ? 'border-blue-600 bg-blue-50 text-blue-600 scale-110 shadow-md' 
                           : tamanho.disponivel
                           ? 'border-gray-300 hover:border-blue-600 hover:bg-blue-50 hover:scale-105'
-                          : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'border-gray-200 text-gray-400'
                       }`}
-                      title={`Tamanho ${tamanho.nome}${!tamanho.disponivel ? ' (Indisponível)' : ''}`}
-                      disabled={!tamanho.disponivel}
+                      title={`Tamanho ${tamanho.nome}${!tamanho.disponivel ? ' (Indisponível - Estoque: 0)' : ` (Estoque: ${tamanho.estoque || 'N/A'})`}`}
                     >
                       {tamanho.nome}
                     </button>

@@ -149,7 +149,7 @@ export async function DELETE(req, { params }) {
     const produto = await prisma.produto.findUnique({
       where: { id: parseInt(id) },
       include: { 
-        itensPedido: true  // Nome correto da relação
+        itensPedido: true
       }
     });
 
