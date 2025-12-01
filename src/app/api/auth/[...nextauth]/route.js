@@ -54,7 +54,7 @@ export const authOptions = {
 
           console.log('✅ Login autorizado para:', user.email);
           return {
-            id: user.id,
+            id: user.id.toString(),
             email: user.email,
             nome: user.nome,
             role: user.role,
@@ -68,14 +68,19 @@ export const authOptions = {
     })
   ],
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 dias
   },
   pages: {
-    signIn: "/login"
+    signIn: "/login",
+    error: "/login",
   },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.role = user.role;
         token.nome = user.nome;
       }
@@ -83,7 +88,7 @@ export const authOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.sub;
+        session.user.id = token.id;
         session.user.role = token.role;
         session.user.nome = token.nome;
       }
