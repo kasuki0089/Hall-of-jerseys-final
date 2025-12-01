@@ -1,16 +1,24 @@
 import prisma from '../../../lib/db';
 import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import { sendVerificationEmail } from '../../../lib/emailService';
 
 // POST /api/usuarios - Registrar novo usuario
 export async function POST(req) {
   try {
+    console.log('📝 Nova requisição de cadastro recebida');
+    
     const {
       nome,
       email,
       senha,
       telefone,
+      cpf,
+      dataNascimento,
       endereco
     } = await req.json();
+
+    console.log('📋 Dados recebidos:', { nome, email, telefone, cpf, temDataNascimento: !!dataNascimento, temEndereco: !!endereco });
 
     // Validacoes basicas
     if (!nome || !email || !senha) {
@@ -23,11 +31,13 @@ export async function POST(req) {
     }
 
     // Verificar se email ja existe
+    console.log('🔍 Verificando se email já existe...');
     const usuarioExistente = await prisma.usuario.findUnique({
-      where: { email }
+      where: { email: email.toLowerCase().trim() }
     });
 
     if (usuarioExistente) {
+      console.log('❌ Email já existe:', email);
       return new Response(JSON.stringify({ 
         error: 'Email ja esta em uso' 
       }), {
@@ -47,7 +57,12 @@ export async function POST(req) {
     }
 
     // Criptografar senha
+    console.log('🔐 Criptografando senha...');
     const senhaHash = await bcrypt.hash(senha, 10);
+
+    // Gerar token de verificação
+    console.log('🔑 Gerando token de verificação...');
+    const tokenVerificacao = crypto.randomBytes(32).toString('hex');
 
     // Criar endereco se fornecido
     let enderecoId = null;
@@ -74,8 +89,12 @@ export async function POST(req) {
         email,
         senha: senhaHash,
         telefone: telefone || null,
+        cpf: cpf || null,
+        dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
         role: 'user', // Sempre usuario comum por padrao
-        enderecoId
+        enderecoId,
+        emailVerificado: false,
+        tokenVerificacao
       },
       select: {
         id: true,
@@ -83,14 +102,28 @@ export async function POST(req) {
         email: true,
         telefone: true,
         role: true,
+        emailVerificado: true,
         criadoEm: true
       }
     });
 
+    // Enviar email de verificação (simulado por enquanto)
+    try {
+      console.log('📧 Enviando email de verificação para:', email);
+      console.log('🔗 Link de verificação:', `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/verificar-email?token=${tokenVerificacao}`);
+      
+      // Descomentar quando configurar o email service
+      // await sendVerificationEmail(email, tokenVerificacao, nome);
+    } catch (emailError) {
+      console.error('Erro ao enviar email:', emailError);
+      // Não falha o cadastro se o email falhar
+    }
+
     return new Response(JSON.stringify({
       success: true,
-      message: 'Usuario criado com sucesso',
-      usuario
+      message: 'Usuario criado com sucesso! Verifique seu email para ativar a conta.',
+      usuario,
+      verificacaoNecessaria: true
     }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }

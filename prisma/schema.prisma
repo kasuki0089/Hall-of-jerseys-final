@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Tabela de Estados
 model Estado {
   uf        String     @id
   nome      String
@@ -19,7 +15,6 @@ model Estado {
   @@map("estados")
 }
 
-// Tabela de Endereços  
 model Endereco {
   id          Int       @id @default(autoincrement())
   endereco    String
@@ -28,49 +23,48 @@ model Endereco {
   bairro      String
   cidade      String
   cep         String
-  estado      Estado    @relation(fields: [estadoUf], references: [uf])
   estadoUf    String
+  estado      Estado    @relation(fields: [estadoUf], references: [uf])
   usuarios    Usuario[]
 
+  @@index([estadoUf], map: "enderecos_estadoUf_fkey")
   @@map("enderecos")
 }
 
-// Tabela de Cores
 model Cor {
   id       Int       @id @default(autoincrement())
   nome     String    @unique
-  codigo   String? // Para hex colors #FFFFFF
+  codigo   String?
   produtos Produto[]
 
   @@map("cores")
 }
 
-// Tabela de Tamanhos
 model Tamanho {
   id            Int                 @id @default(autoincrement())
-  nome          String              @unique // PP, P, M, G, GG, XGG
-  ordem         Int                 @unique // Para ordenação (1=PP, 2=P, etc)
+  nome          String              @unique
+  ordem         Int                 @unique
   carrinhoItens CarrinhoItem[]
-  itensPedido   ItemPedido[]
   estoques      EstoquePorTamanho[]
+  itensPedido   ItemPedido[]
 
   @@map("tamanhos")
 }
 
-// Tabela de Formas de Pagamento
 model FormaPagamento {
   id             Int      @id @default(autoincrement())
-  tipo           String   // 'cartao_credito', 'cartao_debito', 'pix', 'boleto'
-  numeroCartao   String?  // Apenas últimos 4 dígitos para segurança
+  tipo           String
+  numeroCartao   String?
   nomeCartao     String?
-  validadeCartao String?  // MM/YYYY
-  bandeiraCartao String?  // Visa, Mastercard, etc
-  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  validadeCartao String?
+  bandeiraCartao String?
   usuarioId      Int
   ativo          Boolean  @default(true)
   criadoEm       DateTime @default(now())
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   pedidos        Pedido[]
 
+  @@index([usuarioId], map: "formas_pagamento_usuarioId_fkey")
   @@map("formas_pagamento")
 }
 
@@ -78,8 +72,8 @@ model Liga {
   id       Int       @id @default(autoincrement())
   nome     String    @unique
   sigla    String    @unique
-  times    Time[]
   produtos Produto[]
+  times    Time[]
 
   @@map("ligas")
 }
@@ -89,94 +83,96 @@ model Time {
   nome     String
   sigla    String
   cidade   String
-  liga     Liga      @relation(fields: [ligaId], references: [id])
   ligaId   Int
   produtos Produto[]
+  liga     Liga      @relation(fields: [ligaId], references: [id])
 
+  @@index([ligaId], map: "times_ligaId_fkey")
   @@map("times")
 }
 
 model Produto {
-  id                  Int                   @id @default(autoincrement())
-  nome                String
-  codigo              String                @unique
-  descricao           String?
-  modelo              String                // Ex: "Jersey Home", "Jersey Away", "Regata", etc
-  preco               Float
-  year                Int
-  serie               String?               // Home, Away, Third, Special Edition
-  ativo               Boolean               @default(true)
-  sale                Boolean               @default(false)
-  imagemUrl           String?
-  criadoEm            DateTime              @default(now())
-  atualizadoEm        DateTime              @updatedAt
-  liga                Liga                  @relation(fields: [ligaId], references: [id])
-  ligaId              Int
-  time                Time?                 @relation(fields: [timeId], references: [id])
-  timeId              Int?
-  cor                 Cor                   @relation(fields: [corId], references: [id])
-  corId               Int
-  itensPedido         ItemPedido[]
-  carrinhoItens       CarrinhoItem[]
-  configuracaoEstoque ConfiguracaoEstoque?
+  id                   Int                   @id @default(autoincrement())
+  nome                 String
+  codigo               String                @unique
+  descricao            String?
+  modelo               String
+  preco                Float
+  year                 Int
+  serie                String?
+  ativo                Boolean               @default(true)
+  sale                 Boolean               @default(false)
+  imagemUrl            String?
+  criadoEm             DateTime              @default(now())
+  atualizadoEm         DateTime              @updatedAt
+  ligaId               Int
+  timeId               Int?
+  corId                Int
+  avaliacoes           Avaliacao[]
+  carrinhoItens        CarrinhoItem[]
+  configuracaoEstoque  ConfiguracaoEstoque?
+  estoques             EstoquePorTamanho[]
+  itensPedido          ItemPedido[]
   movimentacoesEstoque MovimentacaoEstoque[]
-  avaliacoes          Avaliacao[]
-  estoques            EstoquePorTamanho[]
+  cor                  Cor                   @relation(fields: [corId], references: [id])
+  liga                 Liga                  @relation(fields: [ligaId], references: [id])
+  time                 Time?                 @relation(fields: [timeId], references: [id])
 
+  @@index([corId], map: "produtos_corId_fkey")
+  @@index([ligaId], map: "produtos_ligaId_fkey")
+  @@index([timeId], map: "produtos_timeId_fkey")
   @@map("produtos")
 }
 
-// Nova tabela para controlar estoque por tamanho
 model EstoquePorTamanho {
-  id         Int      @id @default(autoincrement())
-  produtoId  Int
-  tamanhoId  Int
-  quantidade Int      @default(0)
-  criadoEm   DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  produtoId    Int
+  tamanhoId    Int
+  quantidade   Int      @default(0)
+  criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
-  produto    Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  tamanho    Tamanho  @relation(fields: [tamanhoId], references: [id])
+  produto      Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  tamanho      Tamanho  @relation(fields: [tamanhoId], references: [id])
 
-  @@unique([produtoId, tamanhoId]) // Um produto só pode ter um registro por tamanho
+  @@unique([produtoId, tamanhoId])
+  @@index([tamanhoId], map: "estoque_por_tamanho_tamanhoId_fkey")
   @@map("estoque_por_tamanho")
 }
 
-// Tabela de Configuração de Estoque por Produto
 model ConfiguracaoEstoque {
-  id                    Int      @id @default(autoincrement())
-  produtoId             Int      @unique
-  quantidadeMinima      Int      @default(5)    // Alerta de estoque baixo
-  quantidadeMaxima      Int      @default(100)  // Limite de estoque
-  pontoReposicao        Int      @default(10)   // Quando atingir, criar alerta de reposição
-  tempoMedioReposicao   Int?                    // Em dias
-  fornecedor            String?                 // Nome do fornecedor principal
-  custoUltimaCompra     Float?                  // Custo da última compra
-  dataUltimaCompra      DateTime?               // Data da última compra
-  observacoes           String?
-  produto               Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  criadoEm              DateTime @default(now())
-  atualizadoEm          DateTime @updatedAt
+  id                  Int       @id @default(autoincrement())
+  produtoId           Int       @unique
+  quantidadeMinima    Int       @default(5)
+  quantidadeMaxima    Int       @default(100)
+  pontoReposicao      Int       @default(10)
+  tempoMedioReposicao Int?
+  fornecedor          String?
+  custoUltimaCompra   Float?
+  dataUltimaCompra    DateTime?
+  observacoes         String?
+  criadoEm            DateTime  @default(now())
+  atualizadoEm        DateTime  @updatedAt
+  produto             Produto   @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@map("configuracoes_estoque")
 }
 
-// Tabela de Movimentação de Estoque (Histórico)
 model MovimentacaoEstoque {
-  id                Int      @id @default(autoincrement())
-  produtoId         Int
-  tipo              String   // ENTRADA, SAIDA, AJUSTE, DEVOLUCAO
-  quantidade        Int      // Positivo para entrada, negativo para saída
-  quantidadeAntes   Int      // Estoque antes da movimentação
-  quantidadeDepois  Int      // Estoque depois da movimentação
-  motivo            String?  // Compra, Venda, Ajuste de inventário, etc
-  custo             Float?   // Custo unitário (para entradas)
-  valorTotal        Float?   // Quantidade * Custo
-  fornecedor        String?  // Para entradas
-  notaFiscal        String?  // Número da NF
-  responsavel       String?  // Quem fez a movimentação
-  observacoes       String?
-  produto           Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
-  criadoEm          DateTime @default(now())
+  id               Int      @id @default(autoincrement())
+  produtoId        Int
+  tipo             String
+  quantidade       Int
+  quantidadeAntes  Int
+  quantidadeDepois Int
+  motivo           String?
+  custo            Float?
+  valorTotal       Float?
+  fornecedor       String?
+  notaFiscal       String?
+  responsavel      String?
+  observacoes      String?
+  criadoEm         DateTime @default(now())
+  produto          Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
 
   @@index([produtoId])
   @@index([tipo])
@@ -185,24 +181,27 @@ model MovimentacaoEstoque {
 }
 
 model Usuario {
-  id               Int               @id @default(autoincrement())
-  nome             String
-  email            String            @unique
-  senha            String
-  telefone         String?
-  cpf              String?
-  dataNascimento   DateTime?
-  genero           String?
-  role             String            @default("user") // user, admin
-  criadoEm         DateTime          @default(now())
-  atualizadoEm     DateTime          @updatedAt
-  endereco         Endereco?         @relation(fields: [enderecoId], references: [id])
-  enderecoId       Int?
-  formasPagamento  FormaPagamento[]
-  pedidos          Pedido[]
-  carrinhoItens    CarrinhoItem[]
-  avaliacoes       Avaliacao[]
+  id                Int              @id @default(autoincrement())
+  nome              String
+  email             String           @unique
+  senha             String
+  telefone          String?
+  role              String           @default("user")
+  emailVerificado   Boolean          @default(false)
+  tokenVerificacao  String?
+  criadoEm          DateTime         @default(now())
+  atualizadoEm      DateTime         @updatedAt
+  enderecoId        Int?
+  cpf               String?
+  dataNascimento    DateTime?
+  genero            String?
+  avaliacoes        Avaliacao[]
+  carrinhoItens     CarrinhoItem[]
+  formasPagamento   FormaPagamento[]
+  pedidos           Pedido[]
+  endereco          Endereco?        @relation(fields: [enderecoId], references: [id])
 
+  @@index([enderecoId], map: "usuarios_enderecoId_fkey")
   @@map("usuarios")
 }
 
@@ -210,17 +209,19 @@ model Pedido {
   id               Int             @id @default(autoincrement())
   usuarioId        Int
   total            Float
-  status           String          @default("pendente") // pendente, processando, enviado, entregue, cancelado
+  status           String          @default("pendente")
   criadoEm         DateTime        @default(now())
   atualizadoEm     DateTime        @updatedAt
   confirmadoEm     DateTime?
   transacaoId      String?         @unique
-  usuario          Usuario         @relation(fields: [usuarioId], references: [id])
-  formaPagamento   FormaPagamento? @relation(fields: [formaPagamentoId], references: [id])
   formaPagamentoId Int?
   itens            ItemPedido[]
+  formaPagamento   FormaPagamento? @relation(fields: [formaPagamentoId], references: [id])
   transacao        Transacao?      @relation(fields: [transacaoId], references: [id])
+  usuario          Usuario         @relation(fields: [usuarioId], references: [id])
 
+  @@index([formaPagamentoId], map: "pedidos_formaPagamentoId_fkey")
+  @@index([usuarioId], map: "pedidos_usuarioId_fkey")
   @@map("pedidos")
 }
 
@@ -230,12 +231,15 @@ model ItemPedido {
   produtoId  Int
   quantidade Int
   preco      Float
-  tamanhoId  Int?
   criadoEm   DateTime @default(now())
+  tamanhoId  Int?
   pedido     Pedido   @relation(fields: [pedidoId], references: [id])
   produto    Produto  @relation(fields: [produtoId], references: [id])
   tamanho    Tamanho? @relation(fields: [tamanhoId], references: [id])
 
+  @@index([pedidoId], map: "itens_pedido_pedidoId_fkey")
+  @@index([produtoId], map: "itens_pedido_produtoId_fkey")
+  @@index([tamanhoId], map: "itens_pedido_tamanhoId_fkey")
   @@map("itens_pedido")
 }
 
@@ -246,55 +250,56 @@ model CarrinhoItem {
   quantidade Int
   tamanhoId  Int?
   criadoEm   DateTime @default(now())
-  
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
   produto    Produto  @relation(fields: [produtoId], references: [id])
   tamanho    Tamanho? @relation(fields: [tamanhoId], references: [id])
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
 
   @@unique([usuarioId, produtoId, tamanhoId])
+  @@index([produtoId], map: "carrinho_itens_produtoId_fkey")
+  @@index([tamanhoId], map: "carrinho_itens_tamanhoId_fkey")
   @@map("carrinho_itens")
 }
 
 model Transacao {
-  id            String    @id
-  pedidoId      Int
-  tipo          String    // PIX, CARTAO, BOLETO
-  valor         Float
-  status        String    // PENDENTE, APROVADO, REJEITADO, CANCELADO
-  dadosGateway  String?   // JSON com dados do gateway
-  erro          String?
-  processadoEm  DateTime  @default(now())
-  pedido        Pedido?
+  id           String   @id
+  pedidoId     Int
+  tipo         String
+  valor        Float
+  status       String
+  dadosGateway String?
+  erro         String?
+  processadoEm DateTime @default(now())
+  pedido       Pedido?
 
   @@map("transacoes")
 }
 
 model Avaliacao {
-  id         Int      @id @default(autoincrement())
-  usuarioId  Int
-  produtoId  Int
-  nota       Float    // 1.0 a 5.0
-  comentario String?
-  criadoEm   DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int
+  produtoId    Int
+  nota         Float
+  comentario   String?
+  criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  produto    Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  produto      Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  usuario      Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  @@unique([usuarioId, produtoId]) // Um usuário pode avaliar cada produto apenas uma vez
+  @@unique([usuarioId, produtoId])
   @@index([produtoId])
   @@index([nota])
   @@map("avaliacoes")
 }
 
 model Contato {
-  id        Int      @id @default(autoincrement())
-  nome      String
-  email     String
-  telefone  String?
-  motivo    String   // Compras, Vendas, Entregas, Feedback, Curriculo
-  mensagem  String
-  status    String   @default("novo") // novo, lido, respondido
-  criadoEm  DateTime @default(now())
+  id           Int       @id @default(autoincrement())
+  nome         String
+  email        String
+  telefone     String?
+  motivo       String
+  mensagem     String
+  status       String    @default("novo")
+  criadoEm     DateTime  @default(now())
   respondidoEm DateTime?
 
   @@index([status])

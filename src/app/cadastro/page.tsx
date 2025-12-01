@@ -65,6 +65,30 @@ export default function CadastroPage() {
     setLoading(true);
     setMessage('');
 
+    // Validações básicas
+    if (!formData.nomeCompleto.trim()) {
+      setMessage('Nome completo é obrigatório');
+      setSuccess(false);
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      setMessage('Email é obrigatório');
+      setSuccess(false);
+      setLoading(false);
+      return;
+    }
+
+    // Validação de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setMessage('Email inválido');
+      setSuccess(false);
+      setLoading(false);
+      return;
+    }
+
     // Validações
     if (formData.senha !== formData.confirmarSenha) {
       setMessage('As senhas não coincidem');
@@ -80,32 +104,58 @@ export default function CadastroPage() {
       return;
     }
 
+    // Preparar data de nascimento
+    let dataNascimento = null;
+    if (formData.dataNascimento) {
+      try {
+        // Converter data DD/MM/AAAA para ISO
+        const [dia, mes, ano] = formData.dataNascimento.split('/');
+        if (dia && mes && ano && ano.length === 4) {
+          dataNascimento = new Date(parseInt(ano), parseInt(mes) - 1, parseInt(dia)).toISOString();
+        }
+      } catch (error) {
+        console.error('Erro ao converter data:', error);
+      }
+    }
+
     try {
+      console.log('📝 Enviando dados de cadastro...');
+      const dadosEnvio = {
+        nome: formData.nomeCompleto.trim(),
+        email: formData.email.trim().toLowerCase(),
+        senha: formData.senha,
+        telefone: formData.telefone || null,
+        cpf: formData.cpf || null,
+        dataNascimento,
+        endereco: formData.endereco ? {
+          endereco: formData.endereco,
+          numero: '123', // Como não tem campo número no form, usar padrão
+          cidade: formData.cidade,
+          cep: formData.cep.replace(/\D/g, ''), // Remove formatação
+          estadoUf: formData.estado.length === 2 ? formData.estado : 'SP'
+        } : null
+      };
+
+      console.log('📋 Dados preparados:', dadosEnvio);
+
       const response = await fetch('/api/usuarios', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          nome: formData.nomeCompleto,
-          email: formData.email,
-          senha: formData.senha,
-          telefone: formData.telefone,
-          endereco: formData.endereco ? {
-            endereco: formData.endereco,
-            numero: '123', // Como não tem campo número no form, usar padrão
-            cidade: formData.cidade,
-            cep: formData.cep,
-            estadoUf: formData.estado.length === 2 ? formData.estado : 'SP'
-          } : null
-        }),
+        body: JSON.stringify(dadosEnvio),
       });
 
       const result = await response.json();
+      console.log('📨 Resposta da API:', result);
 
       if (response.ok) {
         setSuccess(true);
-        setMessage('Cadastro realizado com sucesso! Você já pode fazer login.');
+        if (result.verificacaoNecessaria) {
+          setMessage('Cadastro realizado com sucesso! Verifique seu email para ativar sua conta antes de fazer login.');
+        } else {
+          setMessage('Cadastro realizado com sucesso! Você já pode fazer login.');
+        }
         // Limpar formulário
         setFormData({
           nomeCompleto: "",
@@ -125,9 +175,9 @@ export default function CadastroPage() {
         setMessage(result.error || 'Erro ao realizar cadastro');
       }
     } catch (error) {
-      console.error('Erro ao cadastrar:', error);
+      console.error('❌ Erro ao cadastrar:', error);
       setSuccess(false);
-      setMessage('Erro ao conectar com o servidor');
+      setMessage('Erro ao conectar com o servidor. Tente novamente.');
     } finally {
       setLoading(false);
     }

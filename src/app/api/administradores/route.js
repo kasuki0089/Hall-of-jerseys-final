@@ -82,7 +82,7 @@ export async function POST(request) {
         nome: true,
         email: true,
         telefone: true,
-        createdAt: true
+        criadoEm: true
       }
     });
 

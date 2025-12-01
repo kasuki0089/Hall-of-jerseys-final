@@ -6,6 +6,7 @@ import MainTemplate from "@/templates/MainTemplate/Index";
 import Link from "next/link";
 import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
+import ReviewSection from "@/components/ReviewSection";
 import { ShoppingCart } from "lucide-react";
 
 export default function ProductPage() {
@@ -343,6 +344,11 @@ export default function ProductPage() {
                 <strong>Cor:</strong> {product.cor?.nome}
               </div>
             </div>
+          </div>
+
+          {/* Sistema de avaliações */}
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-16">
+            <ReviewSection produtoId={parseInt(id)} />
           </div>
 
           {/* Produtos relacionados */}

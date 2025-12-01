@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import MainTemplate from "@/templates/MainTemplate/Index";
 import ProfileSidebar from "@/components/Profile/ProfileSidebar";
 import OrderStatusBadge from "@/components/Profile/OrderStatusBadge";
 import { Package, ArrowLeft, MapPin, CreditCard } from "lucide-react";
@@ -94,25 +95,29 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Carregando...</p>
-      </div>
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </MainTemplate>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error || "Pedido não encontrado"}</p>
-          <button
-            onClick={() => router.push("/perfil/pedidos")}
-            className="text-blue-600 hover:underline"
-          >
-            Voltar para pedidos
-          </button>
+      <MainTemplate>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 mb-4">{error || "Pedido não encontrado"}</p>
+            <button
+              onClick={() => router.push("/perfil/pedidos")}
+              className="text-blue-600 hover:underline"
+            >
+              Voltar para pedidos
+            </button>
+          </div>
         </div>
-      </div>
+      </MainTemplate>
     );
   }
 
@@ -126,12 +131,13 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        <ProfileSidebar activePage="pedidos" />
-        
-        <main className="flex-1 p-8">
-          <div className="max-w-6xl mx-auto">
+    <MainTemplate>
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex">
+          <ProfileSidebar activePage="pedidos" />
+          
+          <main className="flex-1 p-8">
+            <div className="max-w-6xl mx-auto">
             {/* Header */}
             <div className="mb-6">
               <button
@@ -302,6 +308,6 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
           </div>
         </main>
       </div>
-    </div>
+    </MainTemplate>
   );
 }

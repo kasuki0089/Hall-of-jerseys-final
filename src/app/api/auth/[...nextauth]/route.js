@@ -14,36 +14,55 @@ export const authOptions = {
         senha: { label: "Senha", type: "password" }
       },
       async authorize(credentials) {
+        console.log('🔐 Tentativa de login:', { email: credentials?.email, temSenha: !!credentials?.senha });
+        
         if (!credentials?.email || !credentials?.senha) {
+          console.log('❌ Credenciais incompletas');
           return null;
         }
 
         try {
+          console.log('🔍 Buscando usuário no banco...');
           const user = await prisma.usuario.findUnique({
             where: {
-              email: credentials.email
+              email: credentials.email.toLowerCase().trim()
             }
           });
 
+          console.log('👤 Usuário encontrado:', user ? { id: user.id, email: user.email, emailVerificado: user.emailVerificado, role: user.role } : 'Nenhum');
+
           if (!user) {
-            return null;
+            console.log('❌ Usuário não encontrado para email:', credentials.email);
+            throw new Error("Usuário não encontrado");
           }
 
+          console.log('🔓 Verificando senha...');
           const isValidPassword = await bcrypt.compare(credentials.senha, user.senha);
 
           if (!isValidPassword) {
-            return null;
+            console.log('❌ Senha incorreta');
+            throw new Error("Senha incorreta");
           }
 
+          console.log('✅ Senha válida');
+
+          // Verificar se o email foi verificado - temporariamente desabilitado para debug
+          if (user.emailVerificado === false) {
+            console.log('⚠️ Email não verificado, mas permitindo login para debug');
+            // throw new Error("Email não verificado. Verifique sua caixa de entrada.");
+          }
+
+          console.log('✅ Login autorizado para:', user.email);
           return {
             id: user.id,
             email: user.email,
             nome: user.nome,
-            role: user.role
+            role: user.role,
+            emailVerificado: user.emailVerificado
           };
         } catch (error) {
-          console.error("Erro na autenticação:", error);
-          return null;
+          console.error("❌ Erro na autenticação:", error.message);
+          throw error; // Propagate error to show specific message
         }
       }
     })

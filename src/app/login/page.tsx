@@ -19,29 +19,43 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
+    console.log('🔑 Tentando fazer login com:', { email, temSenha: !!password });
+
     try {
       const result = await signIn('credentials', {
-        email,
+        email: email.trim().toLowerCase(),
         senha: password,
         redirect: false,
       });
 
+      console.log('📝 Resultado do signIn:', result);
+
       if (result?.error) {
-        setError("Email ou senha inválidos");
-      } else {
+        console.log('❌ Erro no login:', result.error);
+        setError(result.error || "Email ou senha inválidos");
+      } else if (result?.ok) {
+        console.log('✅ Login bem-sucedido');
         // Verificar se login foi bem sucedido
         const session = await getSession();
+        console.log('👤 Sessão criada:', session);
+        
         if (session) {
           // Redirecionar baseado no role de usuário
           if (session.user?.role === 'admin') {
+            console.log('👑 Redirecionando admin...');
             router.push('/adm/home');
           } else {
+            console.log('👤 Redirecionando usuário...');
             router.push('/');
           }
+        } else {
+          setError("Erro ao criar sessão");
         }
+      } else {
+        setError("Erro desconhecido no login");
       }
     } catch (error) {
-      console.error('Erro no login:', error);
+      console.error('💥 Erro no login:', error);
       setError("Erro interno do servidor");
     } finally {
       setLoading(false);
