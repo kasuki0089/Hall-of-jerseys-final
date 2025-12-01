@@ -23,7 +23,7 @@ const menuItems = [
   { name: "Pedidos", icon: Send, href: "/adm/pedidos" },
   { name: "Avaliações", icon: Star, href: "/adm/avaliacoes" },
   { name: "Mensagens", icon: MessageSquare, href: "/adm/mensagens" },
-  { name: "Carrossel", icon: ImageIcon, href: "/adm/carrossel/gerenciarCarrossel" },
+  { name: "Carousel", icon: ImageIcon, href: "/adm/carousel" },
   { name: "Guia de Produtos", icon: HelpCircle, href: "/adm/guia" },
   { name: "Logs", icon: List, href: "/adm/logs" },
   { name: "Configurações", icon: Settings, href: "/adm/configuracoes" },

@@ -15,7 +15,7 @@ export default function AdminTemplate({ children }: Readonly<AdminTemplateProps>
       <AdminTopBar />
       
       {/* Main Content */}
-      <main className="ml-52 mt-20 p-8">
+      <main className="ml-52 mt-20 p-4">
         {children}
       </main>
     </div>

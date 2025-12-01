@@ -134,7 +134,7 @@ export default function PedidosAdmin() {
   if (loading) {
     return (
       <AdminTemplate>
-        <div className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
         </div>
       </AdminTemplate>
@@ -143,7 +143,7 @@ export default function PedidosAdmin() {
 
   return (
     <AdminTemplate>
-      <div className="p-6">
+      <div>
         <h1 className="text-3xl font-bold mb-6">Gestão de Pedidos</h1>
 
         {/* Filtros */}

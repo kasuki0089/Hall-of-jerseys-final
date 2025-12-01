@@ -307,3 +307,19 @@ model Contato {
   @@index([criadoEm])
   @@map("contatos")
 }
+
+model Carousel {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descricao   String?
+  imagemUrl   String
+  linkUrl     String?
+  ativo       Boolean  @default(true)
+  ordem       Int      @default(0)
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([ativo])
+  @@index([ordem])
+  @@map("carousel")
+}

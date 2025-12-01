@@ -206,26 +206,6 @@ export default function AvaliacoesPage() {
           </table>
         )}
       </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-800 text-center">
-                  {avaliacao.avaliadoEm}
-                </td>
-                <td className="px-6 py-4 text-sm">
-                  <div className="flex items-center justify-center">
-                    {renderStars(avaliacao.avaliacao)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-800">
-                  {avaliacao.usuario}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {avaliacao.avaliacaoEscrita}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </AdminTemplate>
   );
 }
