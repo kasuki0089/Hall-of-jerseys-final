@@ -39,7 +39,7 @@ export default function ProfileSidebar({ activePage }: ProfileSidebarProps = {})
   };
 
   return (
-    <aside className="w-full lg:w-64 bg-[#003087] text-white min-h-screen p-4">
+    <aside className="w-full lg:w-64 bg-[#003087] text-white p-4">
       <nav className="space-y-2">
         {sidebarItems.map((item) => {
           const Icon = item.icon;

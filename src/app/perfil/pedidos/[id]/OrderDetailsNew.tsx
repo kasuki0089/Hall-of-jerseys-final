@@ -109,7 +109,7 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
   if (loading) {
     return (
       <MainTemplate>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-gray-50 flex items-center justify-center">
           <p className="text-gray-600">Carregando...</p>
         </div>
       </MainTemplate>
@@ -119,7 +119,7 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
   if (error || !order) {
     return (
       <MainTemplate>
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 mb-4">{error || "Pedido não encontrado"}</p>
             <button
@@ -145,7 +145,7 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
 
   return (
     <MainTemplate>
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-gray-50">
         <div className="flex">
           <ProfileSidebar activePage="pedidos" />
           

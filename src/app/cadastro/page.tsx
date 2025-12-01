@@ -2,7 +2,7 @@
 import MainTemplate from "@/templates/MainTemplate/Index";
 import { User, Mail, Phone, MapPin, Calendar, Lock, Home, Building2, Map, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CadastroPage() {
   const [formData, setFormData] = useState({
@@ -22,6 +22,7 @@ export default function CadastroPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [success, setSuccess] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -60,10 +61,78 @@ export default function CadastroPage() {
     });
   };
 
+  // Função para verificar reCAPTCHA
+  const onCaptchaChange = async (token: string | null) => {
+    if (!token) {
+      setCaptchaVerified(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/verify-recaptcha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setCaptchaVerified(true);
+      } else {
+        setCaptchaVerified(false);
+        setMessage("Verificação reCAPTCHA falhou");
+        setSuccess(false);
+      }
+    } catch (error) {
+      console.error('Erro na verificação reCAPTCHA:', error);
+      setCaptchaVerified(false);
+      setMessage("Erro na verificação reCAPTCHA");
+      setSuccess(false);
+    }
+  };
+
+  // Carregar reCAPTCHA quando componente montar
+  useEffect(() => {
+    const loadRecaptcha = () => {
+      if (typeof window !== 'undefined' && window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          console.log('✅ reCAPTCHA carregado');
+        });
+      } else {
+        setTimeout(loadRecaptcha, 100);
+      }
+    };
+    
+    // Definir função global para callback
+    if (typeof window !== 'undefined') {
+      (window as any).onCaptchaChange = onCaptchaChange;
+    }
+    
+    loadRecaptcha();
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        (window as any).onCaptchaChange = null;
+      }
+    };
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
+
+    // Verificar se reCAPTCHA foi completado (apenas em produção e se chave estiver configurada)
+    const needsCaptcha = process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (needsCaptcha && !captchaVerified) {
+      setMessage("Por favor, complete a verificação reCAPTCHA");
+      setSuccess(false);
+      setLoading(false);
+      return;
+    }
 
     // Validações básicas
     if (!formData.nomeCompleto.trim()) {
@@ -382,13 +451,29 @@ export default function CadastroPage() {
               </div>
             </div>
 
+            {/* reCAPTCHA */}
+            {!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+              <div className="w-full flex justify-center mt-6">
+                <div 
+                  className="g-recaptcha" 
+                  data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  data-callback="onCaptchaChange"
+                ></div>
+              </div>
+            )}
+
             {/* Botão de Cadastro */}
             <div className="w-full flex justify-center md:justify-end mt-8">
               <button
                 type="submit"
-                className="w-full md:w-auto px-8 md:px-12 py-3 bg-primary text-white rounded-lg text-base md:text-lg font-semibold hover:bg-primary-dark transition-all duration-300 flex items-center justify-center gap-2 hover:gap-3 shadow-lg hover:shadow-xl"
+                disabled={loading || (process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)}
+                className={`w-full md:w-auto px-8 md:px-12 py-3 ${
+                  loading || (process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-primary hover:bg-primary-dark hover:gap-3 shadow-lg hover:shadow-xl'
+                } text-white rounded-lg text-base md:text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2`}
               >
-                CADASTRAR
+                {loading ? 'CADASTRANDO...' : 'CADASTRAR'}
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>

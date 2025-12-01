@@ -98,15 +98,15 @@ export default function EditReviewForm({ reviewId }: EditReviewFormProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-gray-600">Carregando...</p>
+      <div className="bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Carregando...</p>
       </div>
     );
   }
 
   if (!review) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Avaliação não encontrada</p>
           <button
@@ -121,7 +121,7 @@ export default function EditReviewForm({ reviewId }: EditReviewFormProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="flex">
         <ProfileSidebar activePage="avaliacoes" />
         

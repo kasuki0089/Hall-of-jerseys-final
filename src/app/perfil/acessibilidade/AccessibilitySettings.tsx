@@ -32,14 +32,14 @@ export default function AccessibilitySettings() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-gray-50 flex items-center justify-center">
         <p className="text-gray-600">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <div className="flex">
         <ProfileSidebar activePage="acessibilidade" />
         

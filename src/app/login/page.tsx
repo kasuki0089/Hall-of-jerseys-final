@@ -2,7 +2,7 @@
 import { User, Lock } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -12,12 +12,83 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const router = useRouter();
+
+  // Função para verificar reCAPTCHA
+  const onCaptchaChange = async (token: string | null) => {
+    if (!token) {
+      setCaptchaVerified(false);
+      setCaptchaToken("");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/verify-recaptcha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setCaptchaVerified(true);
+        setCaptchaToken(token);
+      } else {
+        setCaptchaVerified(false);
+        setCaptchaToken("");
+        setError("Verificação reCAPTCHA falhou");
+      }
+    } catch (error) {
+      console.error('Erro na verificação reCAPTCHA:', error);
+      setCaptchaVerified(false);
+      setCaptchaToken("");
+      setError("Erro na verificação reCAPTCHA");
+    }
+  };
+
+  // Carregar reCAPTCHA quando componente montar
+  useEffect(() => {
+    const loadRecaptcha = () => {
+      if (typeof window !== 'undefined' && window.grecaptcha) {
+        window.grecaptcha.ready(() => {
+          console.log('✅ reCAPTCHA carregado');
+        });
+      } else {
+        setTimeout(loadRecaptcha, 100);
+      }
+    };
+    
+    // Definir função global para callback
+    if (typeof window !== 'undefined') {
+      (window as any).onCaptchaChange = onCaptchaChange;
+    }
+    
+    loadRecaptcha();
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        (window as any).onCaptchaChange = null;
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // Verificar se reCAPTCHA foi completado (apenas em produção e se chave estiver configurada)
+    const needsCaptcha = process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    if (needsCaptcha && !captchaVerified) {
+      setError("Por favor, complete a verificação reCAPTCHA");
+      setLoading(false);
+      return;
+    }
 
     console.log('🔑 Tentando fazer login com:', { email, temSenha: !!password });
 
@@ -133,12 +204,28 @@ export default function LoginPage() {
               </Link>
             </div>
 
+            {/* reCAPTCHA */}
+            {!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
+              <div className="flex justify-center">
+                <div 
+                  className="g-recaptcha" 
+                  data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  data-callback="onCaptchaChange"
+                ></div>
+              </div>
+            )}
+
             {/* Botão Entrar */}
             <button
               type="submit"
-              className="w-full h-12 md:h-14 bg-secondary hover:bg-secondary-dark text-white rounded-2xl text-xl md:text-2xl font-semibold tracking-wide transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] mt-6 md:mt-8"
+              disabled={loading || (process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)}
+              className={`w-full h-12 md:h-14 ${
+                loading || (process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-secondary hover:bg-secondary-dark hover:scale-[1.02] active:scale-[0.98]'
+              } text-white rounded-2xl text-xl md:text-2xl font-semibold tracking-wide transition-all duration-300 mt-6 md:mt-8`}
             >
-              Entrar
+              {loading ? 'Entrando...' : 'Entrar'}
             </button>
 
             {/* Link para Cadastro */}

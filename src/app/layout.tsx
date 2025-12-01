@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
+import Script from "next/script";
 
 import { Space_Grotesk } from "next/font/google";
 
@@ -22,6 +23,10 @@ export default function RootLayout({children}: Readonly<RootLayoutProps>) {
         <NextAuthProvider>
           {children}
         </NextAuthProvider>
+        <Script
+          src="https://www.google.com/recaptcha/api.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

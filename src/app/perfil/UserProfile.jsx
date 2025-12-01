@@ -188,7 +188,7 @@ export default function UserProfile({ session }) {
   if (loading) {
     return (
       <MainTemplate>
-        <div className="flex min-h-screen">
+        <div className="flex">
           <ProfileSidebar />
           <div className="flex-1 flex items-center justify-center">
             <p className="text-gray-500">Carregando...</p>
@@ -200,7 +200,7 @@ export default function UserProfile({ session }) {
 
   return (
     <MainTemplate>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex bg-gray-50">
         <ProfileSidebar />
 
         <main className="flex-1 p-8">

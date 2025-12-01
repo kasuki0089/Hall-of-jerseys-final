@@ -89,7 +89,7 @@ export default function AddAddress({ session }: AddAddressProps) {
 
   return (
     <MainTemplate>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex bg-gray-50">
         <ProfileSidebar />
 
         <main className="flex-1 p-8">
