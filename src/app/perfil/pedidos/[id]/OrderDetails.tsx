@@ -33,6 +33,18 @@ type Order = {
   usuario?: {
     nome: string;
     email: string;
+    telefone?: string;
+    endereco?: {
+      endereco: string;
+      numero: string;
+      complemento?: string;
+      bairro: string;
+      cidade: string;
+      cep: string;
+      estado: {
+        uf: string;
+      };
+    };
   };
   formaPagamento?: {
     tipo: string;
@@ -132,7 +144,7 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
 
   return (
     <MainTemplate>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50"/>
         <div className="flex">
           <ProfileSidebar activePage="pedidos" />
           
