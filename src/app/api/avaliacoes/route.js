@@ -1,15 +1,30 @@
 import prisma from '../../../lib/db';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
-// GET /api/avaliacoes - Listar avaliações do usuário
+// GET /api/avaliacoes - Listar avaliações do usuário ou todas (admin)
 export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const usuarioId = searchParams.get('usuarioId');
     const produtoId = searchParams.get('produtoId');
+    const isAdmin = searchParams.get('admin') === 'true';
 
     const where = {};
     if (usuarioId) where.usuarioId = parseInt(usuarioId);
     if (produtoId) where.produtoId = parseInt(produtoId);
+
+    // Se for admin, verificar autorização
+    if (isAdmin) {
+      const session = await getServerSession(authOptions);
+      if (!session || session.user?.role !== 'admin') {
+        return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores.' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      // Admin pode ver todas as avaliações sem filtro adicional
+    }
 
     const avaliacoes = await prisma.avaliacao.findMany({
       where,
@@ -26,7 +41,8 @@ export async function GET(req) {
         usuario: {
           select: {
             id: true,
-            nome: true
+            nome: true,
+            email: isAdmin
           }
         }
       },

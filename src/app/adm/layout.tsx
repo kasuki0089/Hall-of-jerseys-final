@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
+import AdminProtection from "@/components/AdminProtection";
 
 export const metadata: Metadata = {
-  title: "Login Administrativo - Hall Of Jerseys",
-  description: "Acesso administrativo da Hall Of Jerseys",
+  title: "Painel Administrativo - Hall Of Jerseys",
+  description: "Painel administrativo da Hall Of Jerseys",
 };
 
-export default function AdminLoginLayout({
+export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <AdminProtection>
+      {children}
+    </AdminProtection>
+  );
 }

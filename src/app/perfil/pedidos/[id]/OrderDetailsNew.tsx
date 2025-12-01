@@ -145,7 +145,7 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
 
   return (
     <MainTemplate>
-      <div className="min-h-screen bg-gray-50"/>
+      <div className="min-h-screen bg-gray-50">
         <div className="flex">
           <ProfileSidebar activePage="pedidos" />
           
@@ -318,8 +318,9 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
                 </div>
               </div>
             </div>
-          </div>
-        </main>
+            </div>
+          </main>
+        </div>
       </div>
     </MainTemplate>
   );

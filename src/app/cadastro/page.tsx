@@ -38,7 +38,7 @@ export default function CadastroPage() {
     } else if (name === 'telefone') {
       formattedValue = value
         .replace(/\D/g, '')
-        .replace(/(\d{2})(\d)/, '+55 ($1) $2')
+        .replace(/(\d{2})(\d)/, '($1) $2')
         .replace(/(\d{5})(\d)/, '$1-$2')
         .replace(/(-\d{4})\d+?$/, '$1');
     } else if (name === 'dataNascimento') {

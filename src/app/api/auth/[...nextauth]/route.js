@@ -48,8 +48,8 @@ export const authOptions = {
 
           // Verificar se o email foi verificado - temporariamente desabilitado para debug
           if (user.emailVerificado === false) {
-            console.log('⚠️ Email não verificado, mas permitindo login para debug');
-            // throw new Error("Email não verificado. Verifique sua caixa de entrada.");
+            console.log('⚠️ Email não verificado, permitindo login mesmo assim');
+            // Verificação de email removida para desenvolvimento local
           }
 
           console.log('✅ Login autorizado para:', user.email);

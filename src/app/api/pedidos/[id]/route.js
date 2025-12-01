@@ -26,6 +26,23 @@ export async function GET(req, { params }) {
           usuarioId: parseInt(session.user.id)
         },
         include: {
+          usuario: {
+            select: {
+              nome: true,
+              email: true,
+              telefone: true,
+              endereco: {
+                include: {
+                  estado: {
+                    select: {
+                      uf: true,
+                      nome: true
+                    }
+                  }
+                }
+              }
+            }
+          },
           itens: {
             include: {
               produto: {

@@ -53,7 +53,6 @@ export default function PedidosAdmin() {
   const [filtroStatus, setFiltroStatus] = useState('');
   const [pedidoSelecionado, setPedidoSelecionado] = useState<Pedido | null>(null);
   const [novoStatus, setNovoStatus] = useState('');
-  const [observacoes, setObservacoes] = useState('');
 
   const statusOptions = [
     { value: '', label: 'Todos os Status' },
@@ -91,7 +90,7 @@ export default function PedidosAdmin() {
     }
   };
 
-  const atualizarStatusPedido = async (pedidoId: number, status: string, obs: string = '') => {
+  const atualizarStatusPedido = async (pedidoId: number, status: string) => {
     try {
       const response = await fetch('/api/pedidos', {
         method: 'PUT',
@@ -100,8 +99,7 @@ export default function PedidosAdmin() {
         },
         body: JSON.stringify({
           pedidoId: pedidoId,
-          status: status,
-          observacoes: obs
+          status: status
         }),
       });
 
@@ -112,7 +110,6 @@ export default function PedidosAdmin() {
         carregarPedidos();
         setPedidoSelecionado(null);
         setNovoStatus('');
-        setObservacoes('');
       } else {
         alert('Erro ao atualizar status: ' + result.error);
       }
@@ -364,18 +361,8 @@ export default function PedidosAdmin() {
                       ))}
                     </select>
                   </div>
-                  <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700">Observações (opcional)</label>
-                    <input
-                      type="text"
-                      value={observacoes}
-                      onChange={(e) => setObservacoes(e.target.value)}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                      placeholder="Observações sobre a atualização..."
-                    />
-                  </div>
                   <button
-                    onClick={() => atualizarStatusPedido(pedidoSelecionado.id, novoStatus, observacoes)}
+                    onClick={() => atualizarStatusPedido(pedidoSelecionado.id, novoStatus)}
                     disabled={!novoStatus}
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >

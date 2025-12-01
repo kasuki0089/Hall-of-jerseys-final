@@ -203,6 +203,8 @@ export async function POST(request) {
       serie,
       year,
       codigo,
+      sale,
+      desconto,
       estoques // Array com {tamanhoId, quantidade}
     } = body;
 
@@ -254,7 +256,8 @@ export async function POST(request) {
           corId: parseInt(corId),
           imagemUrl: imagemUrl || null,
           ativo: true,
-          sale: false
+          sale: sale || false,
+          desconto: (sale && desconto) ? parseInt(desconto) : 0
         }
       });
 

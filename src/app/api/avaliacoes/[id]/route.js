@@ -1,4 +1,6 @@
 import prisma from '../../../../lib/db';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../../auth/[...nextauth]/route';
 
 // GET /api/avaliacoes/[id] - Buscar avaliação específica
 export async function GET(req, { params }) {
@@ -88,9 +90,18 @@ export async function PUT(req, { params }) {
   }
 }
 
-// DELETE /api/avaliacoes/[id] - Deletar avaliação
+// DELETE /api/avaliacoes/[id] - Deletar avaliação (apenas admin)
 export async function DELETE(req, { params }) {
   try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || session.user?.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem deletar avaliações.' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const { id } = await params;
 
     await prisma.avaliacao.delete({

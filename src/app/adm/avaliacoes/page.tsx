@@ -1,36 +1,22 @@
 "use client";
+import { useState, useEffect } from "react";
 import AdminTemplate from "@/templates/AdminTemplate";
-import { Star, StarHalf } from "lucide-react";
+import { Star, StarHalf, Trash2, Eye } from "lucide-react";
 
-const avaliacoesData = [
-  {
-    id: 1,
-    produto: "Regata Golden State Warriors",
-    avaliadoEm: "26/11/25",
-    avaliacao: 4.5,
-    usuario: "Daniel Pereira",
-    avaliacaoEscrita:
-      "A regata do Golden State Warriors é leve, confortável e bem-acabada, ótima para treinos ou uso casual. Com nota 4.5, destaca-se pela qualidade e estilo.",
-  },
-  {
-    id: 2,
-    produto: "Camisa Chicago Bulls - Michael Jordan #23",
-    avaliadoEm: "25/11/25",
-    avaliacao: 5,
-    usuario: "Maria Silva",
-    avaliacaoEscrita:
-      "Produto excelente! A qualidade do material é impecável e o design é fiel ao original. Recomendo muito!",
-  },
-  {
-    id: 3,
-    produto: "Regata Los Angeles Lakers - LeBron James #6",
-    avaliadoEm: "24/11/25",
-    avaliacao: 4,
-    usuario: "João Santos",
-    avaliacaoEscrita:
-      "Boa qualidade, mas o tamanho veio um pouco menor do que esperado. No geral, é um bom produto.",
-  },
-];
+interface Avaliacao {
+  id: number;
+  rating: number;
+  comentario?: string;
+  criadoEm: string;
+  usuario: {
+    nome: string;
+    email: string;
+  };
+  produto: {
+    nome: string;
+    id: number;
+  };
+}
 
 const renderStars = (rating: number) => {
   const fullStars = Math.floor(rating);
@@ -55,6 +41,69 @@ const renderStars = (rating: number) => {
 };
 
 export default function AvaliacoesPage() {
+  const [avaliacoes, setAvaliacoes] = useState<Avaliacao[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    carregarAvaliacoes();
+  }, []);
+
+  const carregarAvaliacoes = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/avaliacoes?admin=true');
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao carregar avaliações');
+      }
+      
+      setAvaliacoes(data);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const excluirAvaliacao = async (id: number) => {
+    if (!confirm('Tem certeza que deseja excluir esta avaliação?')) return;
+    
+    try {
+      const response = await fetch(`/api/avaliacoes/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao excluir avaliação');
+      }
+      
+      await carregarAvaliacoes(); // Recarregar lista
+    } catch (error: any) {
+      alert('Erro ao excluir avaliação: ' + error.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <AdminTemplate>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </AdminTemplate>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminTemplate>
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          Erro: {error}
+        </div>
+      </AdminTemplate>
+    );
+  }
   return (
     <AdminTemplate>
       {/* Header da Página */}
@@ -67,37 +116,96 @@ export default function AvaliacoesPage() {
 
       {/* Tabela de Avaliações */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                ID
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                PRODUTO
-              </th>
-              <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
-                AVALIADO EM
-              </th>
-              <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
-                AVALIAÇÃO
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                USUÁRIO
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                AVALIAÇÃO ESCRITA
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200">
-            {avaliacoesData.map((avaliacao) => (
-              <tr key={avaliacao.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 text-sm text-gray-800">
-                  #{avaliacao.id}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-800">
-                  {avaliacao.produto}
+        {avaliacoes.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-lg">Nenhuma avaliação encontrada</p>
+            <p className="text-sm">As avaliações aparecerão aqui quando os clientes avaliarem produtos</p>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                  ID
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                  PRODUTO
+                </th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                  AVALIADO EM
+                </th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                  AVALIAÇÃO
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                  USUÁRIO
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+                  COMENTÁRIO
+                </th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                  AÇÕES
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {avaliacoes.map((avaliacao) => (
+                <tr key={avaliacao.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    #{avaliacao.id}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    {avaliacao.produto.nome}
+                  </td>
+                  <td className="px-6 py-4 text-center text-sm text-gray-600">
+                    {new Date(avaliacao.criadoEm).toLocaleDateString('pt-BR')}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      {renderStars(avaliacao.rating)}
+                      <span className="text-sm font-semibold text-gray-700">
+                        {avaliacao.rating}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-800">
+                    <div>
+                      <div className="font-medium">{avaliacao.usuario.nome}</div>
+                      <div className="text-gray-500 text-xs">{avaliacao.usuario.email}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    <div className="max-w-xs">
+                      <p className="truncate">
+                        {avaliacao.comentario || 'Sem comentário'}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => window.open(`/produtos/${avaliacao.produto.id}`, '_blank')}
+                        className="text-blue-600 hover:text-blue-800 transition-colors"
+                        title="Ver produto"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => excluirAvaliacao(avaliacao.id)}
+                        className="text-red-600 hover:text-red-800 transition-colors"
+                        title="Excluir avaliação"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-800 text-center">
                   {avaliacao.avaliadoEm}

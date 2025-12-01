@@ -23,6 +23,8 @@ export default function AlterarProduto() {
   const [serie, setSerie] = useState("");
   const [year, setYear] = useState("");
   const [codigo, setCodigo] = useState("");
+  const [sale, setSale] = useState(false);
+  const [desconto, setDesconto] = useState(0);
   const [tamanhosSelecionados, setTamanhosSelecionados] = useState<{[key: number]: number}>({});
   const [imagem, setImagem] = useState<File | null>(null);
   const [imagemAtual, setImagemAtual] = useState<string>("");
@@ -86,6 +88,8 @@ export default function AlterarProduto() {
         setSerie(produtoData.serie || "");
         setYear(produtoData.year?.toString() || new Date().getFullYear().toString());
         setCodigo(produtoData.codigo || "");
+        setSale(produtoData.sale || false);
+        setDesconto(produtoData.desconto || 0);
         setImagemAtual(produtoData.imagemUrl || "");
 
         // Carregar estoques por tamanho
@@ -194,6 +198,8 @@ export default function AlterarProduto() {
           timeId: timeId ? parseInt(timeId) : null,
           corId: parseInt(corId),
           imagemUrl: imagemUrl,
+          sale: sale,
+          desconto: sale ? desconto : 0,
           estoques: estoques
         }),
       });
@@ -442,6 +448,60 @@ export default function AlterarProduto() {
             </div>
             <p className="text-xs text-gray-500 mt-2">
               Configure a quantidade disponível para cada tamanho. Deixe em 0 para não incluir o tamanho.
+            </p>
+          </div>
+
+          {/* Campo de Promoção */}
+          <div className="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-lg border border-red-200">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center">
+                <input
+                  id="sale"
+                  name="sale"
+                  type="checkbox"
+                  checked={sale}
+                  onChange={(e) => setSale(e.target.checked)}
+                  className="w-5 h-5 text-red-600 bg-white border-2 border-red-300 rounded focus:ring-red-500 focus:ring-2"
+                />
+                <label
+                  htmlFor="sale"
+                  className="ml-3 text-lg font-semibold text-red-700 cursor-pointer flex items-center gap-2"
+                >
+                  🔥 Produto em Promoção
+                </label>
+              </div>
+              {sale && (
+                <span className="bg-red-100 text-red-800 text-xs font-medium px-3 py-1 rounded-full border border-red-300 animate-pulse">
+                  🏷️ PROMOÇÃO ATIVA
+                </span>
+              )}
+            </div>
+            
+            {sale && (
+              <div className="mt-4 ml-8">
+                <label htmlFor="desconto" className="block text-sm font-medium text-red-700 mb-2">
+                  Desconto (%)
+                </label>
+                <input
+                  type="number"
+                  id="desconto"
+                  name="desconto"
+                  min="0"
+                  max="100"
+                  value={desconto}
+                  onChange={(e) => setDesconto(Number(e.target.value))}
+                  className="w-24 px-3 py-2 border border-red-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                  placeholder="0"
+                />
+                <span className="ml-2 text-sm text-red-600">
+                  {desconto > 0 && `${desconto}% de desconto`}
+                </span>
+              </div>
+            )}
+            
+            <p className="text-sm text-red-600 mt-2 ml-8">
+              Marque esta opção para destacar o produto como em promoção na loja.
+              {sale && " O produto aparecerá com badge de promoção para os clientes."}
             </p>
           </div>
 

@@ -21,7 +21,13 @@ export async function GET(req) {
     let whereClause = {};
 
     if (isAdmin) {
-      // Verificar se é admin (você pode implementar verificação de role aqui)
+      // Verificar se é admin
+      if (session.user.role !== 'admin') {
+        return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem ver todos os pedidos.' }), {
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
       if (status) {
         whereClause.status = status;
       }
@@ -267,7 +273,15 @@ export async function PUT(req) {
       });
     }
 
-    const { pedidoId, status, observacoes } = await req.json();
+    // Verificar se é admin
+    if (session.user.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem atualizar pedidos.' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const { pedidoId, status } = await req.json();
 
     if (!pedidoId || !status) {
       return new Response(JSON.stringify({ error: 'Dados obrigatórios faltando' }), {
@@ -300,9 +314,7 @@ export async function PUT(req) {
     const pedidoAtualizado = await prisma.pedido.update({
       where: { id: parseInt(pedidoId) },
       data: {
-        status: status,
-        observacoes: observacoes || null,
-        atualizadoEm: new Date()
+        status: status
       },
       include: {
         usuario: {
