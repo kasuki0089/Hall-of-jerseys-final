@@ -9,11 +9,6 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["400", "700"] 
 export const metadata: Metadata = {
   title: "Hall OF Jerseys",
   description: "Hall of Jerseys - Camisetas esportivas oficiais",
-  icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
-  },
 };
 
 type RootLayoutProps = {
