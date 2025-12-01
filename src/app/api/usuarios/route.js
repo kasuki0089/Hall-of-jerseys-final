@@ -30,10 +30,54 @@ export async function POST(req) {
       });
     }
 
+    // Sanitizar e validar inputs
+    const nomeLimpo = nome.trim();
+    const emailLimpo = email.toLowerCase().trim();
+    
+    // Validar tamanho dos campos
+    if (nomeLimpo.length < 3 || nomeLimpo.length > 100) {
+      return new Response(JSON.stringify({ 
+        error: 'Nome deve ter entre 3 e 100 caracteres' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (emailLimpo.length > 255) {
+      return new Response(JSON.stringify({ 
+        error: 'Email muito longo' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validacao de email com regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailLimpo)) {
+      return new Response(JSON.stringify({ 
+        error: 'Email invalido' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Validar senha
+    if (senha.length > 100) {
+      return new Response(JSON.stringify({ 
+        error: 'Senha muito longa' 
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Verificar se email ja existe
     console.log('🔍 Verificando se email já existe...');
     const usuarioExistente = await prisma.usuario.findUnique({
-      where: { email: email.toLowerCase().trim() }
+      where: { email: emailLimpo }
     });
 
     if (usuarioExistente) {
@@ -60,41 +104,42 @@ export async function POST(req) {
     console.log('🔐 Criptografando senha...');
     const senhaHash = await bcrypt.hash(senha, 10);
 
-    // Gerar token de verificação
-    console.log('🔑 Gerando token de verificação...');
-    const tokenVerificacao = crypto.randomBytes(32).toString('hex');
-
-    // Criar endereco se fornecido
-    let enderecoId = null;
+    // Preparar dados de endereço se fornecido
+    let enderecoData = null;
     if (endereco && endereco.endereco && endereco.numero && endereco.cidade && endereco.cep && endereco.estadoUf) {
-      const novoEndereco = await prisma.endereco.create({
-        data: {
-          endereco: endereco.endereco,
-          numero: endereco.numero,
-          complemento: endereco.complemento || null,
-          bairro: endereco.bairro || 'Centro',
-          cidade: endereco.cidade,
-          cep: endereco.cep.replace(/\D/g, ''), // Remove caracteres nao numericos
-          estadoUf: endereco.estadoUf
-        }
-      });
+      // Sanitizar dados de endereço
+      const enderecoLimpo = String(endereco.endereco).trim().substring(0, 200);
+      const numeroLimpo = String(endereco.numero).trim().substring(0, 10);
+      const complementoLimpo = endereco.complemento ? String(endereco.complemento).trim().substring(0, 100) : null;
+      const bairroLimpo = endereco.bairro ? String(endereco.bairro).trim().substring(0, 100) : 'Centro';
+      const cidadeLimpo = String(endereco.cidade).trim().substring(0, 100);
+      const cepLimpo = String(endereco.cep).replace(/\D/g, '').substring(0, 8);
+      const estadoUfLimpo = String(endereco.estadoUf).toUpperCase().trim().substring(0, 2);
       
-      enderecoId = novoEndereco.id;
+      enderecoData = {
+        create: {
+          endereco: enderecoLimpo,
+          numero: numeroLimpo,
+          complemento: complementoLimpo,
+          bairro: bairroLimpo,
+          cidade: cidadeLimpo,
+          cep: cepLimpo,
+          estadoUf: estadoUfLimpo
+        }
+      };
     }
 
     // Criar usuario
     const usuario = await prisma.usuario.create({
       data: {
-        nome,
-        email,
+        nome: nomeLimpo,
+        email: emailLimpo,
         senha: senhaHash,
-        telefone: telefone || null,
-        cpf: cpf || null,
+        telefone: telefone ? String(telefone).trim().substring(0, 20) : null,
+        cpf: cpf ? String(cpf).trim().substring(0, 14) : null,
         dataNascimento: dataNascimento ? new Date(dataNascimento) : null,
         role: 'user', // Sempre usuario comum por padrao
-        enderecoId,
-        emailVerificado: false,
-        tokenVerificacao
+        ...(enderecoData && { endereco: enderecoData })
       },
       select: {
         id: true,
@@ -102,28 +147,14 @@ export async function POST(req) {
         email: true,
         telefone: true,
         role: true,
-        emailVerificado: true,
         criadoEm: true
       }
     });
 
-    // Enviar email de verificação (simulado por enquanto)
-    try {
-      console.log('📧 Enviando email de verificação para:', email);
-      console.log('🔗 Link de verificação:', `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/verificar-email?token=${tokenVerificacao}`);
-      
-      // Descomentar quando configurar o email service
-      // await sendVerificationEmail(email, tokenVerificacao, nome);
-    } catch (emailError) {
-      console.error('Erro ao enviar email:', emailError);
-      // Não falha o cadastro se o email falhar
-    }
-
     return new Response(JSON.stringify({
       success: true,
-      message: 'Usuario criado com sucesso! Verifique seu email para ativar a conta.',
-      usuario,
-      verificacaoNecessaria: true
+      message: 'Usuario criado com sucesso! Você já pode fazer login.',
+      usuario
     }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }

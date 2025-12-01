@@ -130,9 +130,10 @@ export default function CadastroPage() {
         endereco: formData.endereco ? {
           endereco: formData.endereco,
           numero: '123', // Como não tem campo número no form, usar padrão
+          bairro: 'Centro', // Campo obrigatório no schema
           cidade: formData.cidade,
           cep: formData.cep.replace(/\D/g, ''), // Remove formatação
-          estadoUf: formData.estado.length === 2 ? formData.estado : 'SP'
+          estadoUf: formData.estado.toUpperCase().substring(0, 2) // Pega os 2 primeiros caracteres em maiúscula
         } : null
       };
 
@@ -151,11 +152,7 @@ export default function CadastroPage() {
 
       if (response.ok) {
         setSuccess(true);
-        if (result.verificacaoNecessaria) {
-          setMessage('Cadastro realizado com sucesso! Verifique seu email para ativar sua conta antes de fazer login.');
-        } else {
-          setMessage('Cadastro realizado com sucesso! Você já pode fazer login.');
-        }
+        setMessage('Cadastro realizado com sucesso! Você já pode fazer login.');
         // Limpar formulário
         setFormData({
           nomeCompleto: "",

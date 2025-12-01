@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function AvaliacoesPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions as any);
 
   if (!session) {
     redirect("/login");
