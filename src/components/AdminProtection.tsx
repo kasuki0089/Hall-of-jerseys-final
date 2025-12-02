@@ -20,7 +20,8 @@ export default function AdminProtection({ children }: AdminProtectionProps) {
       return;
     }
 
-    if (session.user?.role !== 'admin') {
+    const userRole = session.user?.role?.toUpperCase();
+    if (userRole !== 'ADMIN') {
       router.push('/');
       return;
     }

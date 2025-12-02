@@ -80,7 +80,7 @@ export default function Carousel() {
     }
   }, [bannerImages.length]);
 
-  if (loading || bannerImages.length === 0) {
+  if (loading || !Array.isArray(bannerImages) || bannerImages.length === 0) {
     return (
       <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 mx-auto max-w-[1750px] mb-8">
         <div className="w-full h-full flex items-center justify-center">
@@ -96,7 +96,6 @@ export default function Carousel() {
         {bannerImages.map((slide, index) => {
           const SlideContent = (
             <div
-              key={slide.id}
               className={`absolute inset-0 transition-opacity duration-500 ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`}
@@ -125,7 +124,9 @@ export default function Carousel() {
               {SlideContent}
             </Link>
           ) : (
-            SlideContent
+            <div key={slide.id}>
+              {SlideContent}
+            </div>
           );
         })}
 

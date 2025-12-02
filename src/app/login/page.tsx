@@ -112,7 +112,8 @@ export default function LoginPage() {
         
         if (session) {
           // Redirecionar baseado no role de usuário
-          if (session.user?.role === 'admin') {
+          const userRole = session.user?.role?.toUpperCase();
+          if (userRole === 'ADMIN') {
             console.log('👑 Redirecionando admin...');
             router.push('/adm/home');
           } else {

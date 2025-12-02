@@ -102,7 +102,6 @@ model Produto {
   serie                String?
   ativo                Boolean               @default(true)
   sale                 Boolean               @default(false)
-  desconto             Int?                  @default(0)
   imagemUrl            String?
   criadoEm             DateTime              @default(now())
   atualizadoEm         DateTime              @updatedAt
@@ -182,25 +181,25 @@ model MovimentacaoEstoque {
 }
 
 model Usuario {
-  id              Int              @id @default(autoincrement())
-  nome            String
-  email              String           @unique
-  senha              String
-  telefone           String?
-  cpf                String?
-  dataNascimento     DateTime?
-  genero             String?
-  role               String           @default("user")
-  emailVerificado    Boolean          @default(false)
-  tokenVerificacao   String?
-  criadoEm           DateTime         @default(now())
-  atualizadoEm       DateTime         @updatedAt
-  enderecoId         Int?
-  avaliacoes      Avaliacao[]
-  carrinhoItens   CarrinhoItem[]
-  formasPagamento FormaPagamento[]
-  pedidos         Pedido[]
-  endereco        Endereco?        @relation(fields: [enderecoId], references: [id])
+  id               Int              @id @default(autoincrement())
+  nome             String
+  email            String           @unique
+  senha            String
+  telefone         String?
+  cpf              String?
+  dataNascimento   DateTime?
+  genero           String?
+  role             String           @default("user")
+  criadoEm         DateTime         @default(now())
+  atualizadoEm     DateTime         @updatedAt
+  enderecoId       Int?
+  emailVerificado  Boolean          @default(false)
+  tokenVerificacao String?
+  avaliacoes       Avaliacao[]
+  carrinhoItens    CarrinhoItem[]
+  formasPagamento  FormaPagamento[]
+  pedidos          Pedido[]
+  endereco         Endereco?        @relation(fields: [enderecoId], references: [id])
 
   @@index([enderecoId], map: "usuarios_enderecoId_fkey")
   @@map("usuarios")
@@ -311,9 +310,9 @@ model Contato {
 model Carousel {
   id          Int      @id @default(autoincrement())
   titulo      String
-  descricao   String?
-  imagemUrl   String
-  linkUrl     String?
+  descricao   String?  @db.Text
+  imagemUrl   String   @db.VarChar(500)
+  linkUrl     String?  @db.VarChar(500)
   ativo       Boolean  @default(true)
   ordem       Int      @default(0)
   criadoEm    DateTime @default(now())
