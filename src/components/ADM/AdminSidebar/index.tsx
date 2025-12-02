@@ -10,8 +10,6 @@ import {
   Star, 
   MessageSquare, 
   Image as ImageIcon, 
-  List, 
-  Settings,
   HelpCircle
 } from "lucide-react";
 
@@ -25,8 +23,6 @@ const menuItems = [
   { name: "Mensagens", icon: MessageSquare, href: "/adm/mensagens" },
   { name: "Carousel", icon: ImageIcon, href: "/adm/carousel" },
   { name: "Guia de Produtos", icon: HelpCircle, href: "/adm/guia" },
-  { name: "Logs", icon: List, href: "/adm/logs" },
-  { name: "Configurações", icon: Settings, href: "/adm/configuracoes" },
 ];
 
 export default function AdminSidebar() {
