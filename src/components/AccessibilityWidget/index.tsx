@@ -10,9 +10,10 @@ import {
   Minus,
   RotateCcw
 } from 'lucide-react';
-import { notifications } from '@/components/Toast';
+import { useToast } from '@/components/Toast';
 
 export default function AccessibilityWidget() {
+  const { showToast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [settings, setSettings] = useState({
     fontSize: 100, // porcentagem
@@ -78,7 +79,7 @@ export default function AccessibilityWidget() {
 
   const openLibrasVideo = () => {
     // Simular abertura do player de Libras
-    notifications.librasActivated();
+    showToast('Funcionalidade de Libras ativada!', 'success');
     setSettings(prev => ({ ...prev, libras: !prev.libras }));
   };
 
