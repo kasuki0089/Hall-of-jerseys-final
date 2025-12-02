@@ -20,12 +20,14 @@ interface Avaliacao {
 }
 
 const renderStars = (rating: number) => {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
+  // Validar rating
+  const validRating = Math.max(0, Math.min(5, rating || 0));
+  const fullStars = Math.floor(validRating);
+  const hasHalfStar = validRating % 1 !== 0;
 
   return (
     <div className="flex items-center gap-0.5">
-      {[...Array(fullStars)].map((_, index) => (
+      {fullStars > 0 && [...Array(fullStars)].map((_, index) => (
         <Star
           key={`full-${index}`}
           className="w-4 h-4 fill-yellow-400 text-yellow-400"
@@ -60,9 +62,11 @@ export default function AvaliacoesPage() {
         throw new Error(data.error || 'Erro ao carregar avaliações');
       }
       
-      setAvaliacoes(data);
+      // Garantir que data é um array
+      setAvaliacoes(Array.isArray(data) ? data : []);
     } catch (error: any) {
       setError(error.message);
+      setAvaliacoes([]); // Definir array vazio em caso de erro
       notifications.error(error.message || 'Erro ao carregar avaliações');
     } finally {
       setLoading(false);

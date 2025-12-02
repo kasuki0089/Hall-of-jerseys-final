@@ -17,7 +17,7 @@ export async function GET(req) {
     // Se for admin, verificar autorização
     if (isAdmin) {
       const session = await getServerSession(authOptions);
-      if (!session || session.user?.role !== 'admin') {
+      if (!session || session.user?.role?.toUpperCase() !== 'ADMIN') {
         return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores.' }), {
           status: 403,
           headers: { 'Content-Type': 'application/json' }
@@ -51,7 +51,13 @@ export async function GET(req) {
       }
     });
 
-    return new Response(JSON.stringify(avaliacoes), {
+    // Adicionar campo rating como alias de nota
+    const avaliacoesFormatadas = avaliacoes.map(av => ({
+      ...av,
+      rating: av.nota
+    }));
+
+    return new Response(JSON.stringify(avaliacoesFormatadas), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });

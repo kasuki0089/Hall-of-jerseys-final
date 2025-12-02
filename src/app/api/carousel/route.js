@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 const prisma = new PrismaClient();
 
@@ -38,9 +39,9 @@ export async function GET(req) {
 // POST - Criar novo carousel (apenas admin)
 export async function POST(req) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     
-    if (!session?.user?.role || session.user.role !== 'ADMIN') {
+    if (!session?.user?.role || session.user.role?.toUpperCase() !== 'ADMIN') {
       return NextResponse.json(
         { error: 'Acesso negado' },
         { status: 403 }

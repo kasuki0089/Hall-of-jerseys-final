@@ -102,6 +102,7 @@ model Produto {
   serie                String?
   ativo                Boolean               @default(true)
   sale                 Boolean               @default(false)
+  desconto             Float                 @default(0)
   imagemUrl            String?
   criadoEm             DateTime              @default(now())
   atualizadoEm         DateTime              @updatedAt
