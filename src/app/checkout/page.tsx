@@ -132,11 +132,11 @@ export default function CheckoutPage() {
         const valorTotal = calcularTotal();
         router.push(`/pagamento?pedido=${result.pedido.id}&valor=${valorTotal}`);
       } else {
-        notifications.error('Erro ao finalizar pedido: ' + result.error);
+        showToast('Erro ao finalizar pedido: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
-      notifications.orderError();
+      showToast('Erro ao processar pedido. Tente novamente.', 'error');
     } finally {
       setProcessando(false);
     }
