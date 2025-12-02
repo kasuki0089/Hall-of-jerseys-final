@@ -321,6 +321,7 @@ export default function OrderDetails({ orderId }: OrderDetailsProps) {
           </div>
         </main>
       </div>
+      </div>
     </MainTemplate>
   );
 }
