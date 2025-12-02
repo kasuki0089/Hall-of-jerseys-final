@@ -133,6 +133,11 @@ export default function ProductsClient({ products: initialProducts }: ProductsCl
 
   return (
     <>
+      {/* Barra de Pesquisa */}
+      <div className="container mx-auto px-4 mb-6">
+        <ProductSearch onSearch={handleSearch} />
+      </div>
+
       {/* Filtros */}
       <div className="container mx-auto px-4 mb-6">
         <div className="flex gap-4 text-sm">

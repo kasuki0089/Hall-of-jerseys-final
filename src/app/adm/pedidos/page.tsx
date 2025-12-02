@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import AdminTemplate from '@/templates/AdminTemplate/index';
-import { notifications } from '@/components/Toast';
 
 interface Usuario {
   nome: string;

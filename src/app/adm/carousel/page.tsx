@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import AdminTemplate from '@/templates/AdminTemplate';
 import { useSession } from 'next-auth/react';
 import { Trash2, Edit, Plus, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
-import { notifications } from '@/components/Toast';
 
 interface Carousel {
   id: number;

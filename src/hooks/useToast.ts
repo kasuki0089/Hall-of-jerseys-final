@@ -1,3 +1,2 @@
-import { useToast as useToastHook } from '@/components/Toast';
-
-export { useToastHook as useToast };
+// Simple re-export to avoid TypeScript issues
+export { useToast } from '@/components/Toast';

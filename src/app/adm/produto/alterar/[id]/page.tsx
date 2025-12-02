@@ -7,7 +7,6 @@ import AdminInput from "@/components/ADM/AdminInput";
 import AdminFormButtons from "@/components/ADM/AdminFormButtons";
 import ImageUpload from "@/components/ADM/ImageUpload";
 import FormBox from "@/components/ADM/FormBox";
-import { notifications } from "@/components/Toast";
 
 export default function AlterarProduto() {
   const params = useParams();

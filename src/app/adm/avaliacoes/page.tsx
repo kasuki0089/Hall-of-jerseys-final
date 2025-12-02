@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import AdminTemplate from "@/templates/AdminTemplate";
 import { Star, StarHalf, Trash2, Eye } from "lucide-react";
-import { notifications } from "@/components/Toast";
 
 interface Avaliacao {
   id: number;

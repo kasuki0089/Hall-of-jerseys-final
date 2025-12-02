@@ -4,7 +4,7 @@ import { Package, Edit, Trash2, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import AddButton from "@/components/ADM/AddButton";
 import Link from "next/link";
-import { notifications } from "@/components/Toast";
+import { useToast } from "@/hooks/useToast";
 
 const PRODUCTS_PER_PAGE = 16;
 
@@ -13,6 +13,7 @@ export default function GerenciarProdutosPage() {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const showToast = useToast();
 
   useEffect(() => {
     carregarProdutos();
@@ -44,19 +45,19 @@ export default function GerenciarProdutosPage() {
       const data = await res.json();
 
       if (res.ok) {
-        notifications.success(data.message || 'Produto processado com sucesso!');
+        showToast(data.message || 'Produto processado com sucesso!', 'success');
         carregarProdutos(); // Recarrega a lista
       } else {
         if (res.status === 401) {
-          notifications.error('Você precisa fazer login como administrador.');
+          showToast('Você precisa fazer login como administrador.', 'error');
           window.location.href = '/login';
         } else {
-          notifications.error(data.error || 'Erro ao excluir produto');
+          showToast(data.error || 'Erro ao excluir produto', 'error');
         }
       }
     } catch (error) {
       console.error('Erro ao excluir produto:', error);
-      notifications.error('Erro de conexão. Tente novamente.');
+      showToast('Erro de conexão. Tente novamente.', 'error');
     }
   };
 

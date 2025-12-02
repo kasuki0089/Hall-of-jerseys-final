@@ -6,9 +6,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import MainTemplate from '@/templates/MainTemplate/Index';
-import { notifications } from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
 
 export default function Carrinho() {
+  const { showToast } = useToast();
   const { data: session } = useSession();
   const [carrinho, setCarrinho] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -71,11 +72,11 @@ export default function Carrinho() {
         setMensagem('Quantidade atualizada!');
         setTimeout(() => setMensagem(''), 3000);
       } else {
-        notifications.error('Erro ao atualizar quantidade: ' + result.error);
+        showToast('Erro ao atualizar quantidade: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('Erro ao atualizar quantidade:', error);
-      notifications.error('Erro ao atualizar quantidade');
+      showToast('Erro ao atualizar quantidade', 'error');
     } finally {
       setAtualizando(false);
     }
@@ -95,11 +96,11 @@ export default function Carrinho() {
         setMensagem('Item removido do carrinho');
         setTimeout(() => setMensagem(''), 3000);
       } else {
-        notifications.error('Erro ao remover item: ' + result.error);
+        showToast('Erro ao remover item: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('Erro ao remover item:', error);
-      notifications.error('Erro ao remover item');
+      showToast('Erro ao remover item', 'error');
     } finally {
       setAtualizando(false);
     }
@@ -123,11 +124,11 @@ export default function Carrinho() {
         setMensagem('Carrinho limpo com sucesso');
         setTimeout(() => setMensagem(''), 3000);
       } else {
-        notifications.error('Erro ao limpar carrinho: ' + result.error);
+        showToast('Erro ao limpar carrinho: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('Erro ao limpar carrinho:', error);
-      notifications.error('Erro ao limpar carrinho');
+      showToast('Erro ao limpar carrinho', 'error');
     } finally {
       setAtualizando(false);
     }
@@ -141,7 +142,7 @@ export default function Carrinho() {
 
   const finalizarCompra = () => {
     if (carrinho.length === 0) {
-      notifications.warning('Seu carrinho está vazio!');
+      showToast('Seu carrinho está vazio!', 'warning');
       return;
     }
     router.push('/checkout');

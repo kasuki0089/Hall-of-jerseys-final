@@ -9,7 +9,6 @@ import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import ReviewSection from "@/components/ReviewSection";
 import { ShoppingCart } from "lucide-react";
-import { notifications } from "@/components/Toast";
 
 export default function ProductPage() {
   const params = useParams();

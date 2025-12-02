@@ -7,7 +7,6 @@ import { useToast } from '@/hooks/useToast';
 import MainTemplate from '@/templates/MainTemplate/Index';
 import Image from 'next/image';
 import { CheckCircle, XCircle, Clock, Copy, Download } from 'lucide-react';
-import { notifications } from '@/components/Toast';
 
 interface TransacaoData {
   qrCode?: string;
@@ -61,7 +60,7 @@ export default function PagamentoPage() {
 
   const processarPagamento = async () => {
     if (!pedidoId || !valor) {
-      notifications.fillAllFields();
+      showToast('Preencha todos os campos', 'warning');
       return;
     }
 
@@ -73,7 +72,7 @@ export default function PagamentoPage() {
 
       if (formaPagamento === 'cartao') {
         if (!dadosCartao.numero || !dadosCartao.nome || !dadosCartao.validade || !dadosCartao.cvv) {
-          notifications.fillAllFields();
+          showToast('Preencha todos os campos', 'warning');
           setProcessando(false);
           return;
         }
@@ -108,11 +107,11 @@ export default function PagamentoPage() {
           }, 5000);
         }
       } else {
-        notifications.error('Erro no pagamento: ' + result.error);
+        showToast('Erro no pagamento: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('❌ Erro ao processar pagamento:', error);
-      notifications.paymentError();
+      showToast('Erro no pagamento', 'error');
     } finally {
       setProcessando(false);
     }

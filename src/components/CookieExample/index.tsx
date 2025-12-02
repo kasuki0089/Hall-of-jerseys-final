@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useCookies, useUserPreferences, useCartCookies } from '@/hooks/useCookies';
-import { notifications } from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
 
 export default function CookieExample() {
+  const { showToast } = useToast();
   const { setCookie, getCookie, removeCookie, getAllCookies } = useCookies();
   const { setTheme, getTheme, setLanguage, getLanguage } = useUserPreferences();
   const { saveCart, getCart, clearCart } = useCartCookies();
@@ -29,29 +30,29 @@ export default function CookieExample() {
 
   const handleSetCookie = () => {
     setCookie('example-cookie', cookieValue, { expires: 1 }); // 1 dia
-    notifications.cookieSet();
+    showToast('Cookie definido!', 'success');
   };
 
   const handleGetCookie = () => {
     const value = getCookie('example-cookie');
-    notifications.info(`Valor do cookie: ${value || 'Não encontrado'}`);
+    showToast(`Valor do cookie: ${value || 'Não encontrado'}`, 'info');
   };
 
   const handleRemoveCookie = () => {
     removeCookie('example-cookie');
     setCookieValue('');
-    notifications.cookieRemoved();
+    showToast('Cookie removido!', 'success');
   };
 
   const handleSetTheme = (theme: 'light' | 'dark') => {
     setTheme(theme);
     setCurrentTheme(theme);
-    notifications.themeSaved(theme);
+    showToast(`Tema ${theme} salvo!`, 'success');
   };
 
   const handleSetLanguage = () => {
     setLanguage('pt-BR');
-    notifications.languageSaved();
+    showToast('Idioma salvo!', 'success');
   };
 
   const handleAddToCart = () => {
@@ -65,19 +66,19 @@ export default function CookieExample() {
     const updatedCart = [...cartItems, newItem];
     setCartItems(updatedCart);
     saveCart(updatedCart);
-    notifications.success('Item adicionado ao carrinho!');
+    showToast('Item adicionado ao carrinho!', 'success');
   };
 
   const handleClearCart = () => {
     clearCart();
     setCartItems([]);
-    notifications.cartCleared();
+    showToast('Carrinho limpo!', 'success');
   };
 
   const showAllCookies = () => {
     const all = getAllCookies();
     console.log('Todos os cookies:', all);
-    notifications.info('Veja o console para todos os cookies');
+    showToast('Veja o console para todos os cookies', 'info');
   };
 
   return (
