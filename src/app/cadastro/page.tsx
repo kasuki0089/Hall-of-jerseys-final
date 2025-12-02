@@ -126,7 +126,7 @@ export default function CadastroPage() {
     setMessage('');
 
     // Verificar se reCAPTCHA foi completado (apenas em produção e se chave estiver configurada)
-    const needsCaptcha = process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+    const needsCaptcha = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
     if (needsCaptcha && !captchaVerified) {
       setMessage("Por favor, complete a verificação reCAPTCHA");
       setSuccess(false);
@@ -466,9 +466,9 @@ export default function CadastroPage() {
             <div className="w-full flex justify-center md:justify-end mt-8">
               <button
                 type="submit"
-                disabled={loading || (process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)}
+                disabled={loading || (!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)}
                 className={`w-full md:w-auto px-8 md:px-12 py-3 ${
-                  loading || (process.env.NODE_ENV === 'production' && !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)
+                  loading || (!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-primary hover:bg-primary-dark hover:gap-3 shadow-lg hover:shadow-xl'
                 } text-white rounded-lg text-base md:text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2`}
