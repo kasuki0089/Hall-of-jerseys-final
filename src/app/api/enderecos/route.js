@@ -1,24 +1,37 @@
 import prisma from '../../../lib/db';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '../auth/[...nextauth]/route';
 
-// GET /api/enderecos - Listar endereços
+// GET /api/enderecos - Listar endereços do usuário
 export async function GET() {
   try {
-    const enderecos = await prisma.endereco.findMany({
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return new Response(JSON.stringify({ error: 'Não autorizado' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Buscar endereços do usuário logado
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: parseInt(session.user.id) },
       include: {
-        estado: {
-          select: {
-            uf: true,
-            nome: true
-          }
-        },
-        usuarios: {
-          select: {
-            id: true,
-            nome: true
+        endereco: {
+          include: {
+            estado: {
+              select: {
+                uf: true,
+                nome: true
+              }
+            }
           }
         }
       }
     });
+
+    const enderecos = usuario?.endereco ? [usuario.endereco] : [];
 
     return new Response(JSON.stringify(enderecos), {
       status: 200,

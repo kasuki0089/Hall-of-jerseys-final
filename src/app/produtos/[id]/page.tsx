@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useToast } from "@/components/Toast";
 import MainTemplate from "@/templates/MainTemplate/Index";
 import Link from "next/link";
 import Image from "next/image";
@@ -14,6 +15,7 @@ export default function ProductPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
+  const { showToast } = useToast();
   const id = params.id as string;
   
   const [product, setProduct] = useState<any>(null);
@@ -83,13 +85,13 @@ export default function ProductPage() {
 
   const adicionarAoCarrinho = async () => {
     if (!session) {
-      notifications.loginRequired();
+      showToast('Você precisa estar logado para adicionar produtos ao carrinho.', 'warning');
       router.push('/login');
       return;
     }
 
     if (!selectedSize?.disponivel) {
-      notifications.selectSize();
+      showToast('Por favor, selecione um tamanho disponível.', 'warning');
       return;
     }
 
@@ -111,15 +113,15 @@ export default function ProductPage() {
       const result = await response.json();
 
       if (result.success) {
-        notifications.addedToCart();
+        showToast('Produto adicionado ao carrinho com sucesso!', 'success');
         // Opcional: redirecionar para o carrinho
         // router.push('/carrinho');
       } else {
-        notifications.error('Erro ao adicionar produto ao carrinho: ' + result.error);
+        showToast('Erro ao adicionar produto ao carrinho: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);
-      notifications.error('Erro ao adicionar produto ao carrinho. Tente novamente.');
+      showToast('Erro ao adicionar produto ao carrinho. Tente novamente.', 'error');
     } finally {
       setAdicionandoCarrinho(false);
     }
