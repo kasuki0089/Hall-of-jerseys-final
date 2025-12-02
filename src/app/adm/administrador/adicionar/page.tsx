@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import AdminInput from "@/components/ADM/AdminInput";
 import AdminFormButtons from "@/components/ADM/AdminFormButtons";
 import FormBox from "@/components/ADM/FormBox";
+import { notifications } from "@/components/Toast";
 
 export default function AdicionarAdministrador() {
   const [nome, setNome] = useState("");
@@ -36,10 +37,11 @@ export default function AdicionarAdministrador() {
         throw new Error(data.error || 'Erro ao criar administrador');
       }
 
-      alert('Administrador criado com sucesso!');
+      notifications.success('Administrador criado com sucesso!');
       router.push('/adm/administrador/gerenciarAdministradores');
     } catch (err: any) {
       setError(err.message);
+      notifications.error(err.message || 'Erro ao criar administrador');
     } finally {
       setLoading(false);
     }

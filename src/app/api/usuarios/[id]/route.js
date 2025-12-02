@@ -67,7 +67,7 @@ export async function DELETE(req, { params }) {
     const session = await getServerSession(authOptions);
     
     // Verificar se está autenticado e é admin
-    if (!session || session.user.role !== 'admin') {
+    if (!session || session.user.role?.toUpperCase() !== 'ADMIN') {
       return new Response(JSON.stringify({ 
         error: 'Não autorizado' 
       }), {
@@ -164,7 +164,7 @@ export async function PUT(req, { params }) {
     const data = await req.json();
 
     // Verificar se é o próprio usuário ou admin
-    if (parseInt(session.user.id) !== userId && session.user.role !== 'admin') {
+    if (parseInt(session.user.id) !== userId && session.user.role?.toUpperCase() !== 'ADMIN') {
       return new Response(JSON.stringify({ 
         error: 'Não autorizado' 
       }), {

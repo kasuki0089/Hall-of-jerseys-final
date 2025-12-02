@@ -22,7 +22,7 @@ export async function GET(req) {
 
     if (isAdmin) {
       // Verificar se é admin
-      if (session.user.role !== 'admin') {
+      if (session.user.role?.toUpperCase() !== 'ADMIN') {
         return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem ver todos os pedidos.' }), {
           status: 403,
           headers: { 'Content-Type': 'application/json' }

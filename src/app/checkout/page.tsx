@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import MainTemplate from '@/templates/MainTemplate/Index';
 import Image from 'next/image';
+import { notifications } from '@/components/Toast';
 
 interface CarrinhoItem {
   id: number;
@@ -89,13 +90,13 @@ export default function CheckoutPage() {
     try {
       // Validação básica
       if (!endereco.cep || !endereco.rua || !endereco.numero || !endereco.cidade) {
-        alert('Por favor, preencha todos os campos obrigatórios do endereço.');
+        notifications.fillAllFields();
         setProcessando(false);
         return;
       }
 
       if (pagamento.tipo === 'cartao' && (!pagamento.numero || !pagamento.nome || !pagamento.validade || !pagamento.cvv)) {
-        alert('Por favor, preencha todos os dados do cartão.');
+        notifications.fillAllFields();
         setProcessando(false);
         return;
       }
@@ -130,11 +131,11 @@ export default function CheckoutPage() {
         const valorTotal = calcularTotal();
         router.push(`/pagamento?pedido=${result.pedido.id}&valor=${valorTotal}`);
       } else {
-        alert('Erro ao finalizar pedido: ' + result.error);
+        notifications.error('Erro ao finalizar pedido: ' + result.error);
       }
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
-      alert('Erro ao finalizar pedido. Tente novamente.');
+      notifications.orderError();
     } finally {
       setProcessando(false);
     }

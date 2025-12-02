@@ -7,6 +7,7 @@ import AdminInput from "@/components/ADM/AdminInput";
 import AdminFormButtons from "@/components/ADM/AdminFormButtons";
 import ImageUpload from "@/components/ADM/ImageUpload";
 import FormBox from "@/components/ADM/FormBox";
+import { notifications } from "@/components/Toast";
 
 export default function AdicionarProduto() {
   const router = useRouter();
@@ -177,10 +178,11 @@ export default function AdicionarProduto() {
         throw new Error(data.error || 'Erro ao criar produto');
       }
 
-      alert('Produto criado com sucesso!');
+      notifications.success('Produto criado com sucesso!');
       router.push('/adm/produto/gerenciarProdutos');
     } catch (err: any) {
       setError(err.message);
+      notifications.error(err.message || 'Erro ao criar produto');
     } finally {
       setSaving(false);
     }

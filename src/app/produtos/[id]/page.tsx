@@ -8,6 +8,7 @@ import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import ReviewSection from "@/components/ReviewSection";
 import { ShoppingCart } from "lucide-react";
+import { notifications } from "@/components/Toast";
 
 export default function ProductPage() {
   const params = useParams();
@@ -82,13 +83,13 @@ export default function ProductPage() {
 
   const adicionarAoCarrinho = async () => {
     if (!session) {
-      alert('Você precisa estar logado para adicionar produtos ao carrinho.');
+      notifications.loginRequired();
       router.push('/login');
       return;
     }
 
     if (!selectedSize?.disponivel) {
-      alert('Por favor, selecione um tamanho disponível.');
+      notifications.selectSize();
       return;
     }
 
@@ -110,15 +111,15 @@ export default function ProductPage() {
       const result = await response.json();
 
       if (result.success) {
-        alert('Produto adicionado ao carrinho com sucesso!');
+        notifications.addedToCart();
         // Opcional: redirecionar para o carrinho
         // router.push('/carrinho');
       } else {
-        alert('Erro ao adicionar produto ao carrinho: ' + result.error);
+        notifications.error('Erro ao adicionar produto ao carrinho: ' + result.error);
       }
     } catch (error) {
       console.error('Erro ao adicionar ao carrinho:', error);
-      alert('Erro ao adicionar produto ao carrinho. Tente novamente.');
+      notifications.error('Erro ao adicionar produto ao carrinho. Tente novamente.');
     } finally {
       setAdicionandoCarrinho(false);
     }

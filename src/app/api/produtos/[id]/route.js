@@ -72,7 +72,7 @@ export async function PUT(req, { params }) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user.role !== 'admin') {
+    if (!session || session.user.role?.toUpperCase() !== 'ADMIN') {
       return new Response(JSON.stringify({ error: 'Acesso negado. Apenas administradores podem editar produtos.' }), { 
         status: 403,
         headers: { 'Content-Type': 'application/json' }
@@ -82,8 +82,8 @@ export async function PUT(req, { params }) {
     const { id } = await params;
     const body = await req.json();
 
-    // Extrair estoques do body se existirem
-    const { estoques, ...dadosProduto } = body;
+    // Extrair estoques e campos de relacionamento do body
+    const { estoques, ligaId, timeId, corId, ...dadosProduto } = body;
 
     // Validação básica
     if (dadosProduto.preco !== undefined && dadosProduto.preco < 0) {
@@ -93,13 +93,24 @@ export async function PUT(req, { params }) {
       });
     }
 
+    // Preparar dados do produto com relacionamentos usando connect
+    const updateData = {
+      ...dadosProduto,
+      liga: ligaId ? { connect: { id: parseInt(ligaId) } } : undefined,
+      cor: corId ? { connect: { id: parseInt(corId) } } : undefined,
+      time: timeId ? { connect: { id: parseInt(timeId) } } : { disconnect: true }
+    };
+
+    // Remover campos undefined
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
     // Usar transação se tiver estoques para atualizar
     if (estoques && Array.isArray(estoques)) {
       const resultado = await prisma.$transaction(async (tx) => {
         // Atualizar produto
         const produto = await tx.produto.update({
           where: { id: parseInt(id) },
-          data: dadosProduto
+          data: updateData
         });
 
         // Remover estoques antigos
@@ -149,7 +160,7 @@ export async function PUT(req, { params }) {
     // Se não tiver estoques, apenas atualizar o produto
     const produto = await prisma.produto.update({
       where: { id: parseInt(id) },
-      data: dadosProduto
+      data: updateData
     });
 
     return new Response(JSON.stringify(produto), { 

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useCookies, useUserPreferences, useCartCookies } from '@/hooks/useCookies';
+import { notifications } from '@/components/Toast';
 
 export default function CookieExample() {
   const { setCookie, getCookie, removeCookie, getAllCookies } = useCookies();
@@ -28,29 +29,29 @@ export default function CookieExample() {
 
   const handleSetCookie = () => {
     setCookie('example-cookie', cookieValue, { expires: 1 }); // 1 dia
-    alert('Cookie definido!');
+    notifications.cookieSet();
   };
 
   const handleGetCookie = () => {
     const value = getCookie('example-cookie');
-    alert(`Valor do cookie: ${value || 'Não encontrado'}`);
+    notifications.info(`Valor do cookie: ${value || 'Não encontrado'}`);
   };
 
   const handleRemoveCookie = () => {
     removeCookie('example-cookie');
     setCookieValue('');
-    alert('Cookie removido!');
+    notifications.cookieRemoved();
   };
 
   const handleSetTheme = (theme: 'light' | 'dark') => {
     setTheme(theme);
     setCurrentTheme(theme);
-    alert(`Tema ${theme} salvo!`);
+    notifications.themeSaved(theme);
   };
 
   const handleSetLanguage = () => {
     setLanguage('pt-BR');
-    alert('Idioma salvo!');
+    notifications.languageSaved();
   };
 
   const handleAddToCart = () => {
@@ -64,19 +65,19 @@ export default function CookieExample() {
     const updatedCart = [...cartItems, newItem];
     setCartItems(updatedCart);
     saveCart(updatedCart);
-    alert('Item adicionado ao carrinho!');
+    notifications.success('Item adicionado ao carrinho!');
   };
 
   const handleClearCart = () => {
     clearCart();
     setCartItems([]);
-    alert('Carrinho limpo!');
+    notifications.cartCleared();
   };
 
   const showAllCookies = () => {
     const all = getAllCookies();
     console.log('Todos os cookies:', all);
-    alert('Veja o console para todos os cookies');
+    notifications.info('Veja o console para todos os cookies');
   };
 
   return (

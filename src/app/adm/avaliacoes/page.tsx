@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import AdminTemplate from "@/templates/AdminTemplate";
 import { Star, StarHalf, Trash2, Eye } from "lucide-react";
+import { notifications } from "@/components/Toast";
 
 interface Avaliacao {
   id: number;
@@ -62,6 +63,7 @@ export default function AvaliacoesPage() {
       setAvaliacoes(data);
     } catch (error: any) {
       setError(error.message);
+      notifications.error(error.message || 'Erro ao carregar avaliações');
     } finally {
       setLoading(false);
     }
@@ -81,7 +83,7 @@ export default function AvaliacoesPage() {
       
       await carregarAvaliacoes(); // Recarregar lista
     } catch (error: any) {
-      alert('Erro ao excluir avaliação: ' + error.message);
+      notifications.error('Erro ao excluir avaliação: ' + error.message);
     }
   };
 

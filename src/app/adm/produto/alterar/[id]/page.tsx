@@ -7,6 +7,7 @@ import AdminInput from "@/components/ADM/AdminInput";
 import AdminFormButtons from "@/components/ADM/AdminFormButtons";
 import ImageUpload from "@/components/ADM/ImageUpload";
 import FormBox from "@/components/ADM/FormBox";
+import { notifications } from "@/components/Toast";
 
 export default function AlterarProduto() {
   const params = useParams();
@@ -210,10 +211,11 @@ export default function AlterarProduto() {
         throw new Error(data.error || 'Erro ao atualizar produto');
       }
 
-      alert('Produto atualizado com sucesso!');
+      notifications.success('Produto atualizado com sucesso!');
       router.push('/adm/produto/gerenciarProdutos');
     } catch (err: any) {
       setError(err.message);
+      notifications.error(err.message || 'Erro ao atualizar produto');
     } finally {
       setSaving(false);
     }

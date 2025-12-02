@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import MainTemplate from '@/templates/MainTemplate/Index';
 import Image from 'next/image';
 import { CheckCircle, XCircle, Clock, Copy, Download } from 'lucide-react';
+import { notifications } from '@/components/Toast';
 
 interface TransacaoData {
   qrCode?: string;
@@ -58,7 +59,7 @@ export default function PagamentoPage() {
 
   const processarPagamento = async () => {
     if (!pedidoId || !valor) {
-      alert('Dados do pedido incompletos');
+      notifications.fillAllFields();
       return;
     }
 
@@ -70,7 +71,7 @@ export default function PagamentoPage() {
 
       if (formaPagamento === 'cartao') {
         if (!dadosCartao.numero || !dadosCartao.nome || !dadosCartao.validade || !dadosCartao.cvv) {
-          alert('Por favor, preencha todos os dados do cartão');
+          notifications.fillAllFields();
           setProcessando(false);
           return;
         }
@@ -105,11 +106,11 @@ export default function PagamentoPage() {
           }, 5000);
         }
       } else {
-        alert('Erro no pagamento: ' + result.error);
+        notifications.error('Erro no pagamento: ' + result.error);
       }
     } catch (error) {
       console.error('❌ Erro ao processar pagamento:', error);
-      alert('Erro ao processar pagamento. Tente novamente.');
+      notifications.paymentError();
     } finally {
       setProcessando(false);
     }
@@ -138,7 +139,7 @@ export default function PagamentoPage() {
 
   const copiarTexto = (texto: string) => {
     navigator.clipboard.writeText(texto);
-    alert('Copiado para área de transferência!');
+    notifications.copiedToClipboard();
   };
 
   const gerarBoleto = () => {

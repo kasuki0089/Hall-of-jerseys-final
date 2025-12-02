@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import AdminTemplate from '@/templates/AdminTemplate';
 import { useSession } from 'next-auth/react';
 import { Trash2, Edit, Plus, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
+import { notifications } from '@/components/Toast';
 
 interface Carousel {
   id: number;
@@ -78,14 +79,14 @@ export default function CarouselAdmin() {
       if (response.ok) {
         await carregarCarousels();
         fecharModal();
-        alert(editingCarousel ? 'Carousel atualizado!' : 'Carousel criado!');
+        notifications.success(editingCarousel ? 'Carousel atualizado!' : 'Carousel criado!');
       } else {
         const error = await response.json();
-        alert(`Erro: ${error.error}`);
+        notifications.error(`Erro: ${error.error}`);
       }
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao salvar carousel');
+      notifications.error('Erro ao salvar carousel');
     }
   };
 
@@ -99,14 +100,14 @@ export default function CarouselAdmin() {
 
       if (response.ok) {
         await carregarCarousels();
-        alert('Carousel deletado com sucesso!');
+        notifications.success('Carousel deletado com sucesso!');
       } else {
         const error = await response.json();
-        alert(`Erro: ${error.error}`);
+        notifications.error(`Erro: ${error.error}`);
       }
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao deletar carousel');
+      notifications.error('Erro ao deletar carousel');
     }
   };
 
@@ -126,11 +127,11 @@ export default function CarouselAdmin() {
       if (response.ok) {
         await carregarCarousels();
       } else {
-        alert('Erro ao alterar status');
+        notifications.error('Erro ao alterar status');
       }
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao alterar status');
+      notifications.error('Erro ao alterar status');
     }
   };
 
@@ -152,11 +153,11 @@ export default function CarouselAdmin() {
       if (response.ok) {
         await carregarCarousels();
       } else {
-        alert('Erro ao alterar ordem');
+        notifications.error('Erro ao alterar ordem');
       }
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao alterar ordem');
+      notifications.error('Erro ao alterar ordem');
     }
   };
 

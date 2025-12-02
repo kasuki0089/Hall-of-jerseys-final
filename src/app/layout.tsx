@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
+import { ToastProvider } from "@/components/Toast";
 
 import { Space_Grotesk } from "next/font/google";
 
@@ -22,6 +23,7 @@ export default function RootLayout({children}: Readonly<RootLayoutProps>) {
       <body className={spaceGrotesk.className}>
         <NextAuthProvider>
           {children}
+          <ToastProvider />
         </NextAuthProvider>
       </body>
     </html>

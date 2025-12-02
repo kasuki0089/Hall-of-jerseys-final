@@ -6,7 +6,7 @@ export async function PATCH(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user.role !== "admin") {
+    if (!session || session.user.role?.toUpperCase() !== "ADMIN") {
       return new Response(JSON.stringify({ error: "Acesso negado" }), { 
         status: 403 
       });
@@ -46,7 +46,7 @@ export async function DELETE(request, { params }) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || session.user.role !== "admin") {
+    if (!session || session.user.role?.toUpperCase() !== "ADMIN") {
       return new Response(JSON.stringify({ error: "Acesso negado" }), { 
         status: 403 
       });

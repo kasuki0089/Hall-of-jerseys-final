@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import StarRating from '../StarRating';
 import { Send } from 'lucide-react';
+import { notifications } from '@/components/Toast';
 
 interface ReviewFormProps {
   produtoId: number;
@@ -57,7 +58,7 @@ export default function ReviewForm({ produtoId, onReviewSubmitted }: ReviewFormP
       setComentario('');
       onReviewSubmitted();
       
-      alert('Avaliação enviada com sucesso!');
+      notifications.reviewSuccess();
     } catch (err: any) {
       setError(err.message);
     } finally {

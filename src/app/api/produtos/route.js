@@ -186,7 +186,7 @@ export async function POST(request) {
     const session = await getServerSession(authOptions);
     
     // Verificar autorização de admin
-    if (!session || session.user.role !== 'admin') {
+    if (!session || session.user.role?.toUpperCase() !== 'ADMIN') {
       return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
     }
 

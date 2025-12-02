@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import AdminTemplate from '@/templates/AdminTemplate/index';
+import { notifications } from '@/components/Toast';
 
 interface Usuario {
   nome: string;
@@ -106,16 +107,16 @@ export default function PedidosAdmin() {
       const result = await response.json();
 
       if (result.success) {
-        alert('Status atualizado com sucesso!');
+        notifications.success('Status atualizado com sucesso!');
         carregarPedidos();
         setPedidoSelecionado(null);
         setNovoStatus('');
       } else {
-        alert('Erro ao atualizar status: ' + result.error);
+        notifications.error('Erro ao atualizar status: ' + result.error);
       }
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
-      alert('Erro ao atualizar status');
+      notifications.error('Erro ao atualizar status');
     }
   };
 

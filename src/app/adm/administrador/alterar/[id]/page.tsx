@@ -6,6 +6,7 @@ import { Edit } from "lucide-react";
 import AdminInput from "@/components/ADM/AdminInput";
 import AdminFormButtons from "@/components/ADM/AdminFormButtons";
 import FormBox from "@/components/ADM/FormBox";
+import { notifications } from "@/components/Toast";
 
 export default function AlterarAdministrador() {
   const params = useParams();
@@ -38,6 +39,7 @@ export default function AlterarAdministrador() {
       setTelefone(data.telefone || '');
     } catch (err: any) {
       setError(err.message);
+      notifications.error(err.message || 'Erro ao carregar administrador');
     } finally {
       setLoading(false);
     }
@@ -70,10 +72,11 @@ export default function AlterarAdministrador() {
         throw new Error(data.error || 'Erro ao atualizar administrador');
       }
 
-      alert('Administrador atualizado com sucesso!');
+      notifications.success('Administrador atualizado com sucesso!');
       router.push('/adm/administrador/gerenciarAdministradores');
     } catch (err: any) {
       setError(err.message);
+      notifications.error(err.message || 'Erro ao atualizar administrador');
     } finally {
       setSaving(false);
     }

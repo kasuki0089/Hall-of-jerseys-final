@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import MainTemplate from '@/templates/MainTemplate/Index';
+import { notifications } from '@/components/Toast';
 
 export default function Carrinho() {
   const { data: session } = useSession();
@@ -70,11 +71,11 @@ export default function Carrinho() {
         setMensagem('Quantidade atualizada!');
         setTimeout(() => setMensagem(''), 3000);
       } else {
-        alert('Erro ao atualizar quantidade: ' + result.error);
+        notifications.error('Erro ao atualizar quantidade: ' + result.error);
       }
     } catch (error) {
       console.error('Erro ao atualizar quantidade:', error);
-      alert('Erro ao atualizar quantidade');
+      notifications.error('Erro ao atualizar quantidade');
     } finally {
       setAtualizando(false);
     }
@@ -94,11 +95,11 @@ export default function Carrinho() {
         setMensagem('Item removido do carrinho');
         setTimeout(() => setMensagem(''), 3000);
       } else {
-        alert('Erro ao remover item: ' + result.error);
+        notifications.error('Erro ao remover item: ' + result.error);
       }
     } catch (error) {
       console.error('Erro ao remover item:', error);
-      alert('Erro ao remover item');
+      notifications.error('Erro ao remover item');
     } finally {
       setAtualizando(false);
     }
@@ -122,11 +123,11 @@ export default function Carrinho() {
         setMensagem('Carrinho limpo com sucesso');
         setTimeout(() => setMensagem(''), 3000);
       } else {
-        alert('Erro ao limpar carrinho: ' + result.error);
+        notifications.error('Erro ao limpar carrinho: ' + result.error);
       }
     } catch (error) {
       console.error('Erro ao limpar carrinho:', error);
-      alert('Erro ao limpar carrinho');
+      notifications.error('Erro ao limpar carrinho');
     } finally {
       setAtualizando(false);
     }
@@ -140,7 +141,7 @@ export default function Carrinho() {
 
   const finalizarCompra = () => {
     if (carrinho.length === 0) {
-      alert('Seu carrinho está vazio!');
+      notifications.warning('Seu carrinho está vazio!');
       return;
     }
     router.push('/checkout');

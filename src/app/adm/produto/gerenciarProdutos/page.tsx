@@ -4,6 +4,7 @@ import { Package, Edit, Trash2, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import AddButton from "@/components/ADM/AddButton";
 import Link from "next/link";
+import { notifications } from "@/components/Toast";
 
 const PRODUCTS_PER_PAGE = 16;
 
@@ -43,19 +44,19 @@ export default function GerenciarProdutosPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(data.message || 'Produto processado com sucesso!');
+        notifications.success(data.message || 'Produto processado com sucesso!');
         carregarProdutos(); // Recarrega a lista
       } else {
         if (res.status === 401) {
-          alert('Você precisa fazer login como administrador.');
+          notifications.error('Você precisa fazer login como administrador.');
           window.location.href = '/login';
         } else {
-          alert(data.error || 'Erro ao excluir produto');
+          notifications.error(data.error || 'Erro ao excluir produto');
         }
       }
     } catch (error) {
       console.error('Erro ao excluir produto:', error);
-      alert('Erro de conexão. Tente novamente.');
+      notifications.error('Erro de conexão. Tente novamente.');
     }
   };
 

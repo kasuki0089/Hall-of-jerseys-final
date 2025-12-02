@@ -4,6 +4,7 @@ import AdminTemplate from "@/templates/AdminTemplate";
 import { Shield, Edit, Trash2 } from "lucide-react";
 import AddButton from "@/components/ADM/AddButton";
 import Link from "next/link";
+import { notifications } from "@/components/Toast";
 
 export default function AdministradoresPage() {
   const [admins, setAdmins] = useState([]);
@@ -26,6 +27,7 @@ export default function AdministradoresPage() {
       setAdmins(data);
     } catch (err: any) {
       setError(err.message);
+      notifications.error(err.message || 'Erro ao carregar administradores');
     } finally {
       setLoading(false);
     }
@@ -47,10 +49,10 @@ export default function AdministradoresPage() {
         throw new Error(data.error || 'Erro ao deletar administrador');
       }
 
-      alert('Administrador deletado com sucesso!');
+      notifications.success('Administrador deletado com sucesso!');
       carregarAdministradores();
     } catch (err: any) {
-      alert(err.message);
+      notifications.error(err.message);
     }
   };
   return (
