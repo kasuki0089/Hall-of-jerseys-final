@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useToast } from '@/components/Toast';
 import MainTemplate from '@/templates/MainTemplate/Index';
 import Image from 'next/image';
 import { CheckCircle, XCircle, Clock, Copy, Download } from 'lucide-react';
@@ -29,6 +30,7 @@ interface Transacao {
 export default function PagamentoPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { showToast } = useToast();
   const searchParams = useSearchParams();
   const pedidoId = searchParams.get('pedido');
   const valor = searchParams.get('valor');
@@ -138,7 +140,7 @@ export default function PagamentoPage() {
 
   const copiarTexto = (texto: string) => {
     navigator.clipboard.writeText(texto);
-    alert('Copiado para área de transferência!');
+    showToast('Copiado para área de transferência!', 'success');
   };
 
   const gerarBoleto = () => {

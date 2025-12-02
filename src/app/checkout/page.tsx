@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/Toast';
 import MainTemplate from '@/templates/MainTemplate/Index';
 import Image from 'next/image';
 
@@ -31,6 +32,7 @@ interface CarrinhoItem {
 export default function CheckoutPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { showToast } = useToast();
   const [carrinho, setCarrinho] = useState<CarrinhoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [processando, setProcessando] = useState(false);
@@ -89,13 +91,13 @@ export default function CheckoutPage() {
     try {
       // Validação básica
       if (!endereco.cep || !endereco.rua || !endereco.numero || !endereco.cidade) {
-        alert('Por favor, preencha todos os campos obrigatórios do endereço.');
+        showToast('Por favor, preencha todos os campos obrigatórios do endereço.', 'warning');
         setProcessando(false);
         return;
       }
 
       if (pagamento.tipo === 'cartao' && (!pagamento.numero || !pagamento.nome || !pagamento.validade || !pagamento.cvv)) {
-        alert('Por favor, preencha todos os dados do cartão.');
+        showToast('Por favor, preencha todos os dados do cartão.', 'warning');
         setProcessando(false);
         return;
       }

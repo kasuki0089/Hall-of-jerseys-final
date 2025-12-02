@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { useToast } from '@/components/Toast';
 import StarRating from '../StarRating';
 import { Send } from 'lucide-react';
 
@@ -11,6 +12,7 @@ interface ReviewFormProps {
 
 export default function ReviewForm({ produtoId, onReviewSubmitted }: ReviewFormProps) {
   const { data: session } = useSession();
+  const { showToast } = useToast();
   const [rating, setRating] = useState(0);
   const [comentario, setComentario] = useState('');
   const [loading, setLoading] = useState(false);
@@ -57,7 +59,7 @@ export default function ReviewForm({ produtoId, onReviewSubmitted }: ReviewFormP
       setComentario('');
       onReviewSubmitted();
       
-      alert('Avaliação enviada com sucesso!');
+      showToast('Avaliação enviada com sucesso!', 'success');
     } catch (err: any) {
       setError(err.message);
     } finally {

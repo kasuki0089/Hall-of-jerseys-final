@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ShoppingCart } from "lucide-react";
 
 type ProductCardProps = {
   product: {
@@ -39,8 +40,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     : null;
 
   return (
-    <Link href={`/produtos/${product.id}`}>
-      <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer h-full flex flex-col">
+    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow h-full flex flex-col">
+      <Link href={`/produtos/${product.id}`} className="flex-grow flex flex-col">
         <div className="aspect-square bg-gray-200 rounded-t-lg relative overflow-hidden">
           <Image
             src={imagePath}
@@ -76,7 +77,17 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
         </div>
+      </Link>
+      
+      {/* Botão Comprar */}
+      <div className="p-4 pt-0">
+        <Link href={`/produtos/${product.id}`}>
+          <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]">
+            <ShoppingCart className="w-4 h-4" />
+            Comprar
+          </button>
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 }

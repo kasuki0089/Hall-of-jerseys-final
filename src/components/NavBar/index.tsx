@@ -34,7 +34,9 @@ export default function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <Search className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
+          <Link href="/produtos">
+            <Search className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
+          </Link>
           <Link href="/carrinho">
             <ShoppingCart className="w-5 h-5 cursor-pointer hover:text-secondary transition duration-500" />
           </Link>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import ProductCard from "@/components/ProductCard";
+import ProductSearch from "@/components/ProductSearch";
 
 type Product = {
   id: number;
@@ -32,6 +33,7 @@ const LEAGUES = [
 export default function ProductsClient({ products: initialProducts }: ProductsClientProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilter, setActiveFilter] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [loading, setLoading] = useState(false);
 
@@ -65,17 +67,35 @@ export default function ProductsClient({ products: initialProducts }: ProductsCl
   };
 
   const filteredProducts = useMemo(() => {
-    if (activeFilter === "ALL") {
-      return products;
+    let filtered = products;
+
+    // Filtro por liga
+    if (activeFilter !== "ALL") {
+      filtered = filtered.filter(product => {
+        const liga = product.time?.liga?.sigla;
+        return liga === activeFilter;
+      });
+    }
+
+    // Filtro por busca
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(product => {
+        const nome = product.nome?.toLowerCase() || "";
+        const liga = product.time?.liga?.sigla?.toLowerCase() || "";
+        
+        return nome.includes(query) || liga.includes(query);
+      });
     }
     
-    const filtered = products.filter(product => {
-      const liga = product.time?.liga?.sigla;
-      return liga === activeFilter;
-    });
-    
     return filtered;
-  }, [products, activeFilter]);
+  }, [products, activeFilter, searchQuery]);
+
+  // Função para lidar com a busca
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+    setCurrentPage(1); // Resetar para primeira página quando buscar
+  }, []);
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE);
   
@@ -113,6 +133,15 @@ export default function ProductsClient({ products: initialProducts }: ProductsCl
 
   return (
     <>
+      {/* Barra de pesquisa */}
+      <div className="container mx-auto px-4 mb-6">
+        <ProductSearch 
+          onSearch={handleSearch}
+          placeholder="Buscar por nome do produto ou liga..."
+          className="max-w-lg mx-auto"
+        />
+      </div>
+
       {/* Filtros */}
       <div className="container mx-auto px-4 mb-6">
         <div className="flex gap-4 text-sm">
@@ -148,17 +177,32 @@ export default function ProductsClient({ products: initialProducts }: ProductsCl
           {currentProducts.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg mb-4">
-                {filteredProducts.length === 0 
-                  ? `Nenhum produto encontrado para ${LEAGUES.find(l => l.id === activeFilter)?.name || 'esta categoria'}.`
-                  : 'Nenhum produto encontrado.'
+                {searchQuery.trim() !== "" 
+                  ? `Nenhum produto encontrado para "${searchQuery}".`
+                  : filteredProducts.length === 0 
+                    ? `Nenhum produto encontrado para ${LEAGUES.find(l => l.id === activeFilter)?.name || 'esta categoria'}.`
+                    : 'Nenhum produto encontrado.'
                 }
               </p>
-              <button
-                onClick={() => handleFilterChange('ALL')}
-                className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-              >
-                Ver todos os produtos
-              </button>
+              <div className="flex gap-3 justify-center">
+                {searchQuery.trim() !== "" && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition-colors"
+                  >
+                    Limpar busca
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    handleFilterChange('ALL');
+                    setSearchQuery("");
+                  }}
+                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors"
+                >
+                  Ver todos os produtos
+                </button>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

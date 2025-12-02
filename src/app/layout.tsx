@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NextAuthProvider } from "@/providers/NextAuthProvider";
+import { ToastProvider } from "@/components/Toast";
 import Script from "next/script";
 
 import { Space_Grotesk } from "next/font/google";
@@ -20,9 +21,11 @@ export default function RootLayout({children}: Readonly<RootLayoutProps>) {
   return (
     <html lang="pt-BR">
       <body className={spaceGrotesk.className}>
-        <NextAuthProvider>
-          {children}
-        </NextAuthProvider>
+        <ToastProvider>
+          <NextAuthProvider>
+            {children}
+          </NextAuthProvider>
+        </ToastProvider>
         <Script
           src="https://www.google.com/recaptcha/api.js"
           strategy="afterInteractive"

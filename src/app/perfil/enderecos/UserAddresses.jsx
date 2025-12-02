@@ -125,12 +125,12 @@ export default function UserAddresses({ session }) {
                   <AddressCard
                     key={endereco.id}
                     numero={index + 1}
-                    logradouro={endereco.logradouro}
+                    logradouro={endereco.endereco}
                     numeroEndereco={endereco.numero}
                     complemento={endereco.complemento}
                     bairro={endereco.bairro}
                     cidade={endereco.cidade}
-                    uf={endereco.estado?.uf || endereco.uf}
+                    uf={endereco.estado?.uf || endereco.estadoUf}
                     cep={endereco.cep}
                     onEdit={() => window.location.href = `/perfil/enderecos/editar/${endereco.id}`}
                     onDelete={() => handleDelete(endereco.id)}
