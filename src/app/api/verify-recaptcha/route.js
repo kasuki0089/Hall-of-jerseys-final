@@ -13,7 +13,7 @@ export async function POST(req) {
 
     // Verificar token com Google reCAPTCHA
     const verifyUrl = `https://www.google.com/recaptcha/api/siteverify`;
-    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LchVh4sAAAAAPoiiAY_isgmtURnwJiRoFIS60jK';
 
     if (!secretKey) {
       console.warn('⚠️ RECAPTCHA_SECRET_KEY não configurado, pulando validação');

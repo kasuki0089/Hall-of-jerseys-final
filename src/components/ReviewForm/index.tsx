@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { useToast } from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
 import StarRating from '../StarRating';
 import { Send } from 'lucide-react';
 

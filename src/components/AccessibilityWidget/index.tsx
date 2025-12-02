@@ -10,7 +10,7 @@ import {
   Minus,
   RotateCcw
 } from 'lucide-react';
-import { useToast } from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
 
 export default function AccessibilityWidget() {
   const { showToast } = useToast();

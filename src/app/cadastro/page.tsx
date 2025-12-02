@@ -125,9 +125,8 @@ export default function CadastroPage() {
     setLoading(true);
     setMessage('');
 
-    // Verificar se reCAPTCHA foi completado (apenas em produção e se chave estiver configurada)
-    const needsCaptcha = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    if (needsCaptcha && !captchaVerified) {
+    // Verificar se reCAPTCHA foi completado
+    if (!captchaVerified) {
       setMessage("Por favor, complete a verificação reCAPTCHA");
       setSuccess(false);
       setLoading(false);
@@ -452,23 +451,21 @@ export default function CadastroPage() {
             </div>
 
             {/* reCAPTCHA */}
-            {!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-              <div className="w-full flex justify-center mt-6">
-                <div 
-                  className="g-recaptcha" 
-                  data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                  data-callback="onCaptchaChange"
-                ></div>
-              </div>
-            )}
+            <div className="w-full flex justify-center mt-6">
+              <div 
+                className="g-recaptcha" 
+                data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LchVh4sAAAAACcbs9svN3DkcbYw6G1AXAUK1gSj"}
+                data-callback="onCaptchaChange"
+              ></div>
+            </div>
 
             {/* Botão de Cadastro */}
             <div className="w-full flex justify-center md:justify-end mt-8">
               <button
                 type="submit"
-                disabled={loading || (!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)}
+                disabled={loading || !captchaVerified}
                 className={`w-full md:w-auto px-8 md:px-12 py-3 ${
-                  loading || (!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)
+                  loading || !captchaVerified
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-primary hover:bg-primary-dark hover:gap-3 shadow-lg hover:shadow-xl'
                 } text-white rounded-lg text-base md:text-lg font-semibold transition-all duration-300 flex items-center justify-center gap-2`}

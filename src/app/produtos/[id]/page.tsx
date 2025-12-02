@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useToast } from "@/components/Toast";
+import { useToast } from "@/hooks/useToast";
 import MainTemplate from "@/templates/MainTemplate/Index";
 import Link from "next/link";
 import Image from "next/image";

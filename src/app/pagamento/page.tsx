@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useToast } from '@/components/Toast';
+import { useToast } from '@/hooks/useToast';
 import MainTemplate from '@/templates/MainTemplate/Index';
 import Image from 'next/image';
 import { CheckCircle, XCircle, Clock, Copy, Download } from 'lucide-react';

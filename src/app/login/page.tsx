@@ -82,9 +82,8 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    // Verificar se reCAPTCHA foi completado (se chave estiver configurada)
-    const needsCaptcha = !!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-    if (needsCaptcha && !captchaVerified) {
+    // Verificar se reCAPTCHA foi completado
+    if (!captchaVerified) {
       setError("Por favor, complete a verificação reCAPTCHA");
       setLoading(false);
       return;
@@ -206,22 +205,20 @@ export default function LoginPage() {
             </div>
 
             {/* reCAPTCHA */}
-            {!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && (
-              <div className="flex justify-center">
-                <div 
-                  className="g-recaptcha" 
-                  data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                  data-callback="onCaptchaChange"
-                ></div>
-              </div>
-            )}
+            <div className="mb-4">
+              <div 
+                className="g-recaptcha" 
+                data-sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LchVh4sAAAAACcbs9svN3DkcbYw6G1AXAUK1gSj"}
+                data-callback="onCaptchaSuccess"
+              ></div>
+            </div>
 
             {/* Botão Entrar */}
             <button
               type="submit"
-              disabled={loading || (!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)}
+              disabled={loading || !captchaVerified}
               className={`w-full h-12 md:h-14 ${
-                loading || (!!process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY && !captchaVerified)
+                loading || !captchaVerified
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-secondary hover:bg-secondary-dark hover:scale-[1.02] active:scale-[0.98]'
               } text-white rounded-2xl text-xl md:text-2xl font-semibold tracking-wide transition-all duration-300 mt-6 md:mt-8`}
