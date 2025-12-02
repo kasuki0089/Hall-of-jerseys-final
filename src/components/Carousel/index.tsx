@@ -82,7 +82,7 @@ export default function Carousel() {
 
   if (loading || !Array.isArray(bannerImages) || bannerImages.length === 0) {
     return (
-      <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 mx-auto max-w-[1750px] mb-8">
+      <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 mb-8">
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-gray-500">Carregando...</div>
         </div>
@@ -91,7 +91,7 @@ export default function Carousel() {
   }
 
   return (
-    <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 mx-auto max-w-[1750px] mb-8">
+    <section className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-gray-100 mb-8">
       <div className="relative w-full h-full">
         {bannerImages.map((slide, index) => {
           const SlideContent = (
